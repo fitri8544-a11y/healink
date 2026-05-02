@@ -129,6 +129,52 @@ function selectJenis(jenis){
 
 // DAFTAR
 document.getElementById("formDaftar").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  const nama = document.getElementById("nama").value;
+  const organisasi = document.getElementById("organisasi").value;
+  const kelas = document.getElementById("kelas").value;
+
+  // contoh jenis (ikut button cikgu)
+  const jenis = "Murid";
+
+  // 🔥 FIREBASE DULU
+  db.collection("pengunjung").add({
+    jenis, nama, organisasi, kelas,
+    masa: new Date()
+  })
+  .then(() => {
+
+    // 🔥 GOOGLE SHEETS
+    return fetch("https://script.google.com/macros/s/AKfycbzu7nTnuzmvQA322WmETt1lEqT8mdz1wfLWAcvUWHEKk59pEsdus5XVt5nnK7rS6Gbs/exec", {
+      method: "POST",
+      body: new URLSearchParams({
+        nama: nama,
+        sekolah: organisasi,
+        kelas: kelas,
+        aktiviti: "HEALINK",
+        jenis: jenis
+      })
+    });
+
+  })
+  .then(res => res.text())
+  .then(data => {
+
+    console.log("RESPONSE:", data);
+
+    alert("✅ Data berjaya direkod!");
+    window.location.href = "/";
+
+  })
+  .catch(err => {
+
+    console.error("ERROR:", err);
+
+    alert("⚠️ Sheets gagal, Firebase OK");
+  });
+
+});
 
   e.preventDefault(); // 🔥 block submit
 
