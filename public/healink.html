@@ -2399,5 +2399,27 @@ refHealink.get().then(doc => {
 
 });
 </script>
+
+<script>
+
+function setGreeting(){
+
+  const nama = sessionStorage.getItem("nama") || "Pengguna";
+
+  const jam = new Date().getHours();
+  let ucapan = "Selamat Datang";
+
+  if(jam < 12) ucapan = "Selamat Pagi";
+  else if(jam < 18) ucapan = "Selamat Petang";
+  else ucapan = "Selamat Malam";
+
+  document.getElementById("greetingHeader").innerText =
+    `${ucapan}, ${nama}`;
+}
+
+setGreeting();
+
+</script>
+
 </body>
 </html>
