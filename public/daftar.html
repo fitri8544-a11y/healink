@@ -172,8 +172,10 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
     alert("✅ Data berjaya direkod!");
 
+    // 🔥 FIX UTAMA
+    sessionStorage.setItem("sudahDaftar","yes");
     window.location.href = "healink.html";
-
+    
   })
   .catch(err => {
 
