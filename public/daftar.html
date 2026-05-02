@@ -72,7 +72,6 @@
 
 <script>
 
-// 🔥 CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
   authDomain: "bimbingankaunselingskkk.firebaseapp.com",
@@ -82,41 +81,27 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// STATE
 let jenisDipilih = "";
 
 // PILIH JENIS
 function selectJenis(jenis){
-
   jenisDipilih = jenis;
 
-  // reset semua
   document.querySelectorAll("#btnMurid, #btnGuru, #btnPelawat, #btnAdmin")
     .forEach(btn => btn.classList.remove(
       "bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400"
     ));
 
-  if(jenis === "Murid"){
-    btnMurid.classList.add("bg-green-400");
-  }
-
-  if(jenis === "Guru"){
-    btnGuru.classList.add("bg-blue-400");
-  }
-
-  if(jenis === "Pelawat"){
-    btnPelawat.classList.add("bg-yellow-400");
-  }
+  if(jenis === "Murid") btnMurid.classList.add("bg-green-400");
+  if(jenis === "Guru") btnGuru.classList.add("bg-blue-400");
+  if(jenis === "Pelawat") btnPelawat.classList.add("bg-yellow-400");
 
   if(jenis === "Admin"){
     btnAdmin.classList.add("bg-red-400");
-
-    // 🔥 TERUS KE LOGIN ADMIN
     window.location.href = "login.html";
     return;
   }
 
-  // hide/show kelas
   const kelasField = document.getElementById("kelas");
 
   if(jenis === "Guru" || jenis === "Pelawat"){
@@ -124,28 +109,50 @@ function selectJenis(jenis){
   } else {
     kelasField.style.display = "block";
   }
-
 }
 
-// DAFTAR
+// SUBMIT
 document.getElementById("formDaftar").addEventListener("submit", function(e){
   e.preventDefault();
 
-  const nama = document.getElementById("nama").value;
-  const organisasi = document.getElementById("organisasi").value;
-  const kelas = document.getElementById("kelas").value;
+  const jenis = jenisDipilih;
+  const nama = document.getElementById("nama").value.trim();
+  const organisasi = document.getElementById("organisasi").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
 
-  // contoh jenis (ikut button cikgu)
-  const jenis = "Murid";
+  // VALIDATION
+  if(!jenis){
+    alert("Sila pilih jenis pengguna");
+    return;
+  }
 
-  // 🔥 FIREBASE DULU
+  if(!nama){
+    alert("Sila isi nama");
+    return;
+  }
+
+  if(jenis === "Murid"){
+    if(!organisasi || !kelas){
+      alert("Murid wajib isi Sekolah dan Kelas");
+      return;
+    }
+  }
+
+  if(jenis === "Guru" || jenis === "Pelawat"){
+    if(!organisasi){
+      alert("Sila isi Sekolah / Organisasi");
+      return;
+    }
+  }
+
+  // FIREBASE
   db.collection("pengunjung").add({
     jenis, nama, organisasi, kelas,
     masa: new Date()
   })
   .then(() => {
 
-    // 🔥 GOOGLE SHEETS
+    // GOOGLE SHEETS (NO CORS ISSUE)
     return fetch("https://script.google.com/macros/s/AKfycbzu7nTnuzmvQA322WmETt1lEqT8mdz1wfLWAcvUWHEKk59pEsdus5XVt5nnK7rS6Gbs/exec", {
       method: "POST",
       body: new URLSearchParams({
@@ -164,7 +171,8 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
     console.log("RESPONSE:", data);
 
     alert("✅ Data berjaya direkod!");
-    window.location.href = "/";
+
+    window.location.href = "healink.html";
 
   })
   .catch(err => {
@@ -172,67 +180,11 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
     console.error("ERROR:", err);
 
     alert("⚠️ Sheets gagal, Firebase OK");
+
   });
 
 });
 
-  e.preventDefault(); // 🔥 block submit
-
-  const jenis = jenisDipilih;
-  const nama = document.getElementById("nama").value.trim();
-  const organisasi = document.getElementById("organisasi").value.trim();
-  const kelas = document.getElementById("kelas").value.trim();
-
-  console.log("VALIDATION CHECK:", jenis, nama, organisasi, kelas);
-
-  if(!jenis){
-    alert("Sila pilih jenis pengguna");
-    return;
-  }
-
-  if(!nama){
-    alert("Sila isi nama");
-    return;
-  }
-
-  if(jenis === "Murid"){
-    if(!organisasi || !kelas){
-      alert("Murid wajib isi Sekolah dan Kelas");
-      return;
-    }
-  }
-
-  if(jenis === "Guru"){
-    if(!organisasi){
-      alert("Guru wajib isi Sekolah");
-      return;
-    }
-  }
-
-  if(jenis === "Pelawat"){
-    if(!organisasi){
-      alert("Pelawat wajib isi Organisasi");
-      return;
-    }
-  }
-
-  // ✅ LULUS
-  sessionStorage.setItem("nama", nama);
-  sessionStorage.setItem("jenis", jenis);
-  sessionStorage.setItem("kelas", kelas);
-  sessionStorage.setItem("organisasi", organisasi);
-
-  // 🔥 TAMBAH INI (WAJIB)
-  sessionStorage.setItem("sudahDaftar","yes");
-
-  db.collection("pengunjung").add({
-    jenis, nama, organisasi, kelas,
-    masa: new Date()
-  });
-
-  window.location.href = "healink.html";
-
-});
 </script>
 
 </body>
