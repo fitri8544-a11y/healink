@@ -153,7 +153,7 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
   .then(() => {
 
     // GOOGLE SHEETS (NO CORS ISSUE)
-    return fetch("https://script.google.com/macros/s/AKfycbzu7nTnuzmvQA322WmETt1lEqT8mdz1wfLWAcvUWHEKk59pEsdus5XVt5nnK7rS6Gbs/exec", {
+    return fetch("https://script.google.com/macros/s/AKfycbwf33cGtv1AjGPfl-t2on1-Sa5-xc5C18lARv5Bwk2kXJqTArg3MLff8U9fhom5o9LTzQ/exec", {
       method: "POST",
       body: new URLSearchParams({
         nama: nama,
