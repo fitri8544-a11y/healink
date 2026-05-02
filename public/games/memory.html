@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>HEALINK Memory Pro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+/* 3D CARD */
+.card {
+  perspective: 1000px;
+}
+.inner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+.flipped {
+  transform: rotateY(180deg);
+}
+.front, .back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.front {
+  background: white;
+  color: black;
+  font-size: 28px;
+}
+.back {
+  background: #9333ea;
+  color: white;
+  transform: rotateY(180deg);
+  font-size: 32px;
+}
+</style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-600 to-purple-600 min-h-screen flex flex-col items-center justify-center text-white">
+
+<!-- HEADER -->
+<div class="fixed top-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
+  <button onclick="history.back()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
+  <div>🧠 Memory Pro</div>
+  <button onclick="startGame()" class="bg-red-500 px-3 py-1 rounded">⟳ Restart</button>
+</div>
+
+<div class="mt-20 text-center">
+
+<h1 class="text-2xl font-bold mb-2">🎴 Memory Emosi</h1>
+
+<!-- LEVEL -->
+<div class="mb-4">
+  <button onclick="setLevel(4)" class="bg-green-400 px-3 py-1 rounded">Mudah</button>
+  <button onclick="setLevel(6)" class="bg-yellow-400 px-3 py-1 rounded">Sederhana</button>
+  <button onclick="setLevel(8)" class="bg-red-400 px-3 py-1 rounded">Sukar</button>
+</div>
+
+<!-- SCORE -->
+<div class="mb-4">
+  ⭐ <span id="score">0</span> | ⏱️ <span id="time">0</span>s
+</div>
+
+<!-- GRID -->
+<div id="grid" class="grid gap-4"></div>
+
+</div>
+
+<!-- WIN -->
+<div id="winBox" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+  <div class="bg-white text-black p-8 rounded-xl text-center">
+    <h2 class="text-xl font-bold text-purple-600">🎉 Tahniah!</h2>
+    <p>Anda berjaya!</p>
+    <button onclick="startGame()" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded">
+      Main Lagi
+    </button>
+  </div>
+</div>
+
+<script>
+let emojisBase = ["😄","😢","😡","😎","😱","😴","😇","🤯"];
+let cards = [];
+let first = null;
+let second = null;
+let lock = false;
+let score = 0;
+let pairs = 4;
+
+// SOUND
+const flipSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const matchSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const winSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+
+// LEVEL
+function setLevel(p){
+  pairs = p;
+  startGame();
+}
+
+function startGame(){
+
+  score = 0;
+  document.getElementById("score").innerText = score;
+  document.getElementById("winBox").classList.add("hidden");
+
+  const selected = emojisBase.slice(0,pairs);
+  cards = [...selected, ...selected].sort(()=>0.5-Math.random());
+
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  grid.style.gridTemplateColumns = `repeat(${Math.sqrt(cards.length)}, 1fr)`;
+
+  cards.forEach(icon=>{
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const inner = document.createElement("div");
+    inner.className = "inner";
+
+    const front = document.createElement("div");
+    front.className = "front";
+    front.innerText = "?";
+
+    const back = document.createElement("div");
+    back.className = "back";
+    back.innerText = icon;
+
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+
+    card.onclick = ()=>flip(inner);
+
+    grid.appendChild(card);
+  });
+
+  first = null;
+  second = null;
+}
+
+// FLIP
+function flip(card){
+
+  if(lock || card.classList.contains("flipped")) return;
+
+  flipSound.play();
+  card.classList.add("flipped");
+
+  if(!first){
+    first = card;
+  } else {
+    second = card;
+    lock = true;
+    setTimeout(check, 700);
+  }
+}
+
+// CHECK
+function check(){
+  if(first.children[1].innerText === second.children[1].innerText){
+    matchSound.play();
+    score++;
+    document.getElementById("score").innerText = score;
+
+    if(score === cards.length/2){
+      winSound.play();
+      document.getElementById("winBox").classList.remove("hidden");
+    }
+
+  } else {
+    first.classList.remove("flipped");
+    second.classList.remove("flipped");
+  }
+
+  first = null;
+  second = null;
+  lock = false;
+}
+
+// TIMER
+let time = 0;
+setInterval(()=>{
+  time++;
+  document.getElementById("time").innerText = time;
+},1000);
+
+// START
+startGame();
+</script>
+
+</body>
+</html>

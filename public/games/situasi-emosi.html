@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>Situasi Emosi HEALINK</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<div class="bg-white text-gray-800 p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl text-center">
+
+  <h1 class="text-2xl font-bold mb-2">🧠 Situasi Emosi</h1>
+  <p class="text-gray-500 mb-4">Pilih tindakan terbaik berdasarkan situasi</p>
+
+  <!-- SCORE -->
+  <div class="mb-4 font-semibold">
+    ⭐ Skor: <span id="score">0</span>
+  </div>
+
+  <!-- QUESTION -->
+  <div id="question" class="text-lg font-semibold mb-6"></div>
+
+  <!-- OPTIONS -->
+  <div id="options" class="space-y-3"></div>
+
+  <!-- RESULT -->
+  <p id="result" class="mt-4 font-semibold"></p>
+
+</div>
+
+<!-- WIN -->
+<div id="winBox" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl text-center shadow-xl text-gray-800">
+
+    <h2 class="text-2xl font-bold text-purple-700 mb-3">
+      🎉 Tahniah!
+    </h2>
+
+    <p class="mb-4">Anda berjaya membuat keputusan yang baik!</p>
+
+    <p id="motivasi" class="italic text-purple-500 mb-6"></p>
+
+    <button onclick="restartGame()" 
+      class="px-6 py-2 bg-purple-600 text-white rounded-lg">
+      🔁 Main Lagi
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const situasi = [
+{
+q: "Kawan mengejek anda di kelas.",
+options: [
+{ text:"Marah balik", correct:false, msg:"Tindakan ini boleh memburukkan keadaan." },
+{ text:"Abaikan dan kekal tenang", correct:true, msg:"Bagus! Anda mengawal emosi dengan baik." },
+{ text:"Menangis", correct:false, msg:"Ini menunjukkan emosi tidak terkawal." }
+]
+},
+{
+q: "Anda gagal dalam ujian penting.",
+options: [
+{ text:"Putus asa", correct:false, msg:"Jangan mudah berputus asa." },
+{ text:"Belajar dari kesilapan", correct:true, msg:"Hebat! Ini sikap positif." },
+{ text:"Salahkan orang lain", correct:false, msg:"Ini tidak membantu perkembangan diri." }
+]
+},
+{
+q: "Rakan tidak mahu bercakap dengan anda.",
+options: [
+{ text:"Terus marah", correct:false, msg:"Ini boleh merosakkan hubungan." },
+{ text:"Tanya dengan baik", correct:true, msg:"Bagus! Komunikasi penting." },
+{ text:"Abaikan terus", correct:false, msg:"Masalah tidak akan selesai." }
+]
+}
+];
+
+let index = 0;
+let score = 0;
+
+const motivasiList = [
+"Anda semakin matang dalam mengawal emosi.",
+"Keputusan anda menunjukkan kebijaksanaan.",
+"Teruskan sikap positif ini!"
+];
+
+function loadQuestion(){
+  const q = situasi[index];
+  document.getElementById("question").innerText = q.q;
+
+  const optDiv = document.getElementById("options");
+  optDiv.innerHTML = "";
+
+  q.options.forEach(option => {
+    const btn = document.createElement("button");
+    btn.innerText = option.text;
+    btn.className = "w-full p-3 rounded-lg bg-purple-100 hover:bg-purple-200 transition";
+
+    btn.onclick = () => checkAnswer(option);
+
+    optDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(option){
+
+  document.getElementById("result").innerText = option.msg;
+
+  if(option.correct){
+    score += 10;
+  }
+
+  document.getElementById("score").innerText = score;
+
+  setTimeout(()=>{
+    index++;
+
+    if(index < situasi.length){
+      loadQuestion();
+      document.getElementById("result").innerText = "";
+    } else {
+      showWin();
+    }
+
+  }, 1200);
+}
+
+function showWin(){
+  const msg = motivasiList[Math.floor(Math.random()*motivasiList.length)];
+  document.getElementById("motivasi").innerText = msg;
+  document.getElementById("winBox").classList.remove("hidden");
+}
+
+function restartGame(){
+  location.reload();
+}
+
+loadQuestion();
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "../healink.html"; 
+}
+</script>
+
+</body>
+</html>

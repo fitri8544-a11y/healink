@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-600 flex items-center justify-center min-h-screen text-white">
+
+<div class="bg-white text-gray-800 p-8 rounded-xl text-center">
+
+<h1 class="text-xl font-bold mb-4">📊 Self Reflection</h1>
+
+<p class="mb-4">Bagaimana perasaan anda hari ini?</p>
+
+<button onclick="ans('Baik')" class="block w-full mb-2 bg-green-200 p-2 rounded">😊 Baik</button>
+<button onclick="ans('Sederhana')" class="block w-full mb-2 bg-yellow-200 p-2 rounded">😐 Sederhana</button>
+<button onclick="ans('Tidak baik')" class="block w-full bg-red-200 p-2 rounded">😞 Tidak baik</button>
+
+<p id="result" class="mt-4"></p>
+
+</div>
+
+<script>
+function ans(a){
+document.getElementById("result").innerText="Anda pilih: "+a;
+}
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "../healink.html"; 
+}
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>HEALINK Hangman</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<div class="bg-white text-gray-800 p-8 rounded-2xl shadow-xl w-[90%] max-w-xl text-center">
+
+  <h1 class="text-2xl font-bold mb-2">🔤 Hangman HEALINK</h1>
+  <p class="text-gray-500 mb-4">Teka perkataan berkaitan emosi</p>
+
+  <!-- SCORE & LIFE -->
+  <div class="flex justify-between mb-4 text-sm font-semibold">
+    <span>⭐ Skor: <span id="score">0</span></span>
+    <span>❤️ Nyawa: <span id="lives">5</span></span>
+  </div>
+
+  <!-- WORD -->
+  <div id="word" class="text-3xl tracking-widest mb-6"></div>
+
+  <!-- INPUT -->
+  <div class="flex justify-center gap-2">
+    <input id="input" maxlength="1"
+      class="border p-2 text-center w-16 text-xl rounded">
+
+    <button onclick="guess()" 
+      class="px-4 py-2 bg-purple-600 text-white rounded hover:scale-105 transition">
+      Teka
+    </button>
+  </div>
+
+  <!-- ACTION -->
+  <div class="mt-4 flex justify-center gap-2">
+    <button onclick="useHint()" 
+      class="px-4 py-1 bg-yellow-500 text-white rounded text-sm">
+      💡 Hint
+    </button>
+  </div>
+
+  <!-- RESULT -->
+  <p id="status" class="mt-4 font-semibold"></p>
+
+</div>
+
+<!-- ================= WIN POPUP ================= -->
+<div id="winBox" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl text-center shadow-xl">
+
+    <h2 class="text-2xl font-bold text-purple-700 mb-3">
+      🎉 Tahniah!
+    </h2>
+
+    <p class="mb-4">Anda berjaya!</p>
+
+    <p id="motivasi" class="italic text-purple-500 mb-6"></p>
+
+    <button onclick="restartGame()" 
+      class="px-6 py-2 bg-purple-600 text-white rounded-lg">
+      🔁 Main Lagi
+    </button>
+
+  </div>
+</div>
+
+<!-- ================= LOSE POPUP ================= -->
+<div id="loseBox" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
+
+  <div class="bg-white p-8 rounded-2xl text-center shadow-xl">
+
+    <h2 class="text-2xl font-bold text-red-600 mb-3">
+      💔 Cuba Lagi!
+    </h2>
+
+    <p id="jawapan" class="mb-4"></p>
+
+    <button onclick="restartGame()" 
+      class="px-6 py-2 bg-red-500 text-white rounded-lg">
+      🔁 Cuba Lagi
+    </button>
+
+  </div>
+</div>
+
+<script>
+const data = [
+  {word:"STRESS", hint:"Perasaan tertekan"},
+  {word:"EMOSI", hint:"Perasaan dalaman"},
+  {word:"TENANG", hint:"Keadaan damai"},
+  {word:"MARAH", hint:"Perasaan panas hati"},
+  {word:"GEMBIRA", hint:"Perasaan sangat senang"}
+];
+
+let selected = data[Math.floor(Math.random()*data.length)];
+let word = selected.word;
+let hint = selected.hint;
+
+let display = "_ ".repeat(word.length).split(" ");
+let lives = 5;
+let score = 0;
+
+const motivasiList = [
+  "Hebat! Anda mengawal emosi dengan baik.",
+  "Teruskan usaha, anda semakin kuat!",
+  "Bagus! Anda semakin memahami diri."
+];
+
+function render(){
+  document.getElementById("word").innerText = display.join(" ");
+  document.getElementById("lives").innerText = lives;
+  document.getElementById("score").innerText = score;
+}
+
+function guess(){
+  const input = document.getElementById("input").value.toUpperCase();
+  document.getElementById("input").value = "";
+
+  if(!input) return;
+
+  let correct = false;
+
+  for(let i=0;i<word.length;i++){
+    if(word[i] === input){
+      display[i] = input;
+      correct = true;
+    }
+  }
+
+  if(correct){
+    document.getElementById("status").innerText = "✅ Betul!";
+  } else {
+    lives--;
+    document.getElementById("status").innerText = "❌ Salah!";
+  }
+
+  render();
+
+  // MENANG
+  if(!display.includes("_")){
+    score += 10;
+    showWin();
+  }
+
+  // KALAH
+  if(lives <= 0){
+    showLose();
+  }
+}
+
+function useHint(){
+  document.getElementById("status").innerText = "💡 Hint: " + hint;
+}
+
+function showWin(){
+  const msg = motivasiList[Math.floor(Math.random()*motivasiList.length)];
+  document.getElementById("motivasi").innerText = msg;
+  document.getElementById("winBox").classList.remove("hidden");
+}
+
+function showLose(){
+  document.getElementById("jawapan").innerText = "Jawapan: " + word;
+  document.getElementById("loseBox").classList.remove("hidden");
+}
+
+function restartGame(){
+  location.reload();
+}
+
+render();
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "menu.html";  // ✅ balik ke menu game
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<title>Dashboard Aktiviti Pelajar</title>
+<link rel="icon" type="image/png" href="assets/admin.png">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Firebase (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+  .card { @apply bg-white/20 border border-white/20 backdrop-blur-lg rounded-2xl p-5 shadow-lg; }
+</style>
+<style>
+  body {
+    color: #ffffff;
+  }
+</style>
+<style>
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+.section-box {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(12px);
+}
+.sidebar-btn{
+  width:100%;
+  text-align:left;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:5px;
+  background:rgba(255,255,255,0.05);
+}
+.sidebar-btn:hover{
+  background:rgba(255,255,255,0.2);
+}
+
+.card{
+  background: rgba(255,255,255,0.1);
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.title{
+  font-size:16px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.label{
+  font-size:12px;
+  opacity:0.7;
+}
+.sidebar-item {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sidebar-item:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.badge {
+  font-size: 12px;
+  color: #fde047;
+  font-weight: bold;
+}
+.sidebar-item{
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover{
+  background: rgba(255,255,255,0.12);
+  transform: translateX(4px);
+}
+
+.sidebar-item.active{
+  background: linear-gradient(to right, #f59e0b, #f97316);
+  color: white;
+  font-weight: 600;
+}
+
+.badge{
+  background: #facc15;
+  color: black;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* =============== DASHBOARD BACKGROUND =============== */
+body {
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+
+  background-size: 200% 200%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* subtle glow */
+body::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99,102,241,0.25), transparent);
+  top: -80px;
+  left: -80px;
+  filter: blur(100px);
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.25), transparent);
+  bottom: -80px;
+  right: -80px;
+  filter: blur(100px);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% { transform: translateY(0px); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(-600px); opacity: 0; }
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+
+<body class="flex bg-gradient-to-br from-[#1e1b4b] via-purple-700 to-blue-600 text-white">
+
+  <!-- ================= SIDEBAR ================= -->
+  <div class="w-64 min-h-screen bg-white/10 backdrop-blur-lg p-5 border-r border-white/10">
+
+    <h2 class="text-xl font-bold mb-6">📊 Dashboard</h2>
+
+    <!-- VISITOR -->
+    <div class="bg-white/10 p-4 rounded-xl text-center mt-6 shadow-inner">
+
+      <p class="text-xs text-gray-300 uppercase tracking-wide">
+        👁️ Pelawat Portal
+      </p>
+
+      <p id="visitorCount" class="text-4xl font-extrabold text-yellow-300 mt-1">
+        5
+      </p>
+
+      <p class="text-[10px] text-green-400 mt-1 animate-pulse">
+        ● LIVE
+      </p>
+
+    </div>
+
+<!-- HEALINK VISITOR -->
+<div class="bg-white/10 p-4 rounded-xl text-center mt-4 shadow-inner">
+
+  <p class="text-xs text-gray-300 uppercase tracking-wide">
+    🧠 Pelawat HEALINK
+  </p>
+
+  <p id="visitorHealink" class="text-4xl font-extrabold text-pink-300 mt-1">
+    0
+  </p>
+
+  <p class="text-[10px] text-green-400 mt-1 animate-pulse">
+    ● LIVE
+  </p>
+
+</div>
+
+<!-- ================= ADVANCED FILTER ================= -->
+<div class="bg-white/10 p-3 rounded-xl mt-6 space-y-3">
+
+  <p class="text-xs text-gray-300 uppercase">
+    🔍 Carian Murid
+  </p>
+
+  <!-- NAMA -->
+  <input 
+    type="text" 
+    id="searchNama"
+    placeholder="Nama..."
+    class="w-full px-3 py-2 rounded bg-white/20 text-white placeholder-gray-300 outline-none">
+
+  <!-- KELAS -->
+  <select id="filterKelas" 
+    class="w-full px-3 py-2 rounded bg-purple-900 text-white outline-none">
+    <option value="">Semua Kelas</option>
+  </select>
+
+  <!-- MODUL -->
+  <select id="filterModul" 
+    class="w-full px-3 py-2 rounded bg-purple-900 text-white outline-none">
+    <option value="">Semua Modul</option>
+  </select>
+
+  <!-- RESULT -->
+  <p id="resultCount" class="text-xs text-green-300">
+    0 result
+  </p>
+
+</div>
+
+    <!-- ================= SEKOLAH ================= -->
+    <div onclick="toggleSection('sekolahList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🏫 Sekolah</span>
+      <span id="arrowSekolah">▼</span>
+    </div>
+    <div id="sekolahList" class="space-y-2 hidden"></div>
+
+    <!-- ================= KELAS ================= -->
+    <div onclick="toggleSection('kelasList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🎓 Kelas</span>
+      <span id="arrowKelas">▼</span>
+    </div>
+    <div id="kelasList" class="space-y-2 hidden"></div>
+
+    <!-- ================= ORGANISASI ================= -->
+    <div onclick="toggleSection('organisasiList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🏢 Organisasi</span>
+      <span id="arrowOrg">▼</span>
+    </div>
+    <div id="organisasiList" class="space-y-2 hidden"></div>
+
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+
+  <div class="mb-4">
+  <h2 id="greetingText"
+    class="text-lg font-semibold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
+</h2>
+</div>
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold">📊 Dashboard Aktiviti Pelajar</h1>
+        <p class="text-white/70 text-sm">Analisis penggunaan modul (Real-time)</p>
+      </div>
+
+      <button onclick="logout()" 
+        class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600">
+        🚪 Logout
+      </button>
+    </div>
+
+    <!-- FILTER TARIKH -->
+    <div class="grid md:grid-cols-3 gap-4">
+      <input id="fromDate" type="date" class="p-2 rounded text-black">
+      <input id="toDate" type="date" class="p-2 rounded text-black">
+      <button onclick="applyFilter()" 
+        class="bg-white/20 rounded-lg hover:bg-white/30">
+        Tapis Data
+      </button>
+    </div>
+
+    <!-- ================= PENGUNJUNG ================= -->
+    <div class="card">
+      <div class="title">👥 Analisis Pengunjung</div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-center">
+
+        <div class="grid grid-cols-3 text-center">
+          <div>👨‍🎓 <br><b id="kpiMurid">0</b></div>
+          <div>👨‍🏫 <br><b id="kpiGuru">0</b></div>
+          <div>👤 <br><b id="kpiPelawat">0</b></div>
+        </div>
+
+        <div class="h-40">
+          <canvas id="visitorChart"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+<!-- ================= KPI ================= -->
+<div class="grid md:grid-cols-4 gap-4">
+
+  <div class="card text-center">
+    <div class="label">Interaksi</div>
+    <b id="kpiTotal">0</b>
+  </div>
+
+  <div class="card text-center">
+    <div class="label">Modul Aktif</div>
+    <b id="kpiModules">0</b>
+  </div>
+
+  <div class="card text-center">
+    <div class="label">Top Modul</div>
+    <b id="kpiTop">-</b>
+  </div>
+
+  <div class="card text-center">
+    <div class="label">Purata</div>
+    <b id="kpiAvg">0</b>
+  </div>
+
+</div>
+
+
+<!-- ================= ALERT + LIVE ================= -->
+<div class="grid md:grid-cols-2 gap-6 mt-6 items-stretch">
+
+  <!-- ALERT -->
+  <div class="section-box flex flex-col h-[420px]">
+
+    <div class="section-title text-red-400">
+      ⚠️ Murid Perlu Perhatian
+    </div>
+
+    <!-- 🔥 SCROLL DALAM -->
+    <div id="alertList"
+         class="space-y-3 mt-4 overflow-y-auto flex-1 pr-2">
+    </div>
+
+  </div>
+
+  <!-- LIVE -->
+  <div class="card flex flex-col h-[420px]">
+
+    <div class="title">
+      📋 Aktiviti Pengguna (Live)
+    </div>
+
+    <!-- 🔥 SCROLL DALAM -->
+    <div id="activityList"
+         class="space-y-2 mt-3 overflow-y-auto flex-1 pr-2">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= CHART ================= -->
+<div class="grid md:grid-cols-2 gap-6 mt-6">
+
+  <div class="card">
+    <div class="title text-center">📊 Bar Chart</div>
+    <div class="h-64 md:h-72">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title text-center">📊 Pie Chart</div>
+    <div class="h-64 md:h-72 flex justify-center items-center">
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= RANKING ================= -->
+<div class="card mt-6">
+  <div class="title">🏆 Ranking Modul</div>
+  <div id="ranking" class="grid md:grid-cols-3 gap-4"></div>
+</div>
+
+<script>
+
+const SUPER_ADMIN = "fitrieusop@moe.gov.my";
+
+function generateGreeting(){
+
+  firebase.auth().onAuthStateChanged(user => {
+
+    let namaPaparan = "Pengguna";
+    let roleText = "";
+
+    if(user && user.email){
+
+      const email = user.email.toLowerCase();
+      const raw = email.split("@")[0];
+
+      const nama = raw.charAt(0).toUpperCase() + raw.slice(1);
+
+      // ================= ROLE LOGIC =================
+      if(email === SUPER_ADMIN){
+        roleText = "Admin";
+        namaPaparan = "Fitri";
+      }
+      else if(ADMIN_EMAILS.includes(email)){
+        roleText = "Admin";
+        namaPaparan = "";
+      }
+      else{
+        const jenis = sessionStorage.getItem("jenis");
+
+        if(jenis === "Guru"){
+          roleText = "Cikgu";
+          namaPaparan = sessionStorage.getItem("nama") || nama;
+        }
+        else if(jenis === "Murid"){
+          roleText = "";
+          namaPaparan = sessionStorage.getItem("nama") || nama;
+        }
+      }
+    }
+
+    // ================= MASA =================
+    const hour = new Date().getHours();
+
+    let greeting = "";
+
+    if(hour >= 5 && hour < 12){
+      greeting = "🌅 Selamat Pagi";
+    }
+    else if(hour >= 12 && hour < 18){
+      greeting = "🌤 Selamat Petang";
+    }
+    else{
+      greeting = "🌙 Selamat Malam";
+    }
+
+    // ================= OUTPUT =================
+    let fullText = greeting;
+
+    if(roleText && namaPaparan){
+      fullText += `, ${roleText} ${namaPaparan}`;
+    }
+    else if(roleText){
+      fullText += `, ${roleText}`;
+    }
+    else{
+      fullText += `, ${namaPaparan}`;
+    }
+
+    const el = document.getElementById("greetingText");
+
+    el.innerText = fullText;
+
+    // ================= WARNA ROLE =================
+    if(roleText === "Admin"){
+      el.className = "text-lg font-semibold text-yellow-300";
+    }
+    else if(roleText === "Cikgu"){
+      el.className = "text-lg font-semibold text-blue-300";
+    }
+    else{
+      el.className = "text-lg font-semibold text-green-300";
+    }
+
+  });
+
+}
+
+// 🔥 CONFIG (guna config cikgu)
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// STATE
+let rawData = [];
+let stats = {};
+let barChart, pieChart;
+
+// 📡 REALTIME LISTENER
+db.collection("aktivitiPelajar").onSnapshot(snapshot => {
+  rawData = [];
+  snapshot.forEach(doc => rawData.push(doc.data()));
+  computeAndRender();
+});
+
+// 🔎 FILTER TARIKH
+function applyFilter(){
+  computeAndRender();
+}
+
+function inRange(date){
+  const from = document.getElementById('fromDate').value;
+  const to   = document.getElementById('toDate').value;
+
+  if(!from && !to) return true;
+
+  const d = new Date(date?.seconds ? date.seconds*1000 : date);
+  if(from){
+    const f = new Date(from + "T00:00:00");
+    if(d < f) return false;
+  }
+  if(to){
+    const t = new Date(to + "T23:59:59");
+    if(d > t) return false;
+  }
+  return true;
+}
+
+// 🧠 COMPUTE
+function computeAndRender(){
+  stats = {};
+  let total = 0;
+
+  rawData.forEach(d => {
+    if(!inRange(d.masa)) return;
+
+    const m = d.module || "Lain";
+    if(!stats[m]) stats[m] = 0;
+    stats[m]++;
+    total++;
+  });
+
+  renderKPI(stats, total);
+  renderCharts(stats);
+  renderRanking(stats);
+}
+
+// 📊 KPI
+function renderKPI(stats, total){
+  const modules = Object.keys(stats).length;
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+  const top = sorted[0]?.[0] || "-";
+  const avg = modules ? Math.round(total/modules) : 0;
+
+  document.getElementById("kpiTotal").innerText = total;
+  document.getElementById("kpiModules").innerText = modules;
+  document.getElementById("kpiTop").innerText = top;
+  document.getElementById("kpiAvg").innerText = avg;
+}
+
+// 📈 CHART
+function renderCharts(stats){
+
+  const labels = Object.keys(stats);
+  const data = Object.values(stats);
+
+  // destroy lama
+  if(barChart) barChart.destroy();
+  if(pieChart) pieChart.destroy();
+
+  // ================= BAR =================
+  barChart = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Jumlah Klik',
+        data,
+        backgroundColor: "rgba(255,255,255,0.3)",
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // 🔥 WAJIB
+
+      plugins: {
+        legend: {
+          labels: {
+            color: "#ffffff",
+            font: { size: 12 } // kecilkan legend
+          }
+        }
+      },
+
+      scales: {
+        x: {
+          ticks: { 
+            color: "#ffffff",
+            font: { size: 10 } // kecilkan label bawah
+          }
+        },
+        y: {
+          ticks: { 
+            color: "#ffffff",
+            font: { size: 10 }
+          }
+        }
+      }
+    }
+  });
+
+
+  // ================= PIE =================
+  pieChart = new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "#60a5fa","#f87171","#fbbf24","#34d399","#a78bfa",
+          "#f472b6","#22d3ee","#facc15","#fb923c","#4ade80"
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // 🔥 WAJIB
+
+      plugins: {
+        legend: {
+          labels: {
+            color: "#ffffff",
+            font: { size: 11 } // kecilkan legend pie
+          }
+        }
+      }
+    }
+  });
+
+}
+
+// 🏆 RANKING
+function renderRanking(stats){
+  const container = document.getElementById("ranking");
+  container.innerHTML = "";
+
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+
+  sorted.forEach(([module, count], i)=>{
+    const percent = Math.round((count/max)*100);
+
+    container.innerHTML += `
+      <div class="card">
+        <div class="flex justify-between">
+          <div>#${i+1}</div>
+          <div class="text-xs">${percent}%</div>
+        </div>
+        <div class="font-bold mt-2">${module}</div>
+        <div class="text-3xl mt-1">${count}</div>
+        <div class="w-full bg-white/20 h-2 rounded mt-3">
+          <div class="h-2 rounded bg-gradient-to-r from-yellow-400 to-pink-500" style="width:${percent}%"></div>
+        </div>
+      </div>
+    `;
+  });
+}
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<script>
+const ADMIN_EMAILS = [
+  "fitrieusop@moe.gov.my",
+  "g-88050609@moe-dl.edu.my"
+];
+
+firebase.auth().onAuthStateChanged(user => {
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (!ADMIN_EMAILS.includes(user.email)) {
+    alert("Akses terhad untuk admin sahaja");
+    firebase.auth().signOut();
+    window.location.href = "login.html";
+  }
+
+});
+</script>
+
+<script>
+function logout(){
+  firebase.auth().signOut().then(()=>{
+    window.location.href = "healink.html"; // 🔥 balik ke homepage
+  });
+}
+
+let visitorChart;
+
+db.collection("pengunjung").onSnapshot(snapshot => {
+
+  let murid = 0;
+  let guru = 0;
+  let pelawat = 0;
+
+  snapshot.forEach(doc => {
+
+  const d = doc.data();  // ✅ guna d (konsisten)
+
+  // kira jenis pengguna
+  if(d.jenis === "Murid") murid++;
+  else if(d.jenis === "Guru") guru++;
+  else pelawat++;
+
+  // format masa
+  const time = d.masa?.toDate().toLocaleString('ms-MY', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }) || "-";
+
+  // contoh guna untuk display
+  console.log(d.nama, time);
+
+});
+
+  // UPDATE KPI
+  document.getElementById("kpiMurid").innerText = murid;
+  document.getElementById("kpiGuru").innerText = guru;
+  document.getElementById("kpiPelawat").innerText = pelawat;
+
+  // DESTROY CHART LAMA
+  if(visitorChart) visitorChart.destroy();
+
+  // CREATE CHART BARU
+  visitorChart = new Chart(document.getElementById("visitorChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ["Murid", "Guru", "Pelawat"],
+      datasets: [{
+        data: [murid, guru, pelawat],
+        backgroundColor: [
+          "#34d399", // hijau
+          "#60a5fa", // biru
+          "#f59e0b"  // oren
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#fff",
+            font: { size: 12 }
+          }
+        }
+      }
+    }
+  });
+
+});
+</script>
+
+<script>
+
+// ================= FILTER =================
+let currentSekolah = "all";
+let currentKelas = "all";
+
+function filterSekolah(s){
+  currentSekolah = s;
+  loadData();
+}
+
+function filterKelas(k){
+  currentKelas = k;
+  loadData();
+}
+
+// ================= LOAD DATA (KPI + FILTER) =================
+function loadData(){
+
+  db.collection("aktivitiPelajar")
+  .orderBy("masa","desc")
+  .onSnapshot(snapshot => {
+
+    let murid = 0, guru = 0, pelawat = 0;
+
+    snapshot.forEach(doc => {
+
+      const d = doc.data();
+
+      // 🔥 FILTER SEKOLAH
+      if(
+  currentSekolah !== "all" &&
+  d.organisasi?.toLowerCase().trim() !== currentSekolah.toLowerCase().trim()
+) return;
+
+      // 🔥 FILTER KELAS
+      if(
+  currentKelas !== "all" &&
+  d.kelas?.toLowerCase().trim() !== currentKelas.toLowerCase().trim()
+) return;
+
+      if(d.jenis === "Murid") murid++;
+      else if(d.jenis === "Guru") guru++;
+      else pelawat++;
+
+    });
+
+    document.getElementById("kpiMurid").innerText = murid;
+    document.getElementById("kpiGuru").innerText = guru;
+    document.getElementById("kpiPelawat").innerText = pelawat;
+
+  });
+
+}
+
+
+// ================= LIVE ACTIVITY =================
+db.collection("aktivitiPelajar")
+.orderBy("masa", "desc")
+.limit(20)
+.onSnapshot(snapshot => {
+
+  const container = document.getElementById("activityList");
+  if (!container) return;
+
+  let html = "";
+
+  // ✅ TAMBAH INI
+  const kelasSet = new Set();
+  const modulSet = new Set();
+
+  snapshot.forEach(doc => {
+
+    const d = doc.data();
+
+    // ✅ TAMBAH INI
+    kelasSet.add(d.kelas);
+    modulSet.add(d.module);
+
+    const time = d.masa?.toDate().toLocaleString('ms-MY', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) || "-";
+
+    let icon = "👤";
+    const jenis = (d.jenis || "").toString().trim().toLowerCase();
+
+    if (jenis === "murid") icon = "🧑‍🎓";
+    else if (jenis === "guru") icon = "👨‍🏫";
+    else if (jenis === "admin") icon = "🛠️";
+
+    html += `
+      <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center 
+                  hover:bg-white/20 transition duration-300"
+           data-nama="${(d.nama || '').toLowerCase()}"
+           data-kelas="${(d.kelas || '').toLowerCase()}"
+           data-modul="${(d.module || '').toLowerCase()}">
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">${icon}</span>
+            <span class="nama font-semibold text-white">
+              ${d.nama || "Pengguna"}
+            </span>
+          </div>
+
+          <div class="text-xs text-white/70 mt-1">
+            ${d.jenis || "-"} • ${d.kelas || d.organisasi || "-"}
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="text-yellow-300 font-semibold">
+            ${d.module || "-"}
+          </div>
+          <div class="text-xs text-white/60 mt-1">
+            ${time}
+          </div>
+        </div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // ✅ STEP 3 (BETUL)
+  const kelasSelect = document.getElementById("filterKelas");
+  const modulSelect = document.getElementById("filterModul");
+
+  kelasSelect.innerHTML = '<option value="">Semua Kelas</option>';
+  modulSelect.innerHTML = '<option value="">Semua Modul</option>';
+
+  kelasSet.forEach(k => {
+    if(k) kelasSelect.innerHTML += `<option value="${k.toLowerCase()}">${k}</option>`;
+  });
+
+  modulSet.forEach(m => {
+    if(m) modulSelect.innerHTML += `<option value="${m.toLowerCase()}">${m}</option>`;
+  });
+
+});
+
+
+// ================= AUTO LOAD (FINAL CLEAN VERSION) =================
+window.onload = function(){
+
+  generateGreeting(); // 👈 sini
+
+  loadData();      // ✔ dashboard utama
+  loadSidebar();   // ✔ sidebar dynamic (SEKOLAH + KELAS + ORGANISASI)
+  loadAlert();     // ✔ murid perlu perhatian
+  document.getElementById("sekolahList").classList.remove("hidden");
+
+};;
+
+// ================= SEKOLAH =================
+function loadSekolah(){
+
+  const container = document.getElementById("listSekolah");
+  if(!container) return;
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    let sekolahSet = new Set();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if(d.organisasi){
+        sekolahSet.add(d.organisasi);
+      }
+    });
+
+    container.innerHTML = "";
+
+    container.innerHTML += `
+      <button onclick="filterSekolah('all')" class="sidebar-btn">
+        Semua
+      </button>
+    `;
+
+    [...sekolahSet]
+      .map(s => s.trim())
+      .sort()
+      .forEach(sekolah => {
+
+        container.innerHTML += `
+          <button onclick="filterSekolah('${sekolah}')" class="sidebar-btn">
+            ${sekolah}
+          </button>
+        `;
+      });
+
+  });
+
+}
+
+// ================= KELAS =================
+function loadKelas(){
+
+  const container = document.getElementById("listKelas");
+  if(!container) return;
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    let kelasSet = new Set();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if(d.kelas){
+        kelasSet.add(d.kelas);
+      }
+    });
+
+    container.innerHTML = "";
+
+    container.innerHTML += `
+      <button onclick="filterKelas('all')" class="sidebar-btn">
+        Semua
+      </button>
+    `;
+
+    [...kelasSet]
+      .map(k => k.trim())
+      .sort()
+      .forEach(kelas => {
+
+        container.innerHTML += `
+          <button onclick="filterKelas('${kelas}')" class="sidebar-btn">
+            ${kelas}
+          </button>
+        `;
+      });
+
+  });
+
+}
+
+firebase.auth().onAuthStateChanged(user => {
+
+  if(!user){
+    window.location.href = "index.html"; // block access
+  }
+
+});
+
+function loadAlert(){
+
+  const container = document.getElementById("alertList");
+
+  db.collection("aktivitiPelajar")
+  .orderBy("masa","desc") // 🔥 TAMBAH INI
+  .limit(10)
+  .onSnapshot(snapshot => {
+
+    let html = "";
+
+    snapshot.forEach(doc => {
+
+      const d = doc.data();
+
+      if(d.perluPerhatian !== true) return; // 🔥 filter sini
+
+      html += `
+  <div onclick="openDetail(
+    '${(d.nama||'').replace(/'/g,"")}',
+    '${(d.kelas||d.organisasi||'')}',
+    '${(d.module||'')}',
+    '${(d.komen||'').replace(/'/g,"")}'
+  )"
+  class="cursor-pointer bg-red-500/20 border border-red-400 p-4 rounded-xl hover:bg-red-500/30 transition">
+
+    <div class="font-bold text-white">
+      ⚠️ ${d.nama || "Tanpa Nama"}
+    </div>
+
+    <div class="text-sm text-white/80">
+      ${d.kelas || d.organisasi || "-"}
+    </div>
+
+    <div class="text-xs text-red-300 mt-1">
+      Modul: ${d.module || "-"}
+    </div>
+
+  </div>
+`;
+    });
+
+    container.innerHTML = html;
+
+  }, err => {
+    console.error("❌ FIRESTORE ERROR:", err);
+  });
+
+}
+
+console.log("🔥 ALERT LOADED");
+
+function openDetail(nama, kelas, module, komen){
+
+  console.log("CLICK DETECTED:", nama);
+
+  const modal = document.getElementById("detailModal");
+  const content = document.getElementById("detailContent");
+
+  if(!modal || !content){
+    console.error("❌ MODAL TAK JUMPA");
+    return;
+  }
+
+  content.innerHTML = `
+  <b>Nama:</b> ${nama}<br>
+  <b>Kelas:</b> ${kelas}<br>
+  <b>Modul:</b> ${module}<br><br>
+
+  <b>📝 Luahan Murid:</b>
+  <div class="bg-gray-100 text-black p-3 rounded mt-2 text-left">
+    ${komen || "Tiada maklumat"}
+  </div>
+
+  <br>
+  <span class="text-red-500 font-semibold">
+    ⚠️ Murid ini memerlukan perhatian
+  </span>
+`;
+
+  modal.classList.remove("hidden");
+
+}
+function closeDetail(){
+  document.getElementById("detailModal").classList.add("hidden");
+}
+
+function loadSidebar(){
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    const sekolahCount = {};
+    const kelasCount = {};
+    const organisasiCount = {};
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+
+      const orgRaw = (d.organisasi || "").toUpperCase().trim();
+      const kelas = (d.kelas || "-").toUpperCase();
+
+      // ================= CLASSIFY =================
+      let kategori = "LAIN";
+
+      if(
+        orgRaw.includes("SK") ||
+        orgRaw.includes("SMK") ||
+        orgRaw.includes("SJKC") ||
+        orgRaw.includes("SJKT")
+      ){
+        kategori = "SEKOLAH";
+      }
+      else if(
+        orgRaw.includes("PPD") ||
+        orgRaw.includes("JPN")
+      ){
+        kategori = "ORGANISASI";
+      }
+
+      // ================= COUNT =================
+      if(kategori === "SEKOLAH"){
+        sekolahCount[orgRaw] = (sekolahCount[orgRaw] || 0) + 1;
+      }
+
+      if(kategori === "ORGANISASI"){
+        organisasiCount[orgRaw] = (organisasiCount[orgRaw] || 0) + 1;
+      }
+
+      if(kategori === "LAIN"){
+        organisasiCount["LAIN-LAIN"] = (organisasiCount["LAIN-LAIN"] || 0) + 1;
+      }
+
+      // kelas semua
+      kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
+    });
+
+    // ================= SEKOLAH =================
+    let htmlSekolah = `
+      <div onclick="filterSekolah('all')" 
+           class="sidebar-item flex justify-between cursor-pointer">
+        <span>Semua</span>
+        <span class="badge">${snapshot.size}</span>
+      </div>
+    `;
+
+    Object.keys(sekolahCount)
+    .sort((a,b) => sekolahCount[b] - sekolahCount[a])
+    .forEach(s => {
+      htmlSekolah += `
+        <div onclick="filterSekolah('${s}')" 
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>${s}</span>
+          <span class="badge">${sekolahCount[s]}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("sekolahList").innerHTML = htmlSekolah;
+
+    // ================= KELAS =================
+    let htmlKelas = "";
+
+    Object.keys(kelasCount)
+    .sort((a,b) => kelasCount[b] - kelasCount[a])
+    .forEach(k => {
+      htmlKelas += `
+        <div onclick="filterKelas('${k}')" 
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>${k}</span>
+          <span class="badge">${kelasCount[k]}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("kelasList").innerHTML = htmlKelas;
+
+    // ================= ORGANISASI =================
+    let htmlOrg = "";
+
+    Object.keys(organisasiCount)
+    .sort((a,b) => organisasiCount[b] - organisasiCount[a])
+    .forEach(o => {
+      htmlOrg += `
+        <div class="sidebar-item flex justify-between cursor-pointer">
+          <span>${o}</span>
+          <span class="badge">${organisasiCount[o]}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("organisasiList").innerHTML = htmlOrg;
+
+  });
+}
+
+function toggleSection(id){
+
+  const el = document.getElementById(id);
+  const arrow = document.querySelector(`[onclick*="${id}"] span:last-child`);
+
+  el.classList.toggle("hidden");
+
+  if(el.classList.contains("hidden")){
+    arrow.innerText = "▶";
+  } else {
+    arrow.innerText = "▼";
+  }
+}
+</script>
+
+<!-- LETAK SEBELUM </body> -->
+<div id="detailModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-md text-center">
+
+    <h2 class="text-xl font-bold mb-4 text-black">
+      📋 Maklumat Murid
+    </h2>
+
+    <div id="detailContent" class="text-black text-sm"></div>
+
+    <button onclick="closeDetail()" 
+      class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg">
+      Tutup
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const particles = document.getElementById("particles");
+
+for(let i=0; i<15; i++){
+  const p = document.createElement("div");
+  p.classList.add("particle");
+
+  p.style.left = Math.random()*100 + "%";
+  p.style.top = Math.random()*100 + "%";
+  p.style.animationDuration = (8 + Math.random()*10) + "s";
+
+  particles.appendChild(p);
+}
+</script>
+
+<script>
+const refVisitor = db.collection("stats").doc("visitors");
+
+refVisitor.onSnapshot(doc => {
+  if (doc.exists) {
+    document.getElementById("visitorCount").innerText = doc.data().count;
+  }
+});
+</script>
+
+<script>
+const list = document.getElementById("aktivitiList");
+
+// ambil data dari Firestore (guna collection pengunjung Cikgu)
+db.collection("pengunjung")
+  .orderBy("masa", "desc")
+  .limit(20)
+  .onSnapshot(snapshot => {
+
+    list.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const item = doc.data();
+
+      const nama = (item.nama || "").toLowerCase();
+      const kelas = item.kelas || "-";
+      const aktiviti = item.jenis || "-";
+
+      list.innerHTML += `
+        <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center"
+             data-nama="${nama}">
+
+          <div>
+            <p class="font-bold text-white">${item.nama || "TIADA NAMA"}</p>
+            <p class="text-xs text-gray-300">${kelas}</p>
+          </div>
+
+          <div class="text-sm text-yellow-300 font-semibold">
+            ${aktiviti}
+          </div>
+
+        </div>
+      `;
+    });
+
+  });
+</script>
+
+<script>
+document.getElementById("searchNama").addEventListener("keyup", function() {
+
+  const keyword = this.value.toLowerCase();
+  const items = document.querySelectorAll(".user-item");
+
+  items.forEach(item => {
+    const nama = item.getAttribute("data-nama");
+
+    if (nama.includes(keyword)) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+});
+
+function applyFilter() {
+
+  const nama = document.getElementById("searchNama").value.toLowerCase();
+  const kelas = document.getElementById("filterKelas").value;
+  const modul = document.getElementById("filterModul").value;
+
+  const items = document.querySelectorAll(".user-item");
+
+  let count = 0;
+
+  items.forEach(item => {
+
+    const n = item.dataset.nama;
+    const k = item.dataset.kelas;
+    const m = item.dataset.modul;
+
+    const matchNama = n.includes(nama);
+    const matchKelas = !kelas || k === kelas;
+    const matchModul = !modul || m === modul;
+
+    if (matchNama && matchKelas && matchModul) {
+      item.style.display = "flex";
+      count++;
+
+      // highlight nama
+      const namaEl = item.querySelector(".nama");
+      namaEl.innerHTML = nama 
+        ? namaEl.textContent.replace(new RegExp(nama, "gi"), 
+          match => `<span class="bg-yellow-400 text-black px-1 rounded">${match}</span>`)
+        : namaEl.textContent;
+
+    } else {
+      item.style.display = "none";
+    }
+
+  });
+
+  document.getElementById("resultCount").innerText = `${count} result`;
+
+}
+
+// EVENT
+document.getElementById("searchNama").addEventListener("keyup", applyFilter);
+document.getElementById("filterKelas").addEventListener("change", applyFilter);
+document.getElementById("filterModul").addEventListener("change", applyFilter);
+</script>
+
+<script>
+const refHealink = db.collection("stats").doc("visitors_healink");
+
+refHealink.onSnapshot(doc => {
+  if (doc.exists) {
+    const el = document.getElementById("visitorHealink");
+    if (el) {
+      el.innerText = doc.data().count;
+    }
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const refVisitor = db.collection("stats").doc("visitors_healink");
+const refAktiviti = db.collection("aktivitiPelajar");
+
+let chart;
+
+// ambil data real-time
+refAktiviti.onSnapshot(snapshot => {
+
+  let murid = 0;
+  let guru = 0;
+
+  snapshot.forEach(doc => {
+    const d = doc.data();
+    const jenis = (d.jenis || "").toLowerCase();
+
+    if (jenis === "murid") murid++;
+    if (jenis === "guru") guru++;
+  });
+
+  // ambil visitor
+  refVisitor.get().then(doc => {
+    const pelawat = doc.exists ? doc.data().count : 0;
+
+    updateChart(murid, guru, pelawat);
+  });
+
+});
+
+
+function updateChart(murid, guru, pelawat){
+
+  const ctx = document.getElementById("healinkChart").getContext("2d");
+
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Murid', 'Guru', 'Pelawat'],
+      datasets: [{
+        label: 'Jumlah',
+        data: [murid, guru, pelawat],
+        backgroundColor: [
+          '#3b82f6', // murid
+          '#22c55e', // guru
+          '#facc15'  // pelawat
+        ],
+        borderRadius: 10
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<div class="bg-white text-gray-800 p-8 rounded-xl text-center">
+
+<h1 class="text-xl font-bold mb-4">🔍 Cari Perkataan</h1>
+
+<p class="mb-3">Cari perkataan emosi:</p>
+
+<div id="grid" class="grid grid-cols-6 gap-2 text-xl mb-4"></div>
+
+<p id="result"></p>
+
+<button onclick="reset()" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded">
+🔁 Main Lagi
+</button>
+
+</div>
+
+<script>
+const words = ["EMOSI","TENANG","MARAH"];
+const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+function generate(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  for(let i=0;i<36;i++){
+    const div = document.createElement("div");
+    div.className = "w-10 h-10 bg-gray-200 flex items-center justify-center cursor-pointer";
+    div.innerText = letters[Math.floor(Math.random()*letters.length)];
+
+    div.onclick = ()=>{
+      div.classList.toggle("bg-green-300");
+    };
+
+    grid.appendChild(div);
+  }
+}
+
+function reset(){
+  generate();
+  document.getElementById("result").innerText="";
+}
+
+generate();
+</script>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "../healink.html"; 
+}
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+</body>
+</html>

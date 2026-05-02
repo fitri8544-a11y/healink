@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<div class="bg-white text-gray-800 p-8 rounded-xl text-center">
+
+<h1 class="text-xl font-bold mb-4">🧩 Jigsaw Puzzle</h1>
+
+<p class="mb-4">Susun nombor dengan betul</p>
+
+<div id="grid" class="grid grid-cols-3 gap-2 mb-4"></div>
+
+<button onclick="shuffle()" class="px-4 py-2 bg-purple-600 text-white rounded">
+🔀 Shuffle
+</button>
+
+<p id="status" class="mt-3"></p>
+
+</div>
+
+<script>
+let arr = [1,2,3,4,5,6,7,8,""];
+
+function render(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+
+  arr.forEach((n,i)=>{
+    const div = document.createElement("div");
+
+    div.className="w-16 h-16 bg-blue-200 flex items-center justify-center text-xl cursor-pointer";
+
+    div.innerText = n;
+
+    div.onclick = ()=>move(i);
+
+    grid.appendChild(div);
+  });
+}
+
+function move(i){
+  const empty = arr.indexOf("");
+  if(Math.abs(i-empty)===1 || Math.abs(i-empty)===3){
+    [arr[i],arr[empty]]=[arr[empty],arr[i]];
+    render();
+    check();
+  }
+}
+
+function shuffle(){
+  arr.sort(()=>0.5-Math.random());
+  render();
+}
+
+function check(){
+  if(arr.join()=="1,2,3,4,5,6,7,8,"){
+    document.getElementById("status").innerText="🎉 Selesai!";
+  }
+}
+
+render();
+</script>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "../healink.html"; 
+}
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div> 
+
+</body>
+</html>

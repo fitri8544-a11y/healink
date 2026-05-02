@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>HEALINK - Stress Challenge</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<!-- HEADER -->
+<div class="fixed top-0 left-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
+  <button onclick="goBack()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
+  <div>😤 Stress Challenge</div>
+  <button onclick="closeGame()" class="bg-red-500 px-3 py-1 rounded">✕ Tutup</button>
+</div>
+
+<!-- BOX -->
+<div id="gameBox" class="mt-20 bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl">
+
+  <!-- TOP -->
+  <div class="flex justify-between mb-4 text-sm">
+    <span id="noSoalan"></span>
+    <span>😤 Stress Level: <span id="stress">0</span></span>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="w-full bg-white/20 rounded-full h-2 mb-6">
+    <div id="bar" class="bg-red-400 h-2 rounded-full transition-all"></div>
+  </div>
+
+  <!-- SOALAN -->
+  <h3 id="question" class="mb-6 font-semibold text-lg"></h3>
+
+  <!-- JAWAPAN -->
+  <div id="answers" class="space-y-3"></div>
+
+</div>
+
+<!-- RESULT -->
+<div id="resultBox" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+
+  <div class="bg-white text-gray-800 p-8 rounded-xl text-center shadow-xl">
+
+    <h2 class="text-xl font-bold mb-3">🎯 Keputusan</h2>
+
+    <p id="finalText" class="mb-4"></p>
+
+    <button onclick="restart()" class="px-4 py-2 bg-purple-600 text-white rounded">
+      🔁 Main Lagi
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const soalan = [
+{
+q: "Anda mempunyai banyak kerja sekolah dan rasa tertekan.",
+answers: [
+{text:"Rehat sekejap dan susun jadual", stress:-2, msg:"Bagus! Anda mengurus stress dengan baik."},
+{text:"Abaikan semua kerja", stress:+2, msg:"Ini boleh menambah stress."},
+{text:"Marah semua orang", stress:+3, msg:"Tindakan ini tidak membantu."}
+]
+},
+{
+q: "Kawan anda mengejek anda di kelas.",
+answers: [
+{text:"Tenang dan abaikan", stress:-1, msg:"Tindakan matang."},
+{text:"Balas ejekan", stress:+2, msg:"Ini boleh jadi konflik."},
+{text:"Terus marah", stress:+3, msg:"Emosi tidak terkawal."}
+]
+},
+{
+q: "Anda gagal dalam ujian penting.",
+answers: [
+{text:"Belajar dari kesilapan", stress:-2, msg:"Sikap positif."},
+{text:"Putus asa", stress:+2, msg:"Jangan mudah putus asa."},
+{text:"Salahkan orang lain", stress:+1, msg:"Kurang bertanggungjawab."}
+]
+}
+];
+
+let index = 0;
+let stress = 0;
+
+function load(){
+  const q = soalan[index];
+
+  document.getElementById("question").innerText = q.q;
+  document.getElementById("noSoalan").innerText = `Situasi ${index+1}/${soalan.length}`;
+  document.getElementById("stress").innerText = stress;
+
+  let percent = (index/soalan.length)*100;
+  document.getElementById("bar").style.width = percent + "%";
+
+  const box = document.getElementById("answers");
+  box.innerHTML = "";
+
+  q.answers.forEach(ans=>{
+    const btn = document.createElement("button");
+
+    btn.innerText = ans.text;
+    btn.className = "w-full p-3 rounded-lg bg-white/10 hover:bg-white/20 transition";
+
+    btn.onclick = ()=>choose(btn, ans);
+
+    box.appendChild(btn);
+  });
+}
+
+function choose(btn, ans){
+
+  disable();
+
+  stress += ans.stress;
+  document.getElementById("stress").innerText = stress;
+
+  btn.classList.add(ans.stress < 0 ? "bg-green-400 text-black" : "bg-red-400 text-black");
+
+  setTimeout(()=>{
+    index++;
+
+    if(index < soalan.length){
+      load();
+    } else {
+      result();
+    }
+
+  },1000);
+}
+
+function disable(){
+  document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+}
+
+function result(){
+
+  let text;
+
+  if(stress <= 0){
+    text = "🧘 Anda mengawal stress dengan sangat baik!";
+  } else if(stress <= 3){
+    text = "🙂 Anda masih boleh memperbaiki kawalan stress.";
+  } else {
+    text = "⚠️ Tahap stress tinggi! Cuba teknik kawalan emosi.";
+  }
+
+  document.getElementById("resultBox").classList.remove("hidden");
+  document.getElementById("finalText").innerText = text;
+}
+
+function restart(){
+  location.reload();
+}
+
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "menu.html";
+}
+
+load();
+</script>
+
+<script>
+function goBack(){
+  window.history.back();
+}
+
+function closeGame(){
+  window.location.href = "../healink.html"; 
+}
+</script>
+
+<!-- ================= HEADER GAME ================= -->
+<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+
+  <!-- BACK -->
+  <button onclick="goBack()" 
+    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
+    ← Kembali
+  </button>
+
+  <!-- TITLE -->
+  <div class="font-semibold text-sm md:text-base">
+    HEALINK Game
+  </div>
+
+  <!-- CLOSE -->
+  <button onclick="closeGame()" 
+    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
+    ✕ Tutup
+  </button>
+
+</div>
+
+</body>
+</html>

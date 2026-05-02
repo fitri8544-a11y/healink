@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link rel="icon" type="image/png" href="assets/admin.png">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- 🔥 FIREBASE (WAJIB ATAS) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+</head>
+
+<body class="bg-gradient-to-br from-[#1e1b4b] via-purple-700 to-blue-600 min-h-screen flex items-center justify-center text-white">
+
+<!-- CARD -->
+<div class="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-md">
+
+  <h2 class="text-2xl font-bold text-center mb-6 drop-shadow-lg">
+    🔐 Admin
+  </h2>
+
+  <!-- EMAIL -->
+  <input id="email" type="email" placeholder="Email Guru"
+    class="w-full p-3 mb-4 rounded-lg bg-white text-black placeholder-gray-500 
+           focus:outline-none focus:ring-2 focus:ring-purple-400">
+
+  <!-- PASSWORD -->
+  <input id="password" type="password" placeholder="Password"
+    class="w-full p-3 mb-6 rounded-lg bg-white text-black placeholder-gray-500 
+           focus:outline-none focus:ring-2 focus:ring-purple-400">
+
+  <!-- BUTTON -->
+  <button onclick="login()" id="loginBtn"
+    class="w-full bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-lg font-semibold 
+           hover:scale-105 hover:shadow-lg transition duration-300">
+    Login
+  </button>
+
+  <!-- ERROR -->
+  <p id="errorMsg" class="text-red-300 text-sm mt-3 text-center"></p>
+
+  <!-- FOOTER -->
+  <p class="text-xs text-white/60 mt-6 text-center">
+    © 2026 HEALINK System
+  </p>
+
+</div>
+
+<!-- 🔥 SCRIPT -->
+<script>
+
+// CONFIG (guna config cikgu)
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+// INIT FIREBASE
+firebase.initializeApp(firebaseConfig);
+
+// LOGIN FUNCTION
+function login(){
+
+  const btn = document.getElementById("loginBtn");
+  const email = document.getElementById("email").value;
+  const pass  = document.getElementById("password").value;
+
+  btn.innerText = "Loading...";
+
+  firebase.auth().signInWithEmailAndPassword(email, pass)
+  .then(() => {
+    window.location.href = "dashboard.html";
+  })
+  .catch(err => {
+    document.getElementById("errorMsg").innerText = err.message;
+    btn.innerText = "Login";
+  });
+
+}
+
+</script>
+
+</body>
+</html>

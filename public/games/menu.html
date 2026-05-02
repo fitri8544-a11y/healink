@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>HEALINK - Permainan Minda Sihat</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen text-white">
+
+<!-- HEADER -->
+<div class="fixed top-0 left-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
+  <button onclick="goHome()" class="bg-white/20 px-3 py-1 rounded">← Dashboard</button>
+  <div class="font-semibold">🎮 Permainan Minda Sihat</div>
+  <button onclick="history.back()" class="bg-red-500 px-3 py-1 rounded">✕ Tutup</button>
+</div>
+
+<div class="mt-20 max-w-5xl mx-auto px-6">
+
+  <!-- TAB -->
+  <div class="flex justify-center gap-4 mb-6">
+    <button onclick="switchTab('rendah')" id="tabR"
+      class="px-4 py-2 rounded-full bg-purple-500 text-white font-semibold">
+      Sekolah Rendah
+    </button>
+
+    <button onclick="switchTab('menengah')" id="tabM"
+      class="px-4 py-2 rounded-full bg-white/20 text-white">
+      Sekolah Menengah
+    </button>
+  </div>
+
+  <!-- ================= RENDAH ================= -->
+  <div id="rendah" class="grid md:grid-cols-3 gap-4">
+
+    <div onclick="go('memory.html')" class="card">🧩 Memory Card</div>
+    <div onclick="go('teka-emosi.html')" class="card">🎭 Teka Emosi</div>
+    <div onclick="go('hangman.html')" class="card">🔤 Hangman</div>
+    <div onclick="go('cari-perkataan.html')" class="card">🔍 Cari Perkataan</div>
+    <div onclick="go('jigsaw.html')" class="card">🧩 Jigsaw Puzzle</div>
+
+  </div>
+
+  <!-- ================= MENENGAH ================= -->
+  <div id="menengah" class="hidden grid md:grid-cols-3 gap-4">
+
+    <div onclick="go('situasi-emosi.html')" class="card">🧠 Situasi Emosi</div>
+    <div onclick="go('decision-making.html')" class="card">⚖️ Decision Making</div>
+    <div onclick="go('self-reflection.html')" class="card">📊 Self Reflection</div>
+    <div onclick="go('stress.html')" class="card">😤 Stress Challenge</div>
+    <div onclick="go('conflict.html')" class="card">💬 Conflict Resolver</div>
+    <div onclick="go('story.html')" class="card">📖 Life Scenario</div>
+
+  </div>
+
+</div>
+
+<style>
+.card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(168,85,247,0.6);
+}
+</style>
+
+<script>
+function go(page){
+  window.location.href = page;
+}
+
+function goHome(){
+  window.location.href = "../index.html";
+}
+
+function switchTab(tab){
+
+  document.getElementById("rendah").classList.add("hidden");
+  document.getElementById("menengah").classList.add("hidden");
+
+  document.getElementById("tabR").classList.remove("bg-purple-500");
+  document.getElementById("tabM").classList.remove("bg-purple-500");
+
+  if(tab === "rendah"){
+    document.getElementById("rendah").classList.remove("hidden");
+    document.getElementById("tabR").classList.add("bg-purple-500");
+  } else {
+    document.getElementById("menengah").classList.remove("hidden");
+    document.getElementById("tabM").classList.add("bg-purple-500");
+  }
+
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2403 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>HEALINK System</title>
+  <link rel="icon" type="image/png" href="assets/logo-sekolah.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gradient-to-br from-[#1e1b4b] via-purple-700 to-blue-600 min-h-screen text-white">
+
+<!-- ================= AI PARTICLES ================= -->
+<div id="particles"></div>
+
+<!-- ================= HEADER HEALINK ================= -->
+<div class="w-full mt-6 px-6">
+
+  <!-- TOP BAR -->
+  <div class="flex justify-between items-center mb-4">
+
+    <!-- LEFT: UCAPAN + VISITOR -->
+    <div>
+      <div id="greetingHeader" 
+           class="text-white text-sm md:text-base font-semibold">
+      </div>
+
+      <!-- VISITOR HEALINK -->
+      <div class="text-xs text-pink-300 mt-1 flex items-center gap-2">
+        🧠 Pelawat: 
+        <span id="visitorHealink" class="font-bold text-white text-sm">
+          0
+        </span>
+        <span class="text-green-400 text-[10px] animate-pulse">
+          ● LIVE
+        </span>
+      </div>
+    </div>
+
+    <!-- RIGHT: BUTTON -->
+    <button onclick="tukarUser()" 
+      class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg shadow font-semibold">
+      🔄 Tukar Pengguna
+    </button>
+
+  </div>
+
+  <!-- TITLE -->
+  <h1 class="text-center text-4xl md:text-5xl font-extrabold 
+    bg-gradient-to-r from-purple-400 via-pink-300 to-blue-300 
+    bg-[length:200%_200%] bg-clip-text text-transparent 
+    animate-gradientMove animate-float">
+
+    HEALINK
+
+  </h1>
+
+  <!-- SUBTITLE -->
+  <p class="mt-3 text-lg text-white/90 text-center animate-subFloat drop-shadow-md">
+    Smart Student Wellness System
+  </p>
+
+  <!-- TAGLINE -->
+  <p class="text-xs text-white/70 mt-2 text-center">
+    Digital Guidance & Counseling Platform
+  </p>
+
+  <!-- TARIKH & SLOGAN -->
+  <div class="mt-6 text-sm text-white/80 text-center">
+
+    <div class="flex items-center justify-center gap-2">
+      <span>📅</span>
+      <span id="tarikhHari"></span> | 🕒 <span id="masa"></span>
+    </div>
+
+    <p id="sloganHari" 
+       class="italic text-lg md:text-xl text-purple-200 mt-3 tracking-wide drop-shadow-lg">
+    </p>
+
+  </div>
+
+</div>
+
+<style>
+
+/* =========================================
+   🎬 ANIMATION (GLOBAL)
+========================================= */
+
+/* Gradient bergerak */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating tajuk */
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Subtitle floating */
+@keyframes subFloat {
+  0%,100% { transform: translateY(0px); opacity: 0.9; }
+  50% { transform: translateY(3px); opacity: 1; }
+}
+
+/* Slide modal */
+@keyframes slideUp {
+  0% { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+
+/* =========================================
+   ✨ ANIMATION CLASS
+========================================= */
+
+.animate-gradientMove {
+  animation: gradientMove 6s ease infinite;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-subFloat {
+  animation: subFloat 5s ease-in-out infinite;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease;
+}
+
+
+/* =========================================
+   📝 TEXT & HEADER
+========================================= */
+
+#sloganHari {
+  transition: opacity 0.5s ease;
+  min-height: 30px;
+}
+
+
+/* =========================================
+   😊 EMOJI COMPONENT (Heal Talk + Tracker)
+========================================= */
+
+.emoji-card{
+  width: 50px;
+  height: 50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  border-radius:12px;
+  background:#f3f4f6;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.emoji-card:hover{
+  transform:scale(1.1);
+  background:#e9d5ff;
+}
+
+.emoji-selected{
+  background: linear-gradient(to right, #a855f7, #3b82f6);
+  color:white;
+  transform:scale(1.15);
+  box-shadow:0 0 10px rgba(168,85,247,0.5);
+}
+
+
+/* =========================================
+   📊 STATUS ANALYZER (Ketahui Status)
+========================================= */
+
+.check-card{
+  padding:10px 12px;
+  margin-bottom:8px;
+  border-radius:12px;
+  background:white;
+  border:1px solid #e5e7eb;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.2s;
+}
+
+.check-card:hover{
+  background:#f3f4f6;
+  transform:scale(1.03);
+}
+
+.check-active{
+  background: linear-gradient(to right, #a855f7, #3b82f6);
+  color:white;
+  font-weight:600;
+  box-shadow:0 4px 10px rgba(168,85,247,0.4);
+}
+
+
+/* =========================================
+   📦 CARD UI (GLOBAL DASHBOARD)
+========================================= */
+
+.card-hover{
+  transition: all 0.3s ease;
+}
+
+.card-hover:hover{
+  transform: scale(1.05);
+}
+
+
+/* =========================================
+   📱 MODAL GLOBAL
+========================================= */
+
+.modal-box{
+  animation: slideUp 0.3s ease;
+}
+
+/* STATUS UI */
+.check-card{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px;
+  margin-bottom:8px;
+  border-radius:12px;
+  background:white;
+  border:1px solid #e5e7eb;
+  cursor:pointer;
+}
+
+/* INI PENTING */
+.check-text{
+  font-size:14px;
+  font-weight:600;
+  color:#1f2937 !important;   /* 🔥 paksa warna hitam */
+}
+
+/* bila select */
+.check-active{
+  background: linear-gradient(to right, #a855f7, #3b82f6);
+}
+
+.check-active .check-text{
+  color:white !important;
+}
+/* TEKNIK INTEVENSI */
+.circle{
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  font-weight:bold;
+  font-size:18px;
+  background: linear-gradient(to right,#a855f7,#ec4899);
+  transition: transform 1.5s ease-in-out;
+}
+
+/* COPING SKILLS */
+.btn-coping{
+  background: linear-gradient(to right, #9333ea, #3b82f6);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.btn-coping:hover{
+  transform: scale(1.05);
+}
+
+.loader {
+  width: 30px;
+  height: 30px;
+  border: 4px solid white;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ================= FIX TEXT CLARITY ================= */
+
+/* item pilihan (emoji card) */
+.emoji-card {
+  color: #1f2937 !important; /* text-gray-800 */
+  font-weight: 500;
+}
+
+/* hover effect */
+.emoji-card:hover {
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* state aktif */
+.emoji-selected {
+  background: linear-gradient(to right, #7c3aed, #3b82f6);
+  color: white !important;
+  font-weight: 600;
+}
+
+/* ================= FIX BUTTON TEXT ================= */
+
+.emoji-card {
+  background: #ffffff !important;
+  color: #1f2937 !important; /* text-gray-800 */
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.emoji-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* ACTIVE */
+.emoji-selected {
+  background: linear-gradient(to right, #7c3aed, #3b82f6) !important;
+  color: white !important;
+  font-weight: 600;
+}
+
+/* ============ ANALISIS STATUS EMOSI ============== */
+.check-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: #f3f4f6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.check-card:hover {
+  transform: scale(1.02);
+  background: #e5e7eb;
+}
+
+.check-active {
+  background: linear-gradient(to right, #7c3aed, #3b82f6);
+  color: white;
+  font-weight: 600;
+}
+
+/* =============== BACKGROUND =============== */
+body {
+  background: linear-gradient(135deg, #2e1065, #6d28d9, #9333ea);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+
+  /* animation */
+  background-size: 200% 200%;
+  animation: gradientMove 10s ease infinite;
+}
+
+/* glow effect kiri atas */
+body::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(139,92,246,0.4), transparent);
+  top: -100px;
+  left: -100px;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+/* glow effect kanan bawah */
+body::after {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(59,130,246,0.4), transparent);
+  bottom: -100px;
+  right: -100px;
+  filter: blur(120px);
+  z-index: 0;
+}
+
+/* animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.modal-box {
+  position: relative;
+  z-index: 10;
+}
+
+/* =============== PARTICLES =============== */
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% {
+    transform: translateY(0px);
+    opacity: 0;
+  }
+  50% { opacity: 1; }
+  100% {
+    transform: translateY(-800px);
+    opacity: 0;
+  }
+}
+
+/* floating light besar */
+.light {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15), transparent);
+  border-radius: 50%;
+  animation: floatLight 20s linear infinite;
+}
+
+@keyframes floatLight {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-1000px); }
+}
+</style>
+
+<!-- AI STATUS BAR -->
+<div class="max-w-4xl mx-auto mt-8 bg-white/10 backdrop-blur rounded-xl p-5 text-center shadow-lg">
+  🤖 AI System Status: <span class="text-green-300 font-semibold">ACTIVE</span>  
+  | 📊 Real-Time Monitoring Enabled
+</div>
+
+<!-- BUTTON PORTAL UTAMA -->
+<div class="flex justify-center mt-6">
+
+  <a href="https://bimbingankaunselingskkk.web.app/" target="_blank"
+     class="bg-gradient-to-r from-pink-500 to-purple-500 
+            px-6 py-3 rounded-full font-semibold text-white 
+            shadow-lg hover:scale-105 hover:shadow-pink-400/50 
+            transition duration-300 flex items-center gap-2">
+
+    🌐 Portal Utama Bimbingan & Kaunseling SK Kuala Ketil
+
+  </a>
+
+</div>
+
+
+<!-- MAIN DASHBOARD -->
+<div class="max-w-6xl mx-auto mt-10 grid md:grid-cols-4 gap-6 px-6">
+
+
+  
+  <!-- CARD TEMPLATE -->
+  <div onclick="trackActivity('Kuiz'); setTimeout(() => { window.location.href='games/kuiz.html'; }, 300)"
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 hover:shadow-purple-400/40 transition duration-300 cursor-pointer">
+
+  <div class="text-3xl mb-3">🧠</div>
+  <h3 class="text-lg font-semibold text-white">Kuiz Minda Sihat</h3>
+  <p class="text-sm text-white/70 mt-2">Penilaian kesejahteraan pelajar</p>
+
+</div>
+
+  <div onclick="openTracker(); trackActivity('Emotion Tracker')"  
+  class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+         hover:scale-105 hover:shadow-purple-400/40 transition duration-300 cursor-pointer text-center">
+
+  <div class="text-4xl mb-2">🌡️</div>
+  <h3 class="text-lg font-semibold text-white">Emotion Tracker</h3>
+  <p class="text-sm text-white/70 mt-2">Pantauan emosi harian</p>
+
+</div>
+
+  <!-- GAME CARD (HIGHLIGHT) -->
+  <div onclick="trackActivity('Game'); setTimeout(() => { window.location.href='games/menu.html'; }, 300)"
+       class="bg-gradient-to-r from-purple-500 to-blue-500 p-6 rounded-2xl shadow-xl 
+              hover:scale-105 hover:shadow-purple-500/60 transition duration-300 cursor-pointer text-center">
+
+    <div class="text-4xl mb-3">🎮</div>
+    <h3 class="text-lg font-semibold text-white">Permainan Minda Sihat</h3>
+    <p class="text-sm text-white/80 mt-2">Aktiviti interaktif pelajar</p>
+
+  </div>
+
+  <div onclick="openStatus(); trackActivity('Status')"  
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 hover:shadow-blue-400/40 transition duration-300 cursor-pointer text-center">
+
+  <div class="text-3xl mb-3">📊</div>
+  <h3 class="text-lg font-semibold text-white">Ketahui Status Anda</h3>
+  <p class="text-sm text-white/70 mt-2">Data & trend pelajar</p>
+
+</div>
+
+<div onclick="openHealTalk()"
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 hover:shadow-pink-400/40 transition duration-300 cursor-pointer">
+
+  <div class="text-3xl mb-3">💬</div>
+  <h3 class="text-lg font-semibold text-white">HEAL TALK SPACE</h3>
+  <p class="text-sm text-white/70 mt-2">Berhubung dengan kaunselor</p>
+
+</div>
+
+  <div onclick="openIntervensi(); trackActivity('Intervensi')"  
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 hover:shadow-green-400/40 transition duration-300 cursor-pointer">
+
+  <div class="text-3xl mb-3">🧘</div>
+  <h3 class="text-lg font-semibold text-white">Teknik Intervensi</h3>
+  <p class="text-sm text-white/70 mt-2">Teknik kawalan emosi</p>
+
+</div>
+
+  <div onclick="openCoping(); trackActivity('Coping')"  
+  class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+         hover:scale-105 hover:shadow-yellow-400/40 transition duration-300 cursor-pointer">
+
+  <div class="text-3xl mb-3">💪</div>
+  <h3 class="text-lg font-semibold text-white">Coping Skills</h3>
+  <p class="text-sm text-white/70 mt-2">Kemahiran kawal emosi</p>
+
+</div>
+
+  <div onclick="openEmotion(); trackActivity('Emotion')" 
+  class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+         hover:scale-105 transition cursor-pointer text-center">
+
+  <div class="text-3xl mb-3">❤️</div>
+  <h3 class="text-lg font-semibold text-white">Emotion Regulation</h3>
+  <p class="text-sm text-white/70 mt-2">Pengurusan emosi</p>
+
+</div>
+<!-- ================= KAD TAMBAHAN ================= -->
+
+  <!-- KAWAL -->
+  <div onclick="openKawal(); trackActivity('Kawal')" 
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 transition cursor-pointer text-center">
+
+    <div class="text-3xl mb-3">⚖️</div>
+    <h3 class="text-lg font-semibold text-white">Kawal & Tidak Boleh Kawal</h3>
+  </div>
+
+  <!-- PSIKOEDUKASI -->
+  <div onclick="openNota(); trackActivity('Nota')" 
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 transition cursor-pointer text-center">
+
+    <div class="text-3xl mb-3">📘</div>
+    <h3 class="text-lg font-semibold text-white">Nota Psikoedukasi</h3>
+  </div>
+
+  <!-- MINDA SIHAT -->
+  <div onclick="openMinda(); trackActivity('Minda')" 
+     class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+            hover:scale-105 transition cursor-pointer text-center">
+
+    <div class="text-3xl mb-3">🌈</div>
+    <h3 class="text-lg font-semibold text-white">Ciri Minda Sejahtera</h3>
+  </div>
+
+  <!-- 🚀 AKAN DATANG -->
+  <div 
+    class="bg-white/5 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
+           border border-dashed border-white/30 
+           flex flex-col items-center justify-center text-center
+           hover:scale-105 transition cursor-not-allowed opacity-80">
+
+    <div class="text-3xl mb-2 animate-pulse">🚀</div>
+
+    <p class="text-white text-sm font-semibold">
+      Akan Datang
+    </p>
+
+    <p class="text-white/60 text-xs mt-1">
+      Modul baharu sedang dibangunkan
+    </p>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="text-center text-sm text-gray-300 mt-16 pb-6">
+  © 2026 HEALINK System | Sekolah Kebangsaan Kuala Ketil
+</div>
+
+<script>
+function paparkanTarikh() {
+  const hari = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
+  const bulan = [
+    "Januari","Februari","Mac","April","Mei","Jun",
+    "Julai","Ogos","September","Oktober","November","Disember"
+  ];
+
+  const tarikh = new Date();
+
+  const hariIni = hari[tarikh.getDay()];
+  const hariBulan = tarikh.getDate();
+  const bulanIni = bulan[tarikh.getMonth()];
+  const tahun = tarikh.getFullYear();
+
+  const fullTarikh = `${hariIni}, ${hariBulan} ${bulanIni} ${tahun}`;
+
+  document.getElementById("tarikhHari").innerText = fullTarikh;
+}
+
+paparkanTarikh();
+</script>
+
+<script>
+function paparkanMasa() {
+  const now = new Date();
+  document.getElementById("masa").innerText =
+    now.toLocaleTimeString('ms-MY');
+}
+
+setInterval(paparkanMasa, 1000);
+</script>
+
+<script>
+const sloganList = {
+  0: "Rehatkan minda, jaga emosi anda.",
+  1: "Mulakan minggu dengan semangat baru!",
+  2: "Anda lebih kuat daripada yang anda sangka.",
+  3: "Teruskan usaha, kejayaan semakin dekat.",
+  4: "Kawal emosi, bina kekuatan diri.",
+  5: "Ambil masa untuk refleksi dan ketenangan.",
+  6: "Hargai diri anda, anda berharga."
+};
+
+const el = document.getElementById("sloganHari");
+let currentText = "";
+let index = 0;
+
+function typeText(text) {
+  el.innerHTML = "";
+  index = 0;
+
+  function typing() {
+    if (index < text.length) {
+      el.innerHTML += text.charAt(index);
+      index++;
+      setTimeout(typing, 40); // speed typing
+    }
+  }
+
+  typing();
+}
+
+function animateSlogan() {
+  const hari = new Date().getDay();
+  const text = `"${sloganList[hari]}"`;
+
+  // fade out dulu
+  el.style.opacity = 0;
+
+  setTimeout(() => {
+    typeText(text);
+    el.style.opacity = 1;
+  }, 500);
+}
+
+// first load
+animateSlogan();
+
+// ulang setiap 8 saat
+setInterval(animateSlogan, 8000);
+</script>
+
+
+<!-- ================= MODAL PERMAINAN ================= -->
+<div id="gameModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-5xl shadow-2xl relative max-h-[85vh] overflow-y-auto">
+
+    <!-- CLOSE -->
+    <button onclick="closeGame()" 
+      class="absolute top-4 right-4 text-gray-500 text-xl hover:text-black transition">
+      ✕
+    </button>
+
+    <!-- TITLE (PRO STYLE) -->
+    <div class="text-center mb-6">
+      <h2 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center gap-2">
+        🎮 Permainan Minda Sihat
+      </h2>
+      <p class="text-sm text-gray-500 mt-1">
+        Aktiviti Interaktif Kesejahteraan Mental
+      </p>
+    </div>
+
+    <!-- TAB -->
+    <div class="flex gap-4 mb-6 justify-center">
+
+      <button onclick="switchTab('rendah')" id="tabRendah"
+        class="px-5 py-2 rounded-full bg-purple-600 text-white font-semibold shadow">
+        Sekolah Rendah
+      </button>
+
+      <button onclick="switchTab('menengah')" id="tabMenengah"
+        class="px-5 py-2 rounded-full bg-gray-200 text-gray-800 font-semibold">
+        Sekolah Menengah
+      </button>
+
+    </div>
+
+    <!-- RENDAH -->
+    <div id="gameRendah" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+      <div onclick="window.location.href='games/memory.html'"
+      class="bg-purple-100 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🎴</div>
+        <p class="font-semibold text-gray-800">Memory Card</p>
+      </div>
+
+      <div onclick="window.location.href='games/hangman.html'"
+      class="bg-blue-100 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🔤</div>
+        <p class="font-semibold text-gray-800">Hangman</p>
+      </div>
+
+      <div onclick="window.location.href='games/teka-emosi.html'"
+      class="bg-pink-100 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🎭</div>
+        <p class="font-semibold text-gray-800">Teka Emosi</p>
+      </div>
+
+      <div onclick="window.location.href='games/cari-perkataan.html'"
+      class="bg-indigo-100 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🔍</div>
+        <p class="font-semibold text-gray-800">Cari Perkataan</p>
+      </div>
+
+      <div onclick="window.location.href='games/jigsaw.html'"
+      class="bg-green-100 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🧩</div>
+        <p class="font-semibold text-gray-800">Jigsaw Puzzle</p>
+      </div>
+
+    </div>
+
+    <!-- MENENGAH -->
+    <div id="gameMenengah" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+      <div onclick="window.location.href='games/situasi-emosi.html'"
+      class="bg-purple-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🧠</div>
+        <p class="font-semibold text-gray-800">Situasi Emosi</p>
+      </div>
+
+      <div onclick="window.location.href='games/decision.html'"
+      class="bg-blue-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">⚖️</div>
+        <p class="font-semibold text-gray-800">Decision Making</p>
+      </div>
+
+      <div class="bg-pink-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🔥</div>
+        <p class="font-semibold text-gray-800">Stress Challenge</p>
+      </div>
+
+      <div class="bg-indigo-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">📊</div>
+        <p class="font-semibold text-gray-800">Self Reflection</p>
+      </div>
+
+      <div class="bg-green-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🧩</div>
+        <p class="font-semibold text-gray-800">Problem Solving</p>
+      </div>
+
+      <div class="bg-yellow-200 p-6 rounded-xl text-center hover:scale-105 transition cursor-pointer">
+        <div class="text-4xl mb-2">🎯</div>
+        <p class="font-semibold text-gray-800">Mind Strategy</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ================= HEAL TALK MODAL ================= -->
+<div id="healModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-lg shadow-2xl relative">
+
+    <!-- CLOSE -->
+    <!-- ❌ BUTTON TUTUP -->
+    <button onclick="closeHealTalk()"
+        class="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl font-bold transition">
+    ✕
+    </button>
+
+    <!-- TITLE -->
+    <h2 class="text-2xl font-bold text-gray-800 text-center mb-2">
+      💬 HEAL TALK SPACE
+    </h2>
+
+    <p class="text-center text-sm text-gray-500 mb-5">
+      Peti Luahan Perasaan • Selamat & Sulit
+    </p>
+
+    <!-- EMOJI -->
+    <div class="flex justify-between mb-5">
+      <div onclick="selectEmoji(this)" class="emoji-card">😊</div>
+      <div onclick="selectEmoji(this)" class="emoji-card">😢</div>
+      <div onclick="selectEmoji(this)" class="emoji-card">😡</div>
+      <div onclick="selectEmoji(this)" class="emoji-card">😰</div>
+      <div onclick="selectEmoji(this)" class="emoji-card">😴</div>
+      <div onclick="selectEmoji(this)" class="emoji-card">😌</div>
+    </div>
+
+    <!-- TEXT -->
+    <textarea id="luahan"
+  spellcheck="false"
+  class="w-full p-4 rounded-xl border-2 border-purple-200 
+         focus:ring-2 focus:ring-purple-500 
+         text-gray-800 bg-white 
+         placeholder-gray-400 
+         resize-none h-32">
+</textarea>
+
+    <!-- BUTTON -->
+    <button onclick="submitHealTalk()" 
+      class="w-full mt-5 bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-xl">
+      📩 Hantar
+    </button>
+
+    <!-- SUCCESS -->
+    <p id="msg" class="hidden text-center text-green-600 mt-4 font-semibold">
+      ✅ Luahan berjaya dihantar
+    </p>
+
+  </div>
+</div>
+
+<div id="trackerModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-lg shadow-2xl relative">
+
+    <!-- CLOSE -->
+    <button onclick="closeTracker()" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">
+      ✕
+    </button>
+
+    <!-- TITLE -->
+    <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">
+      🌡️ Emotion Tracker
+    </h2>
+
+    <p class="text-center text-sm text-gray-500 mb-5">
+      Pilih emosi anda hari ini
+    </p>
+
+    <!-- EMOJI -->
+    <div class="flex justify-between mb-5">
+      <div onclick="selectMood(this,'😊')" class="emoji-card">😊</div>
+      <div onclick="selectMood(this,'😢')" class="emoji-card">😢</div>
+      <div onclick="selectMood(this,'😡')" class="emoji-card">😡</div>
+      <div onclick="selectMood(this,'😰')" class="emoji-card">😰</div>
+      <div onclick="selectMood(this,'😴')" class="emoji-card">😴</div>
+      <div onclick="selectMood(this,'😌')" class="emoji-card">😌</div>
+    </div>
+
+    <!-- NOTE -->
+    <textarea id="note"
+      placeholder="Nota ringkas (optional)..."
+      class="w-full p-3 border rounded-xl text-gray-700"></textarea>
+
+    <!-- BUTTON -->
+    <button onclick="saveMood()" 
+      class="w-full mt-5 bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-xl">
+      💾 Simpan
+    </button>
+
+    <!-- RESULT -->
+    <p id="trackerMsg" class="hidden text-center text-green-600 mt-3">
+      ✅ Data disimpan
+    </p>
+
+
+  </div>
+</div>
+
+<!-- ================= KETAHUI STATUS ANDA ================= -->
+<div id="statusModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-3xl shadow-2xl relative modal-box">
+
+    <!-- CLOSE -->
+    <button onclick="closeStatus()" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">
+      ✕
+    </button>
+
+    <!-- TITLE -->
+    <h2 class="text-2xl font-bold text-gray-800 text-center mb-2">
+      📊 Analisis Status Emosi
+    </h2>
+
+    <p class="text-center text-gray-500 text-sm mb-6">
+      Pilih simptom yang anda alami hari ini
+    </p>
+
+    <!-- GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+
+      <!-- STRESS -->
+      <div class="p-4 rounded-2xl bg-red-50 border border-red-200">
+        <h3 class="text-red-600 font-bold mb-3 text-center">😰 Stress</h3>
+
+        <div class="check-card" onclick="toggleCheck(this,'stress')" data-type="stress">
+        <span>🔥</span>
+          <span class="check-text">Mudah marah</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'stress')" data-type="stress">
+          <span>😴</span>
+          <span class="check-text">Sukar tidur</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'stress')" data-type="stress">
+          <span>😓</span>
+          <span class="check-text">Letih</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'stress')" data-type="stress">
+          <span>🎯</span>
+          <span class="check-text">Sukar fokus</span>
+        </div>
+
+      </div>
+
+      <!-- ANXIETY -->
+      <div class="p-4 rounded-2xl bg-yellow-50 border border-yellow-200">
+        <h3 class="text-yellow-600 font-bold mb-3 text-center">😨 Anxiety</h3>
+
+        <div class="check-card" onclick="toggleCheck(this,'anxiety')" data-type="anxiety">
+          <span>💓</span>
+          <span class="check-text">Jantung berdebar</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'anxiety')" data-type="anxiety">
+          <span>😟</span>
+          <span class="check-text">Risau berlebihan</span>
+      </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'anxiety')" data-type="anxiety">
+          <span>💦</span>
+          <span class="check-text">Berpeluh</span>
+      </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'anxiety')" data-type="anxiety">
+          <span>😵</span>
+          <span class="check-text">Gelisah</span>
+        </div>
+        
+      </div>
+
+      <!-- DEPRESSION -->
+      <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200">
+        <h3 class="text-blue-600 font-bold mb-3 text-center">😔 Depression</h3>
+
+        <div class="check-card" onclick="toggleCheck(this,'depression')" data-type="depression">
+          <span>💔</span>
+          <span class="check-text">Hilang Minat</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'depression')" data-type="depression">
+          <span>😢</span>
+          <span class="check-text">Sedih lama</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'depression')" data-type="depression">
+          <span>⚡</span>
+          <span class="check-text">Tiada motivasi</span>
+        </div>
+
+        <div class="check-card" onclick="toggleCheck(this,'depression')" data-type="depression">
+          <span>❌</span>
+          <span class="check-text">Rasa tidak berharga</span>
+        </div>
+        
+      </div>
+
+    </div>
+
+    <!-- BUTTON -->
+    <button onclick="analyzeStatus()" 
+      class="w-full mt-6 bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-xl font-semibold hover:scale-105 transition">
+      🔍 Analisis Sekarang
+    </button>
+
+    <!-- RESULT -->
+    <div id="resultBox" 
+      class="hidden mt-6 p-5 rounded-2xl shadow-lg 
+         bg-gradient-to-r from-purple-600 to-blue-500 
+         text-white text-center flex flex-col items-center justify-center gap-2">
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= TEKNIK INTEVENSI ================= -->
+<div id="intervensiModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-3xl shadow-2xl relative overflow-y-auto max-h-[90vh]">
+
+    <!-- CLOSE -->
+    <button onclick="closeIntervensi()" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">✕</button>
+
+    <h2 class="text-xl font-bold text-purple-700 mb-6 text-center">
+      🧘 Therapist AI – Latihan Pernafasan
+    </h2>
+
+    <!-- CONTROL BAR -->
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-6">
+      <button onclick="startTherapy()" 
+        class="px-4 py-2 rounded-lg text-white bg-gradient-to-r from-purple-600 to-pink-500 shadow hover:scale-105 transition">
+        ▶ Mula
+      </button>
+
+      <button onclick="pauseTherapy()" 
+        class="px-4 py-2 rounded-lg text-white bg-gray-500 shadow hover:scale-105 transition">
+        ⏸ Pause
+      </button>
+
+      <button onclick="stopTherapy()" 
+        class="px-4 py-2 rounded-lg text-white bg-red-500 shadow hover:scale-105 transition">
+        ⏹ Stop
+      </button>
+
+      <button onclick="toggleMusic()" 
+        class="px-4 py-2 rounded-lg text-white bg-blue-500 shadow hover:scale-105 transition">
+        🎵 Muzik
+      </button>
+    </div>
+
+    <!-- VISUAL -->
+    <div class="flex flex-col items-center gap-4">
+      <div id="breathCircle" class="circle">
+        <span id="breathText">Start</span>
+      </div>
+
+      <div id="countdown" class="text-lg font-semibold text-gray-600">
+        4
+      </div>
+    </div>
+
+    <!-- STATUS -->
+    <div class="text-center mt-4 text-sm text-gray-500" id="statusText">
+      Tekan "Mula" untuk memulakan latihan
+    </div>
+
+    <!-- ================= TEKNIK TAMBAHAN ================= -->
+
+    <div class="mt-6 space-y-5">
+
+  <!-- AI MOOD RESET -->
+  <div class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-2xl p-4 shadow">
+    <h3 class="font-semibold mb-2">🤖 AI Mood Reset</h3>
+    <p class="text-sm opacity-90">
+      Tekan “Mula” untuk terapi pernafasan automatik
+    </p>
+  </div>
+
+  <!-- BUTTERFLY HUG -->
+  <div class="bg-pink-50 rounded-2xl p-4 shadow">
+    <h3 class="font-semibold text-pink-600 mb-2">🦋 Butterfly Hug</h3>
+    <p class="text-sm text-gray-700">
+      Silangkan tangan dan tepuk bahu kiri kanan secara bergilir
+    </p>
+  </div>
+
+  <!-- GROUNDING -->
+  <div class="bg-indigo-50 rounded-2xl p-4 shadow">
+    <h3 class="font-semibold text-indigo-600 mb-2">👁️ Teknik 5-4-3-2-1</h3>
+    <p class="text-sm text-gray-700">
+      Fokus kepada persekitaran untuk tenangkan diri
+    </p>
+  </div>
+
+  <!-- FOCUS BOOST -->
+  <div class="bg-blue-50 rounded-2xl p-4 shadow">
+    <h3 class="font-semibold text-blue-600 mb-2">🎯 Focus Booster</h3>
+    <p class="text-sm text-gray-700">
+      Fokus pada satu objek selama 10 saat
+    </p>
+  </div>
+
+  <!-- VISUAL CALM -->
+  <div class="bg-green-50 rounded-2xl p-4 shadow">
+    <h3 class="font-semibold text-green-600 mb-2">🌿 Visual Calm</h3>
+    <p class="text-sm text-gray-700">
+      Bayangkan tempat tenang seperti pantai atau hutan
+    </p>
+  </div>
+
+</div>
+    <!-- AUDIO (OPTIONAL) -->
+    <audio id="bgMusic" loop>
+  <source src="music/calm.mp3" type="audio/mpeg">
+</audio>
+
+  </div>
+</div>
+
+<!-- ================= KAWAL MODAL ================= -->
+<div id="kawalModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg text-center relative shadow-xl">
+
+    <!-- CLOSE BUTTON -->
+    <button onclick="closeKawal()" 
+      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+      ✕
+    </button>
+
+    <h2 class="font-bold text-lg text-gray-800 mb-4">
+      ⚖️ Kawal vs Tidak Boleh Kawal
+    </h2>
+
+    <div class="grid grid-cols-2 gap-4 text-sm">
+
+      <div class="bg-green-100 text-green-900 font-semibold p-4 rounded-xl shadow">
+        ✔ Sikap saya<br>
+        ✔ Usaha saya<br>
+        ✔ Cara saya berfikir
+      </div>
+
+      <div class="bg-red-100 text-red-900 font-semibold p-4 rounded-xl shadow">
+        ❌ Cuaca<br>
+        ❌ Perasaan orang lain<br>
+        ❌ Masa lalu
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= NOTA MODAL ================= -->
+<div id="notaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg relative shadow-xl">
+
+    <!-- CLOSE BUTTON -->
+    <button onclick="closeNota()" 
+      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+      ✕
+    </button>
+
+    <h2 class="font-bold text-lg text-gray-800 mb-4">
+      📘 Nota Psikoedukasi
+    </h2>
+
+    <div class="space-y-3 text-sm font-medium">
+
+      <div class="p-3 bg-yellow-100 text-yellow-900 rounded-lg shadow">
+        😰 Stress = tekanan sementara
+      </div>
+
+      <div class="p-3 bg-orange-100 text-orange-900 rounded-lg shadow">
+        😨 Anxiety = rasa risau berlebihan
+      </div>
+
+      <div class="p-3 bg-blue-100 text-blue-900 rounded-lg shadow">
+        😔 Depression = sedih berpanjangan
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ================= MINDA MODAL ================= -->
+<div id="mindaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg text-center relative shadow-xl">
+
+    <!-- CLOSE BUTTON -->
+    <button onclick="closeMinda()" 
+      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+      ✕
+    </button>
+
+    <h2 class="font-bold text-lg text-gray-800 mb-4">
+      🌈 Ciri Minda Sejahtera
+    </h2>
+
+    <div class="grid grid-cols-2 gap-3 text-sm font-semibold">
+
+      <div class="bg-green-100 text-green-900 p-3 rounded-lg shadow">
+        😊 Positif
+      </div>
+
+      <div class="bg-blue-100 text-blue-900 p-3 rounded-lg shadow">
+        💬 Komunikasi baik
+      </div>
+
+      <div class="bg-purple-100 text-purple-900 p-3 rounded-lg shadow">
+        💪 Yakin diri
+      </div>
+
+      <div class="bg-pink-100 text-pink-900 p-3 rounded-lg shadow">
+        ❤️ Empati
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= EMOTION REGULATION ================= -->
+<div id="emotionModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-2xl shadow-2xl relative text-center">
+
+    <button onclick="closeEmotion()" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">✕</button>
+
+    <h2 class="text-xl font-bold text-purple-700 mb-4">
+      ❤️ Emotion Regulation AI
+    </h2>
+
+    <p class="text-sm text-gray-500 mb-6">
+      Laraskan tahap emosi anda sekarang
+    </p>
+
+    <!-- VISUAL -->
+    <div id="emotionCircle" 
+      class="w-32 h-32 mx-auto rounded-full flex items-center justify-center text-white text-lg font-bold mb-4 transition-all duration-500">
+      😐
+    </div>
+
+    <!-- SLIDER -->
+    <input type="range" min="1" max="5" value="3"
+      class="w-full mb-6"
+      oninput="updateEmotion(this.value)">
+
+    <!-- AI RESULT -->
+    <div id="emotionResult" 
+      class="hidden p-4 rounded-xl bg-white text-gray-800 text-sm shadow text-center font-medium">
+    </div>
+
+    <!-- BUTTON -->
+    <button onclick="analyzeEmotion()" 
+      class="mt-4 px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl shadow hover:scale-105 transition">
+      🤖 Analisis Emosi
+    </button>
+
+  </div>
+</div>
+
+<!-- ================= COPING SKILLS ================= -->
+<div id="copingModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center z-50">
+
+  <div class="bg-white p-8 rounded-3xl w-[90%] max-w-3xl shadow-2xl relative overflow-y-auto max-h-[90vh]">
+
+    <!-- CLOSE -->
+    <button onclick="closeCoping()" 
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">✕</button>
+
+    <h2 class="text-xl font-bold text-purple-700 mb-4 text-center">
+      💪 Coping Skills AI
+    </h2>
+
+    <p class="text-center text-sm text-gray-500 mb-6">
+      Pilih teknik untuk bantu emosi anda
+    </p>
+
+    <!-- GRID -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+
+      <!-- MENTAL -->
+      <div class="bg-blue-50 p-4 rounded-2xl shadow text-center">
+        <h3 class="font-semibold text-blue-600 mb-2">🧠 Mental Reset</h3>
+        <p class="text-sm text-gray-600 mb-3">Ubah cara fikir</p>
+        <button onclick="runCoping('mental')" class="btn-coping">Cuba</button>
+      </div>
+
+      <!-- ACTION -->
+      <div class="bg-green-50 p-4 rounded-2xl shadow text-center">
+        <h3 class="font-semibold text-green-600 mb-2">💪 Action Boost</h3>
+        <p class="text-sm text-gray-600 mb-3">Gerakkan badan</p>
+        <button onclick="runCoping('action')" class="btn-coping">Cuba</button>
+      </div>
+
+      <!-- EMOTION -->
+      <div class="bg-pink-50 p-4 rounded-2xl shadow text-center">
+        <h3 class="font-semibold text-pink-600 mb-2">💬 Emotional Release</h3>
+        <p class="text-sm text-gray-600 mb-3">Luahkan perasaan</p>
+        <button onclick="runCoping('emotion')" class="btn-coping">Cuba</button>
+      </div>
+
+    </div>
+
+    <!-- RESULT BOX -->
+<div id="copingResult" 
+  class="hidden mt-6 p-5 rounded-2xl text-white text-center shadow-lg 
+         bg-gradient-to-r from-purple-600 to-blue-500">
+
+  <!-- LOADING -->
+  <div id="aiLoading" class="flex flex-col items-center gap-2">
+    <div class="loader"></div>
+    <p class="text-sm opacity-90 animate-pulse">
+      🤖 AI sedang menganalisis emosi anda...
+    </p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="aiResult" class="hidden">
+    <div class="text-lg font-semibold mb-2">🤖 AI Cadangan</div>
+    <div id="copingText" class="text-sm leading-relaxed"></div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================
+   🎮 GAME MODAL
+========================================= */
+function openGame() {
+  document.getElementById("gameModal").classList.remove("hidden");
+}
+
+function closeGame() {
+  document.getElementById("gameModal").classList.add("hidden");
+}
+
+function switchTab(tab) {
+
+  const rendah = document.getElementById("gameRendah");
+  const menengah = document.getElementById("gameMenengah");
+
+  const tabR = document.getElementById("tabRendah");
+  const tabM = document.getElementById("tabMenengah");
+
+  rendah.classList.add("hidden");
+  menengah.classList.add("hidden");
+
+  tabR.classList.remove("bg-purple-600","text-white");
+  tabM.classList.remove("bg-purple-600","text-white");
+
+  tabR.classList.add("bg-gray-200","text-gray-800");
+  tabM.classList.add("bg-gray-200","text-gray-800");
+
+  if(tab === "rendah"){
+    rendah.classList.remove("hidden");
+    tabR.classList.add("bg-purple-600","text-white");
+  } else {
+    menengah.classList.remove("hidden");
+    tabM.classList.add("bg-purple-600","text-white");
+  }
+}
+
+
+/* =========================================
+   💬 HEAL TALK
+========================================= */
+
+// 🔥 BUKA MODAL
+function openHealTalk(){
+  closeAllModals(); // 🔥 tambah
+  document.getElementById("healModal").classList.remove("hidden");
+}
+
+
+// 🔥 HANTAR LUAHAN
+function submitHealTalk(){
+
+  const text = document.getElementById("luahan").value.trim();
+
+  if(!text){
+    alert("Sila isi luahan dahulu");
+    return;
+  }
+
+  trackActivity("HealTalk", text);
+
+  document.getElementById("msg").classList.remove("hidden");
+  document.getElementById("luahan").value = "";
+
+  // 🔥 AUTO TUTUP
+  setTimeout(() => {
+    closeHealTalk();
+  }, 2000);
+}
+
+
+/* =========================================
+   🌡️ EMOTION TRACKER
+========================================= */
+
+let selectedMood = "";
+
+/* OPEN / CLOSE */
+function openTracker(){
+  closeAllModals(); // 🔥 tambah
+  document.getElementById("trackerModal").classList.remove("hidden");
+}
+
+/* PILIH EMOSI */
+function selectMood(el, mood){
+
+  document.querySelectorAll("#trackerModal .emoji-card")
+    .forEach(e => e.classList.remove("emoji-selected"));
+
+  el.classList.add("emoji-selected");
+  selectedMood = mood;
+}
+
+/* ================= SIMPAN DATA ================= */
+function saveMood(){
+
+  if(!selectedMood){
+    alert("Sila pilih emosi dahulu");
+    return;
+  }
+
+  const note = document.getElementById("note").value;
+
+  const nama = sessionStorage.getItem("nama");
+  const kelas = sessionStorage.getItem("kelas");
+  const organisasi = sessionStorage.getItem("organisasi");
+
+  firebase.firestore().collection("aktivitiPelajar").add({
+
+    nama: nama || "-",
+    kelas: kelas || "-",
+    organisasi: organisasi || "-",
+
+    mood: selectedMood,
+    module: "Emotion Tracker",
+    komen: note || "",
+
+    // 🔥 LOGIC ALERT
+    perluPerhatian: ["😢","😡"].includes(selectedMood),
+
+    tahap: (
+      ["😢","😡"].includes(selectedMood) ? "TINGGI" :
+      selectedMood === "😰" ? "SEDERHANA" :
+      "RENDAH"
+    ),
+
+    masa: firebase.firestore.FieldValue.serverTimestamp()
+
+  })
+  .then(()=>{
+
+    // ✅ RESET UI
+    selectedMood = "";
+    document.getElementById("note").value = "";
+
+    document.querySelectorAll("#trackerModal .emoji-card").forEach(e => {
+      e.classList.remove("emoji-selected");
+    });
+
+    // ✅ SUCCESS
+    alert("✅ Emosi berjaya disimpan");
+
+    // auto close
+    setTimeout(() => {
+      closeTracker();
+    }, 800);
+
+  })
+  .catch(err => {
+    console.error(err);
+    alert("❌ Gagal simpan data");
+  });
+
+}
+
+  // ================= LOCAL STORAGE =================
+  const data = JSON.parse(localStorage.getItem("emotionData")) || [];
+
+  data.push({
+    mood: selectedMood,
+    note: note,
+    time: new Date().toLocaleTimeString()
+  });
+
+  localStorage.setItem("emotionData", JSON.stringify(data));
+
+  // ================= 🔥 FIRESTORE (INI PENTING) =================
+  if(typeof firebase !== "undefined"){
+
+    firebase.firestore().collection("aktivitiPelajar").add({
+
+      nama: nama || "-",
+      kelas: kelas || "-",
+      organisasi: organisasi || "-",
+
+      mood: selectedMood,
+      module: "Emotion Tracker",
+      komen: note || "",
+
+      // 🔥 INI UNTUK DASHBOARD
+      perluPerhatian: ["😢","😡"].includes(selectedMood),
+
+      tahap: (
+        ["😢","😡"].includes(selectedMood) ? "TINGGI" :
+        selectedMood === "😰" ? "SEDERHANA" :
+        "RENDAH"
+      ),
+
+      masa: firebase.firestore.FieldValue.serverTimestamp()
+
+    })
+    .then(()=> console.log("✅ Firestore saved"))
+    .catch(err => console.error("❌ Firestore error:", err));
+
+  }
+
+  // ================= UI =================
+  document.getElementById("trackerMsg").classList.remove("hidden");
+
+  selectedMood = "";
+  document.getElementById("note").value = "";
+
+  document.querySelectorAll("#trackerModal .emoji-card").forEach(e => {
+    e.classList.remove("emoji-selected");
+  });
+
+  loadHistory();
+
+  setTimeout(() => {
+    closeTracker();
+  }, 1200);
+
+/* OPEN DETAIL KOMEN */
+function openDetail(nama, kelas, module, komen){
+
+  const modal = document.getElementById("detailModal");
+  const content = document.getElementById("detailContent");
+
+  content.innerHTML = `
+    <b>Nama:</b> ${nama}<br>
+    <b>Kelas:</b> ${kelas}<br>
+    <b>Modul:</b> ${module}<br><br>
+
+    <b>📝 Luahan:</b>
+    <div class="bg-gray-100 p-3 rounded mt-2 text-left text-black">
+      ${komen || "Tiada data"}
+    </div>
+
+    <br>
+    <span class="text-red-500 font-semibold">
+      ⚠️ Murid ini memerlukan perhatian
+    </span>
+  `;
+
+  modal.classList.remove("hidden");
+}
+
+/* HISTORY */
+function loadHistory(){
+
+  const el = document.getElementById("historyList");
+
+  if(!el) return; // 🔥 INI PALING PENTING
+
+  const data = JSON.parse(localStorage.getItem("emotionData")) || [];
+
+  let html = "";
+
+  data.slice(-5).reverse().forEach(item=>{
+    html += `
+      <div class="text-sm text-gray-600 flex justify-between">
+        <span>${item.mood}</span>
+        <span>${item.time}</span>
+      </div>
+    `;
+  });
+
+  el.innerHTML = html;
+}
+
+/* =========================================
+   📊 STATUS ANALYZER (FINAL CLEAN)
+========================================= */
+
+function openStatus(){
+  closeAllModals();
+  document.getElementById("statusModal").classList.remove("hidden");
+
+  // reset pilihan bila buka
+  document.querySelectorAll(".check-active").forEach(el=>{
+    el.classList.remove("check-active");
+  });
+}
+
+function toggleCheck(el,type){
+  el.classList.toggle("check-active");
+}
+
+function analyzeStatus(){
+
+  let stress = 0;
+  let anxiety = 0;
+  let depression = 0;
+
+  document.querySelectorAll(".check-active").forEach(el=>{
+
+    const type = el.getAttribute("data-type");
+
+    if(type === "stress") stress++;
+    if(type === "anxiety") anxiety++;
+    if(type === "depression") depression++;
+
+  });
+
+  let result = "";
+
+// STRESS
+if(stress >= 2){
+  result += "🔴 <b>Stress Tinggi</b><br>";
+} 
+else if(stress === 1){
+  result += "🟡 Stress Ringan<br>";
+}
+
+// ANXIETY
+if(anxiety >= 2){
+  result += "🟠 <b>Anxiety Tinggi</b><br>";
+}
+else if(anxiety === 1){
+  result += "🟡 Anxiety Ringan<br>";
+}
+
+// DEPRESSION
+if(depression >= 2){
+  result += "🔵 <b>Depression Tinggi</b><br>";
+}
+else if(depression === 1){
+  result += "🔵 Depression Ringan<br>";
+}
+
+// STABIL
+if(result === ""){
+  result = "😊 <b>Emosi anda stabil hari ini</b>";
+}
+
+const box = document.getElementById("resultBox");
+
+box.innerHTML = result;
+box.classList.remove("hidden");
+}
+
+/* =========================================
+   🧘 TEKNIK INTERVENSI (FINAL CLEAN)
+========================================= */
+
+/* ========= GLOBAL ========= */
+let therapyInterval;
+let countdownInterval;
+let isRunning = false;
+
+const steps = [
+  {text:"Tarik Nafas", scale:1.4},
+  {text:"Tahan", scale:1},
+  {text:"Hembus Nafas", scale:0.8}
+];
+
+let stepIndex = 0;
+let seconds = 4;
+
+/* ========= OPEN ========= */
+function openIntervensi(){
+  closeAllModals();
+  document.getElementById("intervensiModal").classList.remove("hidden");
+}
+
+/* ========= SUARA ========= */
+function speak(text){
+  speechSynthesis.cancel();
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang = "ms-MY";
+  msg.rate = 0.9;
+  speechSynthesis.speak(msg);
+}
+
+/* ========= STEP ========= */
+function runStep(){
+
+  const text = document.getElementById("breathText");
+  const circle = document.getElementById("breathCircle");
+
+  const step = steps[stepIndex];
+
+  text.innerText = step.text;
+  circle.style.transform = `scale(${step.scale})`;
+
+  speak(step.text);
+
+  stepIndex = (stepIndex + 1) % steps.length;
+}
+
+/* ========= COUNTDOWN ========= */
+function startCountdown(){
+
+  clearInterval(countdownInterval);
+  seconds = 4;
+
+  countdownInterval = setInterval(()=>{
+    document.getElementById("countdown").innerText = seconds;
+    seconds--;
+
+    if(seconds < 0){
+      seconds = 4;
+    }
+
+  },1000);
+}
+
+/* ========= START ========= */
+function startTherapy(){
+
+  if(isRunning) return;
+
+  isRunning = true;
+
+  runStep();
+  startCountdown();
+
+  therapyInterval = setInterval(runStep, 4000);
+
+  document.getElementById("statusText").innerText = "Latihan sedang berjalan...";
+}
+
+/* ========= PAUSE ========= */
+function pauseTherapy(){
+  clearInterval(therapyInterval);
+  clearInterval(countdownInterval);
+
+  isRunning = false;
+
+  document.getElementById("statusText").innerText = "Latihan dijeda";
+}
+
+/* ========= STOP ========= */
+function stopTherapy(){
+
+  clearInterval(therapyInterval);
+  clearInterval(countdownInterval);
+  speechSynthesis.cancel();
+
+  isRunning = false;
+  stepIndex = 0;
+  seconds = 4;
+
+  document.getElementById("breathText").innerText = "Start";
+  document.getElementById("countdown").innerText = "4";
+  document.getElementById("statusText").innerText = "Latihan dihentikan";
+
+  document.getElementById("breathCircle").style.transform = "scale(1)";
+}
+
+/* ========= MUSIC ========= */
+function toggleMusic(){
+  const music = document.getElementById("bgMusic");
+
+  if(music.paused){
+    music.play().catch(err=>{
+      console.log("Audio blocked:", err);
+    });
+  } else {
+    music.pause();
+  }
+}
+
+/* =========================================
+    COPING SKILLS
+========================================= */
+function runCoping(type){
+
+  const box = document.getElementById("copingResult");
+  const loading = document.getElementById("aiLoading");
+  const result = document.getElementById("aiResult");
+  const textBox = document.getElementById("copingText");
+
+  // safety check
+  if(!box || !loading || !result || !textBox){
+    console.log("Element coping tak jumpa ❌");
+    return;
+  }
+
+  box.classList.remove("hidden");
+  loading.classList.remove("hidden");
+  result.classList.add("hidden");
+
+  let text = "";
+
+  if(type === "mental"){
+    text = "🧠 Cuba tukar pemikiran negatif kepada lebih positif. Anda kuat dan mampu mengawal emosi.";
+  } 
+  else if(type === "action"){
+    text = "💪 Bangun dan lakukan pergerakan ringan seperti berjalan atau regangan selama 2 minit.";
+  } 
+  else if(type === "emotion"){
+    text = "💬 Luahkan perasaan anda kepada seseorang atau tulis dalam jurnal untuk melegakan emosi.";
+  } 
+  else {
+    text = "✨ Sila pilih teknik terlebih dahulu.";
+  }
+
+  setTimeout(()=>{
+
+    loading.classList.add("hidden");
+    result.classList.remove("hidden");
+
+    textBox.innerText = text;
+
+    if(typeof speak === "function"){
+      speak(text);
+    }
+
+  }, 1800);
+}
+
+/* OPEN CLOSE */
+function openCoping(){
+  closeAllModals(); // 🔥 tambah
+  document.getElementById("copingModal").classList.remove("hidden");
+}
+</script>
+
+<script>
+/* ================= EMOTION MODAL ================= */
+function closeAllModals(){
+
+  const modals = [
+    "kawalModal",
+    "notaModal",
+    "mindaModal",
+    "copingModal",
+    "intervensiModal",
+    "healModal",
+    "gameModal",
+    "trackerModal",
+    "statusModal",
+    "emotionModal",
+    "detailModal" // 🔥 tambah ini
+  ];
+
+  modals.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.add("hidden");
+  });
+
+}
+
+function openEmotion(){
+
+  closeAllModals(); // 🔥 penting
+
+  const modal = document.getElementById("emotionModal");
+
+  // support dua jenis (class hidden / style)
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+}
+
+function closeEmotion(){
+  const modal = document.getElementById("emotionModal");
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+}
+
+function updateEmotion(val){
+
+  const circle = document.getElementById("emotionCircle");
+
+  if(val == 1){
+    circle.innerText = "😡";
+    circle.style.background = "#ef4444";
+  }
+
+  if(val == 2){
+    circle.innerText = "😟";
+    circle.style.background = "#f97316";
+  }
+
+  if(val == 3){
+    circle.innerText = "😐";
+    circle.style.background = "#6b7280";
+  }
+
+  if(val == 4){
+    circle.innerText = "🙂";
+    circle.style.background = "#22c55e";
+  }
+
+  if(val == 5){
+    circle.innerText = "😄";
+    circle.style.background = "#3b82f6";
+  }
+
+  // 🔥 TAMBAH INI (PENTING)
+  trackActivity("Emotion Tracker");
+}
+
+function analyzeEmotion(){
+
+  const val = document.querySelector('input[type="range"]').value;
+  const box = document.getElementById("emotionResult");
+
+  let text = "";
+
+  if(val == 1){
+    text = "😡 Anda dalam tekanan tinggi. Cuba teknik pernafasan dan rehat seketika.";
+  }
+
+  if(val == 2){
+    text = "😟 Anda sedikit risau. Cuba teknik grounding untuk menenangkan diri.";
+  }
+
+  if(val == 3){
+    text = "😐 Emosi stabil. Teruskan aktiviti positif.";
+  }
+
+  if(val == 4){
+    text = "🙂 Anda dalam keadaan baik. Kekalkan rutin sihat.";
+  }
+
+  if(val == 5){
+    text = "😄 Emosi sangat baik! Teruskan berkongsi energi positif.";
+  }
+
+  box.innerText = text;
+  box.classList.remove("hidden");
+
+  speak(text); // 🔥 guna AI voice cikgu
+}
+</script>
+
+<script>
+
+/* ================= OPEN ================= */
+function openKawal(){
+  closeAllModals();
+  document.getElementById("kawalModal").classList.remove("hidden");
+}
+
+function openNota(){
+  closeAllModals();
+  document.getElementById("notaModal").classList.remove("hidden");
+}
+
+function openMinda(){
+  closeAllModals();
+  document.getElementById("mindaModal").classList.remove("hidden");
+}
+
+/* ================= CLOSE ================= */
+function closeKawal(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById("kawalModal").classList.add("hidden");
+}
+
+function closeNota(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById("notaModal").classList.add("hidden");
+}
+
+function closeMinda(e){
+  if(e && e.target !== e.currentTarget) return;
+  document.getElementById("mindaModal").classList.add("hidden");
+}
+</script>
+
+<!-- 🔥 STEP 1: LOAD FIREBASE DULU -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- 🔥 STEP 2: CONFIG & INIT -->
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// 🔥 REF
+const refHealink = db.collection("stats").doc("visitors_healink");
+
+// 🔥 DISPLAY REALTIME
+refHealink.onSnapshot(doc => {
+  if (doc.exists) {
+    const el = document.getElementById("visitorHealink");
+    if (el) {
+      el.innerText = doc.data().count;
+    }
+  }
+});
+
+// 🔥 LOGIC COUNT
+refHealink.get().then(doc => {
+
+  if (!doc.exists) {
+    return refHealink.set({ count: 1 });
+  }
+
+  if (!localStorage.getItem("hasVisitedHealink")) {
+    return refHealink.update({
+      count: firebase.firestore.FieldValue.increment(1)
+    });
+  }
+
+}).then(() => {
+  localStorage.setItem("hasVisitedHealink", "true");
+});
+</script>
+
+<!-- 🔥 STEP 3: FUNCTION -->
+<script>
+function trackActivity(module, komen = ""){
+
+  const nama = sessionStorage.getItem("nama");
+  const jenis = sessionStorage.getItem("jenis");
+  const kelas = sessionStorage.getItem("kelas");
+  const organisasi = sessionStorage.getItem("organisasi");
+
+  const m = (module || "").toLowerCase();
+
+  // ================================
+  // 🔥 PERLU PERHATIAN
+  // ================================
+  let perluPerhatian = false;
+
+  if(
+    m.includes("heal") ||
+    m.includes("coping") ||
+    m.includes("emotion")
+  ){
+    perluPerhatian = true;
+  }
+
+  // ================================
+  // 🔥 RISK SCORE (WAJIB ATAS)
+  // ================================
+  let riskScore = 0;
+  let tahap = "RENDAH";
+
+  if(m.includes("heal")) riskScore += 5;
+  if(m.includes("coping")) riskScore += 2;
+  if(m.includes("emotion")) riskScore += 3;
+
+  if(riskScore >= 7) tahap = "TINGGI";
+  else if(riskScore >= 4) tahap = "SEDERHANA";
+
+  console.log("📊 SCORE:", riskScore, tahap);
+
+  // ================================
+  // 🔥 SIMPAN FIRESTORE (LAST)
+  // ================================
+  db.collection("aktivitiPelajar").add({
+    module,
+    nama,
+    jenis,
+    kelas,
+    organisasi,
+    komen,
+    perluPerhatian,
+    riskScore,
+    tahap,
+    masa: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+}
+</script> 
+
+<script>
+// 🔥 BLOCK AWAL (sebelum Firebase)
+if(!sessionStorage.getItem("sudahDaftar")){
+  window.location.href = "daftar.html";
+}
+firebase.auth().onAuthStateChanged(user => {
+
+  if(user){
+    return; // admin
+  }
+
+  if(!sessionStorage.getItem("sudahDaftar")){
+    window.location.href = "daftar.html";
+  }
+
+});
+
+
+// ================= SUBMIT DAFTAR =================
+function submitDaftar(){
+
+  const jenis = document.getElementById("jenis").value;
+  const nama  = document.getElementById("nama").value.trim();
+  const organisasi = document.getElementById("organisasi").value.trim();
+  const kelas = document.getElementById("kelas").value.trim();
+
+  // 🔥 ADMIN → terus login modal
+  if(jenis === "Admin"){
+
+    document.getElementById("modalDaftar").classList.add("hidden");
+    document.getElementById("modalLoginAdmin").classList.remove("hidden");
+
+    return;
+  }
+
+  // VALIDATION
+  if(!jenis || !nama){
+    alert("Sila lengkapkan maklumat");
+    return;
+  }
+
+  // SIMPAN SESSION
+  sessionStorage.setItem("nama", document.getElementById("nama").value);
+  sessionStorage.setItem("jenis", jenis);
+  sessionStorage.setItem("kelas", kelas);
+  sessionStorage.setItem("organisasi", organisasi);
+  sessionStorage.setItem("sudahDaftar","yes");
+  sessionStorage.setItem("jantina", jantina);
+
+  // SIMPAN FIRESTORE
+  db.collection("pengunjung").add({
+    jenis, nama, organisasi, kelas,
+    masa: new Date()
+  });
+
+  // tutup modal
+  document.getElementById("modalDaftar").classList.add("hidden");
+
+}
+
+
+// ================= LOGIN ADMIN =================
+function loginAdmin(){
+
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value.trim();
+
+  if(!email || !password){
+    alert("Sila isi email & password");
+    return;
+  }
+
+  firebase.auth().signInWithEmailAndPassword(email, password)
+  .then(() => {
+
+    console.log("✅ ADMIN LOGIN SUCCESS");
+
+    // 🔥 AUTO NAMA DARI EMAIL
+    const nama = email.split("@")[0];
+
+    sessionStorage.setItem("nama", nama);
+    sessionStorage.setItem("jenis", "Admin");
+    sessionStorage.setItem("sudahDaftar","yes");
+
+    window.location.href = "dashboard.html";
+
+  })
+  .catch(err => {
+    alert("Login gagal: " + err.message);
+  });
+
+}
+
+
+// ================= HANDLE JENIS =================
+function handleJenis(){
+
+  const jenis = document.getElementById("jenis").value;
+
+  if(jenis === "Admin"){
+
+    document.getElementById("modalDaftar").classList.add("hidden");
+    document.getElementById("modalLoginAdmin").classList.remove("hidden");
+
+  }
+
+}
+
+// ================= CHECK USER =================
+
+// 🔥 ADMIN LOGIN CHECK
+firebase.auth().onAuthStateChanged(user => {
+
+  if(user){
+    return; // admin terus masuk
+  }
+
+  // 🔥 USER BELUM DAFTAR → redirect
+  if(!sessionStorage.getItem("sudahDaftar")){
+    window.location.href = "daftar.html";
+  }
+
+});
+// ================= USER RESET =================
+function tukarUser(){
+
+  // 🔥 buang semua data user
+  sessionStorage.clear();
+
+  // 🔥 logout firebase (kalau admin)
+  firebase.auth().signOut();
+
+  // 🔥 redirect semula ke daftar
+  window.location.href = "daftar.html";
+
+}
+
+function selectEmoji(el){
+
+  // remove highlight semua
+  document.querySelectorAll(".emoji-card")
+    .forEach(e => e.classList.remove("ring-2","ring-purple-500"));
+
+  // highlight yang dipilih
+  el.classList.add("ring-2","ring-purple-500");
+
+  // simpan pilihan (optional)
+  window.selectedEmoji = el.innerText;
+
+  console.log("😊 Emoji dipilih:", window.selectedEmoji);
+}
+
+/* ========= CLOSE ========= */
+function closeIntervensi(){
+  stopTherapy();
+  document.getElementById("intervensiModal").classList.add("hidden");
+}
+
+function closeCoping(){
+  document.getElementById("copingModal").classList.add("hidden");
+}
+
+function closeHealTalk(){
+  document.getElementById("healModal").classList.add("hidden");
+}
+
+function closeStatus(){
+  document.getElementById("statusModal").classList.add("hidden");
+}
+
+function closeTracker(){
+  document.getElementById("trackerModal").classList.add("hidden");
+}
+
+function showGreeting(){
+
+  const nama = sessionStorage.getItem("nama") || "Pengguna";
+  const jam = new Date().getHours();
+  const hari = new Date().getDay(); // 0=Ahad, 1=Isnin...
+
+  let ucapan = "";
+  let icon = "👋";
+
+  // 🌤️ UCAPAN MASA
+  if(jam >= 5 && jam < 12){
+    ucapan = "Selamat Pagi";
+    icon = "🌤️";
+  }
+  else if(jam >= 12 && jam < 18){
+    ucapan = "Selamat Petang";
+    icon = "☀️";
+  }
+  else{
+    ucapan = "Selamat Malam";
+    icon = "🌙";
+  }
+
+  // 🔥 MESEJ IKUT HARI
+  const mesejList = [
+    "Rehatkan minda, jaga emosi anda 💙",          // Ahad
+    "Mulakan minggu dengan semangat baru 💪",      // Isnin
+    "Teruskan usaha, anda di landasan betul 🚀",   // Selasa
+    "Sedikit lagi, kejayaan menanti ✨",           // Rabu
+    "Fokus pada matlamat anda 🎯",                // Khamis
+    "Hebat! Anda berjaya sampai ke sini 🔥",      // Jumaat
+    "Luangkan masa untuk diri sendiri 😊"         // Sabtu
+  ];
+
+  const mesej = mesejList[hari];
+
+  const html = `
+    ${icon} ${ucapan}, <b>${nama}</b><br>
+    <span class="text-xs text-white/70">${mesej}</span>
+  `;
+
+  document.getElementById("greetingHeader").innerHTML = html;
+}
+
+showGreeting();
+</script>
+
+<script>
+const particlesContainer = document.getElementById("particles");
+
+// small particles
+for(let i=0; i<30; i++){
+  const p = document.createElement("div");
+  p.classList.add("particle");
+
+  p.style.left = Math.random()*100 + "%";
+  p.style.top = Math.random()*100 + "%";
+
+  p.style.animationDuration = (6 + Math.random()*6) + "s";
+
+  particlesContainer.appendChild(p);
+}
+
+// floating light
+for(let i=0; i<5; i++){
+  const l = document.createElement("div");
+  l.classList.add("light");
+
+  l.style.left = Math.random()*100 + "%";
+  l.style.top = Math.random()*100 + "%";
+
+  l.style.animationDuration = (15 + Math.random()*10) + "s";
+
+  particlesContainer.appendChild(l);
+}
+
+window.addEventListener("load", function(){
+
+  console.log("HEALINK COUNT");
+
+  const refHealink = db.collection("stats").doc("visitors_healink");
+
+  refHealink.get().then(doc => {
+
+    if (!doc.exists) {
+      return refHealink.set({ count: 1 });
+    }
+
+    // 🔥 LOGIC COUNT (SESSION BASED)
+refHealink.get().then(doc => {
+
+  if (!doc.exists) {
+    return refHealink.set({ count: 1 });
+  }
+
+  if (!sessionStorage.getItem("hasVisitedHealink")) {
+    return refHealink.update({
+      count: firebase.firestore.FieldValue.increment(1)
+    });
+  }
+
+}).then(() => {
+  sessionStorage.setItem("hasVisitedHealink", "true");
+});
+  });
+
+});
+</script>
+</body>
+</html>
