@@ -107,6 +107,8 @@ function setLevel(p){
 
 function startGame(){
 
+  trackAktiviti("Memory Game");
+
   score = 0;
   document.getElementById("score").innerText = score;
   document.getElementById("winBox").classList.add("hidden");
@@ -194,6 +196,26 @@ setInterval(()=>{
 
 // START
 startGame();
+
+function trackAktiviti(namaAktiviti){
+
+  const nama = sessionStorage.getItem("nama") || "Unknown";
+  const kelas = sessionStorage.getItem("kelas") || "-";
+  const sekolah = sessionStorage.getItem("organisasi") || "-";
+  const jenis = sessionStorage.getItem("jenis") || "-";
+
+  fetch("https://script.google.com/macros/s/AKfycbzu7nTnuzmvQA322WmETt1lEqT8mdz1wfLWAcvUWHEKk59pEsdus5XVt5nnK7rS6Gbs/exec", {
+    method: "POST",
+    body: new URLSearchParams({
+      nama: nama,
+      kelas: kelas,
+      sekolah: sekolah,
+      aktiviti: namaAktiviti,
+      jenis: jenis
+    })
+  });
+
+}
 </script>
 
 </body>
