@@ -318,6 +318,12 @@ body::after {
         class="bg-white/20 rounded-lg hover:bg-white/30">
         Tapis Data
       </button>
+    
+    <button onclick="exportCSV()" 
+  class="bg-blue-500 p-2 rounded">
+  📊 Export Excel
+</button>
+
     </div>
 
     <!-- ================= PENGUNJUNG ================= -->
@@ -1491,6 +1497,34 @@ function updateChart(murid, guru, pelawat){
     }
   });
 
+}
+
+// ================= EXPORT CSV =================
+function exportCSV(){
+
+  let csv = "Nama,Kelas,Modul,Masa\n";
+
+  rawData.forEach(d => {
+
+    if(!d.module) return;
+
+    const masa = d.masa?.toDate()
+      ? d.masa.toDate().toLocaleString("ms-MY")
+      : "-";
+
+    csv += `"${d.nama}","${d.kelas}","${d.module}","${masa}"\n`;
+
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_healink.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
