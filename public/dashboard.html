@@ -555,9 +555,20 @@ db.collection("aktivitiPelajar")
 .onSnapshot(snapshot => {
 
   rawData = [];
-  snapshot.forEach(doc => rawData.push(doc.data()));
 
-  console.log("DATA:", rawData);
+  snapshot.forEach(doc => {
+    const d = doc.data();
+
+    rawData.push({
+      nama: d.nama || "-",
+      kelas: d.kelas || "-",
+      jenis: d.jenis || "-",
+      aktiviti: d.aktiviti || "Lain",
+      masa: d.masa || null
+    });
+  });
+
+  console.log("DATA LOADED:", rawData.length, rawData);
 
   renderAll();
 });
