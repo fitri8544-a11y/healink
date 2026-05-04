@@ -335,10 +335,6 @@ body::after {
     📊 Export Excel
   </button>
 
-  <button onclick="testClick()" class="bg-green-500">
-  TEST
-</button>
-
 </div>
 
     <!-- ================= PENGUNJUNG ================= -->
@@ -1516,38 +1512,40 @@ function updateChart(murid, guru, pelawat){
 // ================= REPORT =================
 function generateReport(){
 
-  let filtered = rawData.filter(d => inRange(d.masa));
+  console.log("CLICK REPORT");
 
-  if(filtered.length === 0){
-    alert("Tiada data untuk laporan");
+  if(!rawData || rawData.length === 0){
+    alert("Tiada data");
     return;
   }
 
-  let text = "LAPORAN AKTIVITI HEALINK\n\n";
+  let text = "LAPORAN HEALINK\n\n";
 
-  filtered.forEach(d => {
+  rawData.forEach(d => {
 
-    // 🔥 SAFE DATE
     let masa = "-";
+
     if(d.masa?.seconds){
-      masa = new Date(d.masa.seconds * 1000).toLocaleString("ms-MY");
+      masa = new Date(d.masa.seconds * 1000)
+        .toLocaleString("ms-MY");
     }
 
-    // 🔥 FIX MODULE
-    const modul = d.module || d.aktiviti || "Lain";
+    const modul = d.aktiviti || "Lain";
 
     text += `${d.nama || "-"} | ${d.kelas || "-"} | ${modul} | ${masa}\n`;
   });
 
   const blob = new Blob([text], { type: "text/plain" });
+
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "laporan_healink.txt";
+  a.download = "laporan.txt";
   a.click();
 
   URL.revokeObjectURL(url);
+
 }
 
 // ================= CSV =================
@@ -1585,10 +1583,6 @@ function exportCSV(){
   a.click();
 
   URL.revokeObjectURL(url);
-}
-
-function testClick(){
-  alert("Button hidup!");
 }
 </script>
 </body>
