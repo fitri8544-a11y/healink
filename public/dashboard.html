@@ -698,6 +698,22 @@ function exportCSV(){
 function applyFilter(){
   renderAll();
 }
+
+// ================= VISITOR COUNTER =================
+
+// PORTAL
+db.collection("stats").doc("visitors_portal")
+.onSnapshot(doc => {
+  document.getElementById("visitorCount").innerText =
+    doc.exists ? doc.data().count : 0;
+});
+
+// HEALINK
+db.collection("stats").doc("visitors_healink")
+.onSnapshot(doc => {
+  document.getElementById("visitorHealink").innerText =
+    doc.exists ? doc.data().count : 0;
+});
 </script>
 
 </body>
