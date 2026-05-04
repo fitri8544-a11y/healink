@@ -435,852 +435,6 @@ body::after {
 
 </div>
 
-<!-- ================= RANKING ================= -->
-<div class="card mt-6">
-  <div class="title">🏆 Ranking Modul</div>
-  <div id="ranking" class="grid md:grid-cols-3 gap-4"></div>
-</div>
-
-<script>
-
-const SUPER_ADMIN = "fitrieusop@moe.gov.my";
-
-function generateGreeting(){
-
-  firebase.auth().onAuthStateChanged(user => {
-
-    let namaPaparan = "Pengguna";
-    let roleText = "";
-
-    if(user && user.email){
-
-      const email = user.email.toLowerCase();
-      const raw = email.split("@")[0];
-
-      const nama = raw.charAt(0).toUpperCase() + raw.slice(1);
-
-      // ================= ROLE LOGIC =================
-      if(email === SUPER_ADMIN){
-        roleText = "Admin";
-        namaPaparan = "Fitri";
-      }
-      else if(ADMIN_EMAILS.includes(email)){
-        roleText = "Admin";
-        namaPaparan = "";
-      }
-      else{
-        const jenis = sessionStorage.getItem("jenis");
-
-        if(jenis === "Guru"){
-          roleText = "Cikgu";
-          namaPaparan = sessionStorage.getItem("nama") || nama;
-        }
-        else if(jenis === "Murid"){
-          roleText = "";
-          namaPaparan = sessionStorage.getItem("nama") || nama;
-        }
-      }
-    }
-
-    // ================= MASA =================
-    const hour = new Date().getHours();
-
-    let greeting = "";
-
-    if(hour >= 5 && hour < 12){
-      greeting = "🌅 Selamat Pagi";
-    }
-    else if(hour >= 12 && hour < 18){
-      greeting = "🌤 Selamat Petang";
-    }
-    else{
-      greeting = "🌙 Selamat Malam";
-    }
-
-    // ================= OUTPUT =================
-    let fullText = greeting;
-
-    if(roleText && namaPaparan){
-      fullText += `, ${roleText} ${namaPaparan}`;
-    }
-    else if(roleText){
-      fullText += `, ${roleText}`;
-    }
-    else{
-      fullText += `, ${namaPaparan}`;
-    }
-
-    const el = document.getElementById("greetingText");
-
-    el.innerText = fullText;
-
-    // ================= WARNA ROLE =================
-    if(roleText === "Admin"){
-      el.className = "text-lg font-semibold text-yellow-300";
-    }
-    else if(roleText === "Cikgu"){
-      el.className = "text-lg font-semibold text-blue-300";
-    }
-    else{
-      el.className = "text-lg font-semibold text-green-300";
-    }
-
-  });
-
-}
-
-// 🔥 CONFIG (guna config cikgu)
-const firebaseConfig = {
-  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
-  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
-  projectId: "bimbingankaunselingskkk"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// STATE
-let rawData = [];
-let stats = {};
-let barChart, pieChart;
-
-// 📡 REALTIME LISTENER
-db.collection("aktivitiPelajar").onSnapshot(snapshot => {
-  rawData = [];
-  snapshot.forEach(doc => rawData.push(doc.data()));
-  computeAndRender();
-});
-
-// 🔎 FILTER TARIKH
-function applyFilter(){
-  computeAndRender();
-}
-
-function inRange(date){
-  const from = document.getElementById('fromDate').value;
-  const to   = document.getElementById('toDate').value;
-
-  if(!from && !to) return true;
-
-  const d = new Date(date?.seconds ? date.seconds*1000 : date);
-  if(from){
-    const f = new Date(from + "T00:00:00");
-    if(d < f) return false;
-  }
-  if(to){
-    const t = new Date(to + "T23:59:59");
-    if(d > t) return false;
-  }
-  return true;
-}
-
-// 🧠 COMPUTE
-function computeAndRender(){
-  stats = {};
-  let total = 0;
-
-  rawData.forEach(d => {
-    if(!inRange(d.masa)) return;
-
-    const m = d.module || "Lain";
-    if(!stats[m]) stats[m] = 0;
-    stats[m]++;
-    total++;
-  });
-
-  renderKPI(stats, total);
-  renderCharts(stats);
-  renderRanking(stats);
-}
-
-// 📊 KPI
-function renderKPI(stats, total){
-  const modules = Object.keys(stats).length;
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-  const top = sorted[0]?.[0] || "-";
-  const avg = modules ? Math.round(total/modules) : 0;
-
-  document.getElementById("kpiTotal").innerText = total;
-  document.getElementById("kpiModules").innerText = modules;
-  document.getElementById("kpiTop").innerText = top;
-  document.getElementById("kpiAvg").innerText = avg;
-}
-
-// 📈 CHART
-function renderCharts(stats){
-
-  const labels = Object.keys(stats);
-  const data = Object.values(stats);
-
-  // destroy lama
-  if(barChart) barChart.destroy();
-  if(pieChart) pieChart.destroy();
-
-  // ================= BAR =================
-  barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Jumlah Klik',
-        data,
-        backgroundColor: "rgba(255,255,255,0.3)",
-        borderRadius: 6
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // 🔥 WAJIB
-
-      plugins: {
-        legend: {
-          labels: {
-            color: "#ffffff",
-            font: { size: 12 } // kecilkan legend
-          }
-        }
-      },
-
-      scales: {
-        x: {
-          ticks: { 
-            color: "#ffffff",
-            font: { size: 10 } // kecilkan label bawah
-          }
-        },
-        y: {
-          ticks: { 
-            color: "#ffffff",
-            font: { size: 10 }
-          }
-        }
-      }
-    }
-  });
-
-
-  // ================= PIE =================
-  pieChart = new Chart(document.getElementById('pieChart'), {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: [
-          "#60a5fa","#f87171","#fbbf24","#34d399","#a78bfa",
-          "#f472b6","#22d3ee","#facc15","#fb923c","#4ade80"
-        ]
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // 🔥 WAJIB
-
-      plugins: {
-        legend: {
-          labels: {
-            color: "#ffffff",
-            font: { size: 11 } // kecilkan legend pie
-          }
-        }
-      }
-    }
-  });
-
-}
-
-// 🏆 RANKING
-function renderRanking(stats){
-  const container = document.getElementById("ranking");
-  container.innerHTML = "";
-
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
-
-  sorted.forEach(([module, count], i)=>{
-    const percent = Math.round((count/max)*100);
-
-    container.innerHTML += `
-      <div class="card">
-        <div class="flex justify-between">
-          <div>#${i+1}</div>
-          <div class="text-xs">${percent}%</div>
-        </div>
-        <div class="font-bold mt-2">${module}</div>
-        <div class="text-3xl mt-1">${count}</div>
-        <div class="w-full bg-white/20 h-2 rounded mt-3">
-          <div class="h-2 rounded bg-gradient-to-r from-yellow-400 to-pink-500" style="width:${percent}%"></div>
-        </div>
-      </div>
-    `;
-  });
-}
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-<script>
-const ADMIN_EMAILS = [
-  "fitrieusop@moe.gov.my",
-  "g-88050609@moe-dl.edu.my"
-];
-
-firebase.auth().onAuthStateChanged(user => {
-
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  if (!ADMIN_EMAILS.includes(user.email)) {
-    alert("Akses terhad untuk admin sahaja");
-    firebase.auth().signOut();
-    window.location.href = "login.html";
-  }
-
-});
-</script>
-
-<script>
-function logout(){
-  firebase.auth().signOut().then(()=>{
-    window.location.href = "healink.html"; // 🔥 balik ke homepage
-  });
-}
-
-let visitorChart;
-
-db.collection("pengunjung").onSnapshot(snapshot => {
-
-  let murid = 0;
-  let guru = 0;
-  let pelawat = 0;
-
-  snapshot.forEach(doc => {
-
-  const d = doc.data();  // ✅ guna d (konsisten)
-
-  // kira jenis pengguna
-  if(d.jenis === "Murid") murid++;
-  else if(d.jenis === "Guru") guru++;
-  else pelawat++;
-
-  // format masa
-  const time = d.masa?.toDate().toLocaleString('ms-MY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  }) || "-";
-
-  // contoh guna untuk display
-  console.log(d.nama, time);
-
-});
-
-  // UPDATE KPI
-  document.getElementById("kpiMurid").innerText = murid;
-  document.getElementById("kpiGuru").innerText = guru;
-  document.getElementById("kpiPelawat").innerText = pelawat;
-
-  // DESTROY CHART LAMA
-  if(visitorChart) visitorChart.destroy();
-
-  // CREATE CHART BARU
-  visitorChart = new Chart(document.getElementById("visitorChart"), {
-    type: 'doughnut',
-    data: {
-      labels: ["Murid", "Guru", "Pelawat"],
-      datasets: [{
-        data: [murid, guru, pelawat],
-        backgroundColor: [
-          "#34d399", // hijau
-          "#60a5fa", // biru
-          "#f59e0b"  // oren
-        ],
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          labels: {
-            color: "#fff",
-            font: { size: 12 }
-          }
-        }
-      }
-    }
-  });
-
-});
-</script>
-
-<script>
-
-// ================= FILTER =================
-let currentSekolah = "all";
-let currentKelas = "all";
-
-function filterSekolah(s){
-  currentSekolah = s;
-  loadData();
-}
-
-function filterKelas(k){
-  currentKelas = k;
-  loadData();
-}
-
-// ================= LOAD DATA (KPI + FILTER) =================
-function loadData(){
-
-  db.collection("aktivitiPelajar")
-  .orderBy("masa","desc")
-  .onSnapshot(snapshot => {
-
-    let murid = 0, guru = 0, pelawat = 0;
-
-    snapshot.forEach(doc => {
-
-      const d = doc.data();
-
-      // 🔥 FILTER SEKOLAH
-      if(
-  currentSekolah !== "all" &&
-  d.organisasi?.toLowerCase().trim() !== currentSekolah.toLowerCase().trim()
-) return;
-
-      // 🔥 FILTER KELAS
-      if(
-  currentKelas !== "all" &&
-  d.kelas?.toLowerCase().trim() !== currentKelas.toLowerCase().trim()
-) return;
-
-      if(d.jenis === "Murid") murid++;
-      else if(d.jenis === "Guru") guru++;
-      else pelawat++;
-
-    });
-
-    document.getElementById("kpiMurid").innerText = murid;
-    document.getElementById("kpiGuru").innerText = guru;
-    document.getElementById("kpiPelawat").innerText = pelawat;
-
-  });
-
-}
-
-
-// ================= LIVE ACTIVITY =================
-db.collection("aktivitiPelajar")
-.orderBy("masa", "desc")
-.limit(20)
-.onSnapshot(snapshot => {
-
-  const container = document.getElementById("activityList");
-  if (!container) return;
-
-  let html = "";
-
-  // ✅ TAMBAH INI
-  const kelasSet = new Set();
-  const modulSet = new Set();
-
-  snapshot.forEach(doc => {
-
-    const d = doc.data();
-
-    // ✅ TAMBAH INI
-    kelasSet.add(d.kelas);
-    modulSet.add(d.module);
-
-    const time = d.masa?.toDate().toLocaleString('ms-MY', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }) || "-";
-
-    let icon = "👤";
-    const jenis = (d.jenis || "").toString().trim().toLowerCase();
-
-    if (jenis === "murid") icon = "🧑‍🎓";
-    else if (jenis === "guru") icon = "👨‍🏫";
-    else if (jenis === "admin") icon = "🛠️";
-
-    html += `
-      <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center 
-                  hover:bg-white/20 transition duration-300"
-           data-nama="${(d.nama || '').toLowerCase()}"
-           data-kelas="${(d.kelas || '').toLowerCase()}"
-           data-modul="${(d.module || '').toLowerCase()}">
-
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-2xl">${icon}</span>
-            <span class="nama font-semibold text-white">
-              ${d.nama || "Pengguna"}
-            </span>
-          </div>
-
-          <div class="text-xs text-white/70 mt-1">
-            ${d.jenis || "-"} • ${d.kelas || d.organisasi || "-"}
-          </div>
-        </div>
-
-        <div class="text-right">
-          <div class="text-yellow-300 font-semibold">
-            ${d.module || "-"}
-          </div>
-          <div class="text-xs text-white/60 mt-1">
-            ${time}
-          </div>
-        </div>
-
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  // ✅ STEP 3 (BETUL)
-  const kelasSelect = document.getElementById("filterKelas");
-  const modulSelect = document.getElementById("filterModul");
-
-  kelasSelect.innerHTML = '<option value="">Semua Kelas</option>';
-  modulSelect.innerHTML = '<option value="">Semua Modul</option>';
-
-  kelasSet.forEach(k => {
-    if(k) kelasSelect.innerHTML += `<option value="${k.toLowerCase()}">${k}</option>`;
-  });
-
-  modulSet.forEach(m => {
-    if(m) modulSelect.innerHTML += `<option value="${m.toLowerCase()}">${m}</option>`;
-  });
-
-});
-
-
-// ================= AUTO LOAD (FINAL CLEAN VERSION) =================
-window.onload = function(){
-
-  generateGreeting(); // 👈 sini
-
-  loadData();      // ✔ dashboard utama
-  loadSidebar();   // ✔ sidebar dynamic (SEKOLAH + KELAS + ORGANISASI)
-  loadAlert();     // ✔ murid perlu perhatian
-  document.getElementById("sekolahList").classList.remove("hidden");
-
-};;
-
-// ================= SEKOLAH =================
-function loadSekolah(){
-
-  const container = document.getElementById("listSekolah");
-  if(!container) return;
-
-  db.collection("aktivitiPelajar")
-  .onSnapshot(snapshot => {
-
-    let sekolahSet = new Set();
-
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      if(d.organisasi){
-        sekolahSet.add(d.organisasi);
-      }
-    });
-
-    container.innerHTML = "";
-
-    container.innerHTML += `
-      <button onclick="filterSekolah('all')" class="sidebar-btn">
-        Semua
-      </button>
-    `;
-
-    [...sekolahSet]
-      .map(s => s.trim())
-      .sort()
-      .forEach(sekolah => {
-
-        container.innerHTML += `
-          <button onclick="filterSekolah('${sekolah}')" class="sidebar-btn">
-            ${sekolah}
-          </button>
-        `;
-      });
-
-  });
-
-}
-
-// ================= KELAS =================
-function loadKelas(){
-
-  const container = document.getElementById("listKelas");
-  if(!container) return;
-
-  db.collection("aktivitiPelajar")
-  .onSnapshot(snapshot => {
-
-    let kelasSet = new Set();
-
-    snapshot.forEach(doc => {
-      const d = doc.data();
-      if(d.kelas){
-        kelasSet.add(d.kelas);
-      }
-    });
-
-    container.innerHTML = "";
-
-    container.innerHTML += `
-      <button onclick="filterKelas('all')" class="sidebar-btn">
-        Semua
-      </button>
-    `;
-
-    [...kelasSet]
-      .map(k => k.trim())
-      .sort()
-      .forEach(kelas => {
-
-        container.innerHTML += `
-          <button onclick="filterKelas('${kelas}')" class="sidebar-btn">
-            ${kelas}
-          </button>
-        `;
-      });
-
-  });
-
-}
-
-firebase.auth().onAuthStateChanged(user => {
-
-  if(!user){
-    window.location.href = "index.html"; // block access
-  }
-
-});
-
-function loadAlert(){
-
-  const container = document.getElementById("alertList");
-
-  db.collection("aktivitiPelajar")
-  .orderBy("masa","desc") // 🔥 TAMBAH INI
-  .limit(10)
-  .onSnapshot(snapshot => {
-
-    let html = "";
-
-    snapshot.forEach(doc => {
-
-      const d = doc.data();
-
-      if(d.perluPerhatian !== true) return; // 🔥 filter sini
-
-      html += `
-  <div onclick="openDetail(
-    '${(d.nama||'').replace(/'/g,"")}',
-    '${(d.kelas||d.organisasi||'')}',
-    '${(d.module||'')}',
-    '${(d.komen||'').replace(/'/g,"")}'
-  )"
-  class="cursor-pointer bg-red-500/20 border border-red-400 p-4 rounded-xl hover:bg-red-500/30 transition">
-
-    <div class="font-bold text-white">
-      ⚠️ ${d.nama || "Tanpa Nama"}
-    </div>
-
-    <div class="text-sm text-white/80">
-      ${d.kelas || d.organisasi || "-"}
-    </div>
-
-    <div class="text-xs text-red-300 mt-1">
-      Modul: ${d.module || "-"}
-    </div>
-
-  </div>
-`;
-    });
-
-    container.innerHTML = html;
-
-  }, err => {
-    console.error("❌ FIRESTORE ERROR:", err);
-  });
-
-}
-
-console.log("🔥 ALERT LOADED");
-
-function openDetail(nama, kelas, module, komen){
-
-  console.log("CLICK DETECTED:", nama);
-
-  const modal = document.getElementById("detailModal");
-  const content = document.getElementById("detailContent");
-
-  if(!modal || !content){
-    console.error("❌ MODAL TAK JUMPA");
-    return;
-  }
-
-  content.innerHTML = `
-  <b>Nama:</b> ${nama}<br>
-  <b>Kelas:</b> ${kelas}<br>
-  <b>Modul:</b> ${module}<br><br>
-
-  <b>📝 Luahan Murid:</b>
-  <div class="bg-gray-100 text-black p-3 rounded mt-2 text-left">
-    ${komen || "Tiada maklumat"}
-  </div>
-
-  <br>
-  <span class="text-red-500 font-semibold">
-    ⚠️ Murid ini memerlukan perhatian
-  </span>
-`;
-
-  modal.classList.remove("hidden");
-
-}
-function closeDetail(){
-  document.getElementById("detailModal").classList.add("hidden");
-}
-
-function loadSidebar(){
-
-  db.collection("aktivitiPelajar")
-  .onSnapshot(snapshot => {
-
-    const sekolahCount = {};
-    const kelasCount = {};
-    const organisasiCount = {};
-
-    snapshot.forEach(doc => {
-      const d = doc.data();
-
-      const orgRaw = (d.organisasi || "").toUpperCase().trim();
-      const kelas = (d.kelas || "-").toUpperCase();
-
-      // ================= CLASSIFY =================
-      let kategori = "LAIN";
-
-      if(
-        orgRaw.includes("SK") ||
-        orgRaw.includes("SMK") ||
-        orgRaw.includes("SJKC") ||
-        orgRaw.includes("SJKT")
-      ){
-        kategori = "SEKOLAH";
-      }
-      else if(
-        orgRaw.includes("PPD") ||
-        orgRaw.includes("JPN")
-      ){
-        kategori = "ORGANISASI";
-      }
-
-      // ================= COUNT =================
-      if(kategori === "SEKOLAH"){
-        sekolahCount[orgRaw] = (sekolahCount[orgRaw] || 0) + 1;
-      }
-
-      if(kategori === "ORGANISASI"){
-        organisasiCount[orgRaw] = (organisasiCount[orgRaw] || 0) + 1;
-      }
-
-      if(kategori === "LAIN"){
-        organisasiCount["LAIN-LAIN"] = (organisasiCount["LAIN-LAIN"] || 0) + 1;
-      }
-
-      // kelas semua
-      kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
-    });
-
-    // ================= SEKOLAH =================
-    let htmlSekolah = `
-      <div onclick="filterSekolah('all')" 
-           class="sidebar-item flex justify-between cursor-pointer">
-        <span>Semua</span>
-        <span class="badge">${snapshot.size}</span>
-      </div>
-    `;
-
-    Object.keys(sekolahCount)
-    .sort((a,b) => sekolahCount[b] - sekolahCount[a])
-    .forEach(s => {
-      htmlSekolah += `
-        <div onclick="filterSekolah('${s}')" 
-             class="sidebar-item flex justify-between cursor-pointer">
-          <span>${s}</span>
-          <span class="badge">${sekolahCount[s]}</span>
-        </div>
-      `;
-    });
-
-    document.getElementById("sekolahList").innerHTML = htmlSekolah;
-
-    // ================= KELAS =================
-    let htmlKelas = "";
-
-    Object.keys(kelasCount)
-    .sort((a,b) => kelasCount[b] - kelasCount[a])
-    .forEach(k => {
-      htmlKelas += `
-        <div onclick="filterKelas('${k}')" 
-             class="sidebar-item flex justify-between cursor-pointer">
-          <span>${k}</span>
-          <span class="badge">${kelasCount[k]}</span>
-        </div>
-      `;
-    });
-
-    document.getElementById("kelasList").innerHTML = htmlKelas;
-
-    // ================= ORGANISASI =================
-    let htmlOrg = "";
-
-    Object.keys(organisasiCount)
-    .sort((a,b) => organisasiCount[b] - organisasiCount[a])
-    .forEach(o => {
-      htmlOrg += `
-        <div class="sidebar-item flex justify-between cursor-pointer">
-          <span>${o}</span>
-          <span class="badge">${organisasiCount[o]}</span>
-        </div>
-      `;
-    });
-
-    document.getElementById("organisasiList").innerHTML = htmlOrg;
-
-  });
-}
-
-function toggleSection(id){
-
-  const el = document.getElementById(id);
-  const arrow = document.querySelector(`[onclick*="${id}"] span:last-child`);
-
-  el.classList.toggle("hidden");
-
-  if(el.classList.contains("hidden")){
-    arrow.innerText = "▶";
-  } else {
-    arrow.innerText = "▼";
-  }
-}
-</script>
-
 <!-- LETAK SEBELUM </body> -->
 <div id="detailModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
 
@@ -1302,219 +456,226 @@ function toggleSection(id){
 </div>
 
 <script>
-const particles = document.getElementById("particles");
+// ================= FIREBASE =================
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
 
-for(let i=0; i<15; i++){
-  const p = document.createElement("div");
-  p.classList.add("particle");
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  p.style.left = Math.random()*100 + "%";
-  p.style.top = Math.random()*100 + "%";
-  p.style.animationDuration = (8 + Math.random()*10) + "s";
+// ================= STATE =================
+let rawData = [];
+let barChart, pieChart;
 
-  particles.appendChild(p);
-}
-</script>
+// ================= REALTIME DATA =================
+db.collection("aktivitiPelajar")
+.orderBy("masa","desc")
+.onSnapshot(snapshot => {
 
-<script>
-const refVisitor = db.collection("stats").doc("visitors");
+  rawData = [];
+  snapshot.forEach(doc => rawData.push(doc.data()));
 
-refVisitor.onSnapshot(doc => {
-  if (doc.exists) {
-    document.getElementById("visitorCount").innerText = doc.data().count;
-  }
+  console.log("DATA MASUK:", rawData.length);
+
+  computeAndRender();
+
 });
-</script>
 
-<script>
-const list = document.getElementById("aktivitiList");
+// ================= FILTER TARIKH =================
+function inRange(date){
 
-// ambil data dari Firestore (guna collection pengunjung Cikgu)
-db.collection("pengunjung")
-  .orderBy("masa", "desc")
-  .limit(20)
-  .onSnapshot(snapshot => {
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
 
-    list.innerHTML = "";
+  if(!from && !to) return true;
 
-    snapshot.forEach(doc => {
-      const item = doc.data();
+  const d = date?.seconds 
+    ? new Date(date.seconds * 1000) 
+    : new Date(date);
 
-      const nama = (item.nama || "").toLowerCase();
-      const kelas = item.kelas || "-";
-      const aktiviti = item.jenis || "-";
+  if(from){
+    const f = new Date(from + "T00:00:00");
+    if(d < f) return false;
+  }
 
-      list.innerHTML += `
-        <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center"
-             data-nama="${nama}">
+  if(to){
+    const t = new Date(to + "T23:59:59");
+    if(d > t) return false;
+  }
 
-          <div>
-            <p class="font-bold text-white">${item.nama || "TIADA NAMA"}</p>
-            <p class="text-xs text-gray-300">${kelas}</p>
-          </div>
+  return true;
+}
 
-          <div class="text-sm text-yellow-300 font-semibold">
-            ${aktiviti}
-          </div>
+// ================= MAIN RENDER =================
+function computeAndRender(){
 
+  let stats = {};
+  let total = 0;
+
+  rawData.forEach(d => {
+
+    if(!inRange(d.masa)) return;
+
+    const modul = d.aktiviti || "Lain";
+
+    stats[modul] = (stats[modul] || 0) + 1;
+    total++;
+
+  });
+
+  renderKPI(stats, total);
+  renderCharts(stats);
+  renderRanking(stats);
+  renderLive();
+  renderAlert();
+  renderPengunjung();
+
+}
+
+// ================= KPI =================
+function renderKPI(stats, total){
+
+  const modules = Object.keys(stats).length;
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+
+  document.getElementById("kpiTotal").innerText = total;
+  document.getElementById("kpiModules").innerText = modules;
+  document.getElementById("kpiTop").innerText = sorted[0]?.[0] || "-";
+  document.getElementById("kpiAvg").innerText = modules ? Math.round(total/modules) : 0;
+
+}
+
+// ================= CHART =================
+function renderCharts(stats){
+
+  const labels = Object.keys(stats);
+  const data = Object.values(stats);
+
+  if(barChart) barChart.destroy();
+  if(pieChart) pieChart.destroy();
+
+  barChart = new Chart(document.getElementById("barChart"), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: "rgba(255,255,255,0.3)"
+      }]
+    }
+  });
+
+  pieChart = new Chart(document.getElementById("pieChart"), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "#60a5fa","#f87171","#fbbf24","#34d399","#a78bfa"
+        ]
+      }]
+    }
+  });
+
+}
+
+// ================= RANKING =================
+function renderRanking(stats){
+
+  const box = document.getElementById("ranking");
+  box.innerHTML = "";
+
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+
+  sorted.forEach(([m,c],i)=>{
+    box.innerHTML += `
+      <div class="card">
+        <b>#${i+1} ${m}</b><br>
+        ${c} klik
+      </div>
+    `;
+  });
+
+}
+
+// ================= LIVE =================
+function renderLive(){
+
+  const box = document.getElementById("activityList");
+  box.innerHTML = "";
+
+  rawData.slice(0,20).forEach(d => {
+
+    const masa = d.masa?.seconds
+      ? new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+      : "-";
+
+    box.innerHTML += `
+      <div class="bg-white/10 p-3 rounded">
+        ${d.nama || "-"} | ${d.aktiviti || "-"}
+        <div class="text-xs">${masa}</div>
+      </div>
+    `;
+  });
+
+}
+
+// ================= ALERT =================
+function renderAlert(){
+
+  const box = document.getElementById("alertList");
+  box.innerHTML = "";
+
+  let kira = {};
+
+  rawData.forEach(d => {
+    const nama = d.nama || "Unknown";
+    kira[nama] = (kira[nama] || 0) + 1;
+  });
+
+  Object.entries(kira).forEach(([nama,count])=>{
+    if(count >= 5){
+      box.innerHTML += `
+        <div class="bg-red-400/20 p-3 rounded">
+          ⚠️ ${nama} (${count})
         </div>
       `;
-    });
-
-  });
-</script>
-
-<script>
-document.getElementById("searchNama").addEventListener("keyup", function() {
-
-  const keyword = this.value.toLowerCase();
-  const items = document.querySelectorAll(".user-item");
-
-  items.forEach(item => {
-    const nama = item.getAttribute("data-nama");
-
-    if (nama.includes(keyword)) {
-      item.style.display = "flex";
-    } else {
-      item.style.display = "none";
     }
   });
-
-});
-
-function applyFilter() {
-
-  const nama = document.getElementById("searchNama").value.toLowerCase();
-  const kelas = document.getElementById("filterKelas").value;
-  const modul = document.getElementById("filterModul").value;
-
-  const items = document.querySelectorAll(".user-item");
-
-  let count = 0;
-
-  items.forEach(item => {
-
-    const n = item.dataset.nama;
-    const k = item.dataset.kelas;
-    const m = item.dataset.modul;
-
-    const matchNama = n.includes(nama);
-    const matchKelas = !kelas || k === kelas;
-    const matchModul = !modul || m === modul;
-
-    if (matchNama && matchKelas && matchModul) {
-      item.style.display = "flex";
-      count++;
-
-      // highlight nama
-      const namaEl = item.querySelector(".nama");
-      namaEl.innerHTML = nama 
-        ? namaEl.textContent.replace(new RegExp(nama, "gi"), 
-          match => `<span class="bg-yellow-400 text-black px-1 rounded">${match}</span>`)
-        : namaEl.textContent;
-
-    } else {
-      item.style.display = "none";
-    }
-
-  });
-
-  document.getElementById("resultCount").innerText = `${count} result`;
 
 }
 
-// EVENT
-document.getElementById("searchNama").addEventListener("keyup", applyFilter);
-document.getElementById("filterKelas").addEventListener("change", applyFilter);
-document.getElementById("filterModul").addEventListener("change", applyFilter);
-</script>
-
-<script>
-const refHealink = db.collection("stats").doc("visitors_healink");
-
-refHealink.onSnapshot(doc => {
-  if (doc.exists) {
-    const el = document.getElementById("visitorHealink");
-    if (el) {
-      el.innerText = doc.data().count;
-    }
-  }
-});
-</script>
-
-<script>
-const refVisitor = db.collection("stats").doc("visitors_healink");
-const refAktiviti = db.collection("aktivitiPelajar");
-
-let chart;
-
-// ambil data real-time
-refAktiviti.onSnapshot(snapshot => {
+// ================= PENGUNJUNG =================
+function renderPengunjung(){
 
   let murid = 0;
   let guru = 0;
+  let pelawat = 0;
 
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    const jenis = (d.jenis || "").toLowerCase();
+  rawData.forEach(d => {
 
-    if (jenis === "murid") murid++;
-    if (jenis === "guru") guru++;
+    const jenis = (d.jenis || "").toLowerCase().trim();
+
+    if(jenis === "murid") murid++;
+    else if(jenis === "guru") guru++;
+    else pelawat++;
+
   });
 
-  // ambil visitor
-  refVisitor.get().then(doc => {
-    const pelawat = doc.exists ? doc.data().count : 0;
-
-    updateChart(murid, guru, pelawat);
-  });
-
-});
-
-
-function updateChart(murid, guru, pelawat){
-
-  const ctx = document.getElementById("healinkChart").getContext("2d");
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Murid', 'Guru', 'Pelawat'],
-      datasets: [{
-        label: 'Jumlah',
-        data: [murid, guru, pelawat],
-        backgroundColor: [
-          '#3b82f6', // murid
-          '#22c55e', // guru
-          '#facc15'  // pelawat
-        ],
-        borderRadius: 10
-      }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
+  document.getElementById("kpiMurid").innerText = murid;
+  document.getElementById("kpiGuru").innerText = guru;
+  document.getElementById("kpiPelawat").innerText = pelawat;
 
 }
 
 // ================= REPORT =================
 function generateReport(){
 
-  console.log("CLICK REPORT");
-
-  if(!rawData || rawData.length === 0){
+  if(!rawData.length){
     alert("Tiada data");
     return;
   }
@@ -1523,66 +684,46 @@ function generateReport(){
 
   rawData.forEach(d => {
 
-    let masa = "-";
+    const masa = d.masa?.seconds
+      ? new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+      : "-";
 
-    if(d.masa?.seconds){
-      masa = new Date(d.masa.seconds * 1000)
-        .toLocaleString("ms-MY");
-    }
-
-    const modul = d.aktiviti || "Lain";
-
-    text += `${d.nama || "-"} | ${d.kelas || "-"} | ${modul} | ${masa}\n`;
+    text += `${d.nama} | ${d.kelas} | ${d.aktiviti} | ${masa}\n`;
   });
 
   const blob = new Blob([text], { type: "text/plain" });
-
-  const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
-  a.href = url;
+
+  a.href = URL.createObjectURL(blob);
   a.download = "laporan.txt";
   a.click();
 
-  URL.revokeObjectURL(url);
-
 }
 
-// ================= CSV =================
+// ================= EXPORT CSV =================
 function exportCSV(){
 
   let rows = [["Nama","Kelas","Modul","Masa"]];
 
   rawData.forEach(d => {
 
-    if(!inRange(d.masa)) return;
+    const masa = d.masa?.seconds
+      ? new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+      : "-";
 
-    let masa = "-";
-    if(d.masa?.seconds){
-      masa = new Date(d.masa.seconds * 1000).toLocaleString("ms-MY");
-    }
+    rows.push([d.nama, d.kelas, d.aktiviti, masa]);
 
-    const modul = d.module || d.aktiviti || "Lain";
-
-    rows.push([
-      d.nama || "-",
-      d.kelas || "-",
-      modul,
-      masa
-    ]);
   });
 
   const csv = rows.map(r => r.join(",")).join("\n");
 
   const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-
   const a = document.createElement("a");
-  a.href = url;
+
+  a.href = URL.createObjectURL(blob);
   a.download = "laporan.csv";
   a.click();
 
-  URL.revokeObjectURL(url);
 }
 </script>
 </body>
