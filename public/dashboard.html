@@ -310,15 +310,32 @@ body::after {
       </button>
     </div>
 
-    <!-- FILTER TARIKH -->
-    <div class="grid md:grid-cols-3 gap-4">
-      <input id="fromDate" type="date" class="p-2 rounded text-black">
-      <input id="toDate" type="date" class="p-2 rounded text-black">
-      <button onclick="applyFilter()" 
-        class="bg-white/20 rounded-lg hover:bg-white/30">
-        Tapis Data
-      </button>
-    </div>
+    <!-- FILTER TARIKH + REPORT -->
+<div class="grid md:grid-cols-5 gap-4">
+
+  <!-- TARIKH -->
+  <input id="fromDate" type="date" class="p-2 rounded text-black">
+  <input id="toDate" type="date" class="p-2 rounded text-black">
+
+  <!-- TAPIS -->
+  <button onclick="applyFilter()" 
+    class="bg-white/20 rounded-lg hover:bg-white/30">
+    Tapis Data
+  </button>
+
+  <!-- REPORT TXT -->
+  <button onclick="generateReport()" 
+    class="bg-green-500 rounded-lg hover:bg-green-600">
+    📄 Jana Laporan
+  </button>
+
+  <!-- EXPORT CSV -->
+  <button onclick="exportCSV()" 
+    class="bg-blue-500 rounded-lg hover:bg-blue-600">
+    📊 Export Excel
+  </button>
+
+</div>
 
     <!-- ================= PENGUNJUNG ================= -->
     <div class="card">
