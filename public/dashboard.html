@@ -1316,7 +1316,7 @@ refVisitor.onSnapshot(doc => {
 </script>
 
 <script>
-const list = document.getElementById("aktivitiList");
+const list = document.getElementById("activityList");
 
 // ambil data dari Firestore (guna collection pengunjung Cikgu)
 db.collection("pengunjung")
@@ -1460,44 +1460,6 @@ refAktiviti.onSnapshot(snapshot => {
   });
 
 });
-
-
-function updateChart(murid, guru, pelawat){
-
-  const ctx = document.getElementById("healinkChart").getContext("2d");
-
-  if(chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Murid', 'Guru', 'Pelawat'],
-      datasets: [{
-        label: 'Jumlah',
-        data: [murid, guru, pelawat],
-        backgroundColor: [
-          '#3b82f6', // murid
-          '#22c55e', // guru
-          '#facc15'  // pelawat
-        ],
-        borderRadius: 10
-      }]
-    },
-    options: {
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-
-}
 
 // ================= EXPORT CSV =================
 function exportCSV(){
