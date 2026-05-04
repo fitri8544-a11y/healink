@@ -519,7 +519,7 @@ function computeAndRender(){
 
     if(!inRange(d.masa)) return;
 
-    const modul = d.aktiviti || "Lain";
+    const modul = d.module || "Lain";
 
     stats[modul] = (stats[modul] || 0) + 1;
     total++;
@@ -620,16 +620,21 @@ function renderAlert(){
   .filter(d => inRange(d.masa))
   .forEach(d => {
 
+    const modul = (d.aktiviti || "").toLowerCase();
     const nama = d.nama || "Unknown";
-    kira[nama] = (kira[nama] || 0) + 1;
+
+    // 🎯 FILTER MODUL SAHAJA
+    if(modul.includes("heal talk") || modul.includes("stress")){
+      kira[nama] = (kira[nama] || 0) + 1;
+    }
 
   });
 
   Object.entries(kira).forEach(([nama,count])=>{
-    if(count >= 5){
+    if(count >= 2){ // boleh adjust threshold
       box.innerHTML += `
         <div class="bg-red-400/20 p-3 rounded">
-          ⚠️ ${nama} (${count})
+          ⚠️ ${nama} (${count} interaksi sensitif)
         </div>
       `;
     }
