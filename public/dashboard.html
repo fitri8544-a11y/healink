@@ -725,6 +725,82 @@ db.collection("stats").doc("visitors_healink")
   document.getElementById("visitorHealink").innerText =
     doc.exists ? doc.data().count : 0;
 });
+
+function renderPengunjung(){
+
+  let murid = 0;
+  let guru = 0;
+  let pelawat = 0;
+
+  rawData.forEach(d => {
+
+    if(!d.masa) return; // safety
+
+    if(!inRange(d.masa)) return;
+
+    // 🔥 normalize string
+    const jenis = (d.jenis || "")
+      .toLowerCase()
+      .trim();
+
+    if(jenis === "murid") murid++;
+    else if(jenis === "guru") guru++;
+    else if(jenis === "pelawat") pelawat++;
+    else pelawat++; // fallback
+
+  });
+
+  document.getElementById("countMurid").innerText = murid;
+  document.getElementById("countGuru").innerText = guru;
+  document.getElementById("countPelawat").innerText = pelawat;
+}
+
+function renderPerhatian(){
+
+  let kiraan = {};
+
+  rawData.forEach(d => {
+
+    if(!d.masa) return;
+
+    if(!inRange(d.masa)) return;
+
+    const nama = (d.nama || "Unknown").trim();
+
+    kiraan[nama] = (kiraan[nama] || 0) + 1;
+
+  });
+
+  const box = document.getElementById("perhatianList");
+  box.innerHTML = "";
+
+  let ada = false;
+
+  Object.entries(kiraan).forEach(([nama, count]) => {
+
+    if(count >= 5){
+
+      ada = true;
+
+      box.innerHTML += `
+        <div class="bg-red-400/20 p-3 rounded mb-2">
+          ⚠️ ${nama} (${count} aktiviti)
+        </div>
+      `;
+    }
+
+  });
+
+  // 🔥 kalau tiada murid
+  if(!ada){
+    box.innerHTML = `
+      <div class="text-gray-300 text-sm text-center">
+        Tiada murid perlu perhatian 👍
+      </div>
+    `;
+  }
+
+}
 </script>
 
 </body>
