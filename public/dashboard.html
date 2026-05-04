@@ -713,7 +713,7 @@ function applyFilter(){
 // ================= VISITOR COUNTER =================
 
 // PORTAL
-db.collection("stats").doc("visitors_portal")
+db.collection("stats").doc("visitors")
 .onSnapshot(doc => {
   document.getElementById("visitorCount").innerText =
     doc.exists ? doc.data().count : 0;
