@@ -54,7 +54,44 @@
 
 </div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.firestore();
+</script>
+
+<script>
+function trackAktiviti(namaAktiviti){
+
+  const nama = sessionStorage.getItem("nama") || "Unknown";
+  const kelas = sessionStorage.getItem("kelas") || "-";
+  const sekolah = sessionStorage.getItem("organisasi") || "-";
+  const jenis = sessionStorage.getItem("jenis") || "-";
+
+  db.collection("aktivitiPelajar").add({
+    nama,
+    kelas,
+    sekolah,
+    jenis,
+    aktiviti: namaAktiviti,
+    masa: new Date()
+  })
+  .then(() => console.log("Aktiviti direkod:", namaAktiviti))
+  .catch(err => console.error(err));
+
+}
 const soalan = [
 {
 q: "Anda mempunyai banyak kerja sekolah dan rasa tertekan.",
@@ -112,6 +149,8 @@ function load(){
 
 function choose(btn, ans){
 
+  trackAktiviti("Stress - Pilih: " + ans.text); // 🔥
+
   disable();
 
   stress += ans.stress;
@@ -147,6 +186,8 @@ function result(){
     text = "⚠️ Tahap stress tinggi! Cuba teknik kawalan emosi.";
   }
 
+  trackAktiviti("Stress Result: " + text); // 🔥
+
   document.getElementById("resultBox").classList.remove("hidden");
   document.getElementById("finalText").innerText = text;
 }
@@ -155,15 +196,10 @@ function restart(){
   location.reload();
 }
 
-function goBack(){
-  window.history.back();
-}
-
-function closeGame(){
-  window.location.href = "menu.html";
-}
-
 load();
+
+// 🔥 TAMBAH INI
+trackAktiviti("Stress Challenge");
 </script>
 
 <script>

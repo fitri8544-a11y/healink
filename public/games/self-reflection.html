@@ -19,35 +19,55 @@
 
 </div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
-function ans(a){
-document.getElementById("result").innerText="Anda pilih: "+a;
+// INIT FIREBASE
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
 }
-</script>
 
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+const db = firebase.firestore();
 
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
-  </button>
+// TRACK FUNCTION
+function trackAktiviti(namaAktiviti){
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
-  </div>
+  const nama = sessionStorage.getItem("nama") || "Unknown";
+  const kelas = sessionStorage.getItem("kelas") || "-";
+  const sekolah = sessionStorage.getItem("organisasi") || "-";
+  const jenis = sessionStorage.getItem("jenis") || "-";
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
-  </button>
+  db.collection("aktivitiPelajar").add({
+    nama,
+    kelas,
+    sekolah,
+    jenis,
+    aktiviti: namaAktiviti,
+    masa: new Date()
+  })
+  .then(() => console.log("Aktiviti direkod:", namaAktiviti))
+  .catch(err => console.error(err));
 
-</div>
+}
 
-<script>
+// PILIHAN USER
+function ans(a){
+
+  document.getElementById("result").innerText = "Anda pilih: " + a;
+
+  // 🔥 TRACK PILIHAN
+  trackAktiviti("Self Reflection - Pilih: " + a);
+}
+
+// NAVIGATION
 function goBack(){
   window.history.back();
 }
@@ -55,6 +75,10 @@ function goBack(){
 function closeGame(){
   window.location.href = "../healink.html"; 
 }
+
+// 🔥 TRACK MASUK GAME
+trackAktiviti("Self Reflection");
+
 </script>
 
 <!-- ================= HEADER GAME ================= -->
