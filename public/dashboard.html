@@ -335,6 +335,10 @@ body::after {
     📊 Export Excel
   </button>
 
+  <button onclick="testClick()" class="bg-green-500">
+  TEST
+</button>
+
 </div>
 
     <!-- ================= PENGUNJUNG ================= -->
@@ -1581,6 +1585,10 @@ function exportCSV(){
   a.click();
 
   URL.revokeObjectURL(url);
+}
+
+function testClick(){
+  alert("Button hidup!");
 }
 </script>
 </body>
