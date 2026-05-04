@@ -156,6 +156,7 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
   .then(() => {
 
     // 🔥 SIMPAN SESSION
+    sessionStorage.setItem("sudahDaftar","yes");
     sessionStorage.setItem("nama", nama);
     sessionStorage.setItem("jenis", jenis);
     sessionStorage.setItem("kelas", kelas);
