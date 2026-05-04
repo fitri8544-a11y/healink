@@ -1509,6 +1509,63 @@ function updateChart(murid, guru, pelawat){
   });
 
 }
+
+// ================= REPORT =================
+function generateReport(){
+
+  let filtered = rawData.filter(d => inRange(d.masa));
+
+  if(filtered.length === 0){
+    alert("Tiada data untuk laporan");
+    return;
+  }
+
+  let text = "LAPORAN AKTIVITI HEALINK\n\n";
+
+  filtered.forEach(d => {
+
+    const masa = new Date(d.masa.seconds * 1000)
+      .toLocaleString("ms-MY");
+
+    text += `${d.nama} | ${d.kelas} | ${d.aktiviti} | ${masa}\n`;
+  });
+
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_healink.txt";
+  a.click();
+}
+
+// ================= CSV =================
+function exportCSV(){
+
+  let rows = [["Nama","Kelas","Aktiviti","Masa"]];
+
+  rawData.forEach(d => {
+
+    if(!inRange(d.masa)) return;
+
+    rows.push([
+      d.nama,
+      d.kelas,
+      d.aktiviti,
+      new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+    ]);
+  });
+
+  const csv = rows.map(r => r.join(",")).join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan.csv";
+  a.click();
+}
 </script>
 </body>
 </html>
