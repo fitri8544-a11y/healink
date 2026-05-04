@@ -586,28 +586,30 @@ function renderCharts(stats){
 // ================= LIVE =================
 function renderLive(){
 
-  const box = document.getElementById("activityList");
+  const box = document.getElementById("liveList");
   box.innerHTML = "";
 
   rawData
-.filter(d => inRange(d.masa))
-.slice(0,20)
-.forEach(d => {
+  .filter(d => inRange(d.masa))
+  .filter(d => d.module && d.module.trim() !== "") // 🔥 FILTER DATA ROSAK
+  .slice(0, 20)
+  .forEach(d => {
 
-    const masa = d.masa?.seconds
-      ? new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+    const modul = d.module.trim();
+
+    const masa = d.masa?.toDate()
+      ? d.masa.toDate().toLocaleString("ms-MY")
       : "-";
 
     box.innerHTML += `
-      <div class="bg-white/10 p-3 rounded">
-        ${d.nama || "-"} | ${d.aktiviti || "-"}
-        <div class="text-xs">${masa}</div>
+      <div class="bg-white/10 p-3 rounded mb-2">
+        <b>${d.nama}</b> | ${modul}<br>
+        <small>${masa}</small>
       </div>
     `;
   });
 
 }
-
 // ================= ALERT =================
 function renderAlert(){
 
