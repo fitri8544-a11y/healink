@@ -26,7 +26,7 @@
 
       <!-- VISITOR HEALINK -->
       <div class="text-xs text-pink-300 mt-1 flex items-center gap-2">
-        🧠 JUMLAH PENGGUNA : 
+        🧠 Pelawat: 
         <span id="visitorHealink" class="font-bold text-white text-sm">
           0
         </span>
@@ -2399,27 +2399,5 @@ refHealink.get().then(doc => {
 
 });
 </script>
-
-<script>
-
-function setGreeting(){
-
-  const nama = sessionStorage.getItem("nama") || "Pengguna";
-
-  const jam = new Date().getHours();
-  let ucapan = "Selamat Datang";
-
-  if(jam < 12) ucapan = "Selamat Pagi";
-  else if(jam < 18) ucapan = "Selamat Petang";
-  else ucapan = "Selamat Malam";
-
-  document.getElementById("greetingHeader").innerText =
-    `${ucapan}, ${nama}`;
-}
-
-setGreeting();
-
-</script>
-
 </body>
 </html>
