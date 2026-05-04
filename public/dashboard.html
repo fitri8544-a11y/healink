@@ -310,15 +310,32 @@ body::after {
       </button>
     </div>
 
-    <!-- FILTER TARIKH -->
-    <div class="grid md:grid-cols-3 gap-4">
-      <input id="fromDate" type="date" class="p-2 rounded text-black">
-      <input id="toDate" type="date" class="p-2 rounded text-black">
-      <button onclick="applyFilter()" 
-        class="bg-white/20 rounded-lg hover:bg-white/30">
-        Tapis Data
-      </button>
-    </div>
+    <!-- FILTER TARIKH + REPORT -->
+<div class="grid md:grid-cols-5 gap-4">
+
+  <!-- TARIKH -->
+  <input id="fromDate" type="date" class="p-2 rounded text-black">
+  <input id="toDate" type="date" class="p-2 rounded text-black">
+
+  <!-- TAPIS -->
+  <button onclick="applyFilter()" 
+    class="bg-white/20 rounded-lg hover:bg-white/30">
+    Tapis Data
+  </button>
+
+  <!-- REPORT TXT -->
+  <button onclick="generateReport()" 
+    class="bg-green-500 rounded-lg hover:bg-green-600">
+    📄 Jana Laporan
+  </button>
+
+  <!-- EXPORT CSV -->
+  <button onclick="exportCSV()" 
+    class="bg-blue-500 rounded-lg hover:bg-blue-600">
+    📊 Export Excel
+  </button>
+
+</div>
 
     <!-- ================= PENGUNJUNG ================= -->
     <div class="card">
@@ -1491,6 +1508,85 @@ function updateChart(murid, guru, pelawat){
     }
   });
 
+}
+function generateReport(){
+
+  let report = [];
+  let total = 0;
+  let modulCount = {};
+
+  rawData.forEach(d => {
+
+    if(!inRange(d.masa)) return;
+
+    total++;
+
+    const modul = d.module || "Lain";
+
+    if(!modulCount[modul]) modulCount[modul] = 0;
+    modulCount[modul]++;
+
+    report.push({
+      nama: d.nama || "-",
+      kelas: d.kelas || "-",
+      modul: modul,
+      masa: d.masa?.toDate().toLocaleString('ms-MY') || "-"
+    });
+
+  });
+
+  // ================= RINGKASAN =================
+  let summary = `LAPORAN AKTIVITI HEALINK\n\n`;
+  summary += `Jumlah Interaksi: ${total}\n\n`;
+
+  summary += `Analisis Modul:\n`;
+  Object.entries(modulCount).forEach(([m,c])=>{
+    summary += `- ${m}: ${c}\n`;
+  });
+
+  summary += `\n\nSenarai Aktiviti:\n`;
+
+  report.forEach(r=>{
+    summary += `${r.nama} | ${r.kelas} | ${r.modul} | ${r.masa}\n`;
+  });
+
+  // ================= DOWNLOAD =================
+  const blob = new Blob([summary], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_healink.txt";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+function exportCSV(){
+
+  let rows = [["Nama","Kelas","Modul","Masa"]];
+
+  rawData.forEach(d => {
+
+    if(!inRange(d.masa)) return;
+
+    rows.push([
+      d.nama,
+      d.kelas,
+      d.module,
+      d.masa?.toDate().toLocaleString('ms-MY')
+    ]);
+
+  });
+
+  let csvContent = rows.map(e => e.join(",")).join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_healink.csv";
+  a.click();
 }
 </script>
 </body>
