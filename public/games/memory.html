@@ -85,23 +85,6 @@
   </div>
 </div>
 
-<!-- FIREBASE LIBRARY -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<!-- INIT FIREBASE -->
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
-  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
-  projectId: "bimbingankaunselingskkk"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
-
-<!-- GAME SCRIPT -->
 <script>
 let emojisBase = ["😄","😢","😡","😎","😱","😴","😇","🤯"];
 let cards = [];
@@ -111,6 +94,11 @@ let lock = false;
 let score = 0;
 let pairs = 4;
 
+// SOUND
+const flipSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const matchSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const winSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+
 // LEVEL
 function setLevel(p){
   pairs = p;
@@ -118,8 +106,6 @@ function setLevel(p){
 }
 
 function startGame(){
-
-  trackAktiviti("Memory Game");
 
   score = 0;
   document.getElementById("score").innerText = score;
@@ -160,22 +146,51 @@ function startGame(){
   second = null;
 }
 
-// TRACK
-function trackAktiviti(namaAktiviti){
+// FLIP
+function flip(card){
 
-  const nama = sessionStorage.getItem("nama") || "Unknown";
-  const kelas = sessionStorage.getItem("kelas") || "-";
-  const sekolah = sessionStorage.getItem("organisasi") || "-";
-  const jenis = sessionStorage.getItem("jenis") || "-";
+  if(lock || card.classList.contains("flipped")) return;
 
-  db.collection("aktivitiPelajar").add({
-    nama, kelas, sekolah, jenis,
-    aktiviti: namaAktiviti,
-    masa: new Date()
-  })
-  .then(() => console.log("Aktiviti direkod:", namaAktiviti))
-  .catch(err => console.error(err));
+  flipSound.play();
+  card.classList.add("flipped");
+
+  if(!first){
+    first = card;
+  } else {
+    second = card;
+    lock = true;
+    setTimeout(check, 700);
+  }
 }
+
+// CHECK
+function check(){
+  if(first.children[1].innerText === second.children[1].innerText){
+    matchSound.play();
+    score++;
+    document.getElementById("score").innerText = score;
+
+    if(score === cards.length/2){
+      winSound.play();
+      document.getElementById("winBox").classList.remove("hidden");
+    }
+
+  } else {
+    first.classList.remove("flipped");
+    second.classList.remove("flipped");
+  }
+
+  first = null;
+  second = null;
+  lock = false;
+}
+
+// TIMER
+let time = 0;
+setInterval(()=>{
+  time++;
+  document.getElementById("time").innerText = time;
+},1000);
 
 // START
 startGame();

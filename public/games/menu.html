@@ -72,62 +72,16 @@
 }
 </style>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
-  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
-  projectId: "bimbingankaunselingskkk"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-</script>
-
-<script>
-function trackAktiviti(namaAktiviti){
-
-  const nama = sessionStorage.getItem("nama") || "Unknown";
-  const kelas = sessionStorage.getItem("kelas") || "-";
-  const sekolah = sessionStorage.getItem("organisasi") || "-";
-  const jenis = sessionStorage.getItem("jenis") || "-";
-
-  db.collection("aktivitiPelajar").add({
-    nama,
-    kelas,
-    sekolah,
-    jenis,
-    aktiviti: namaAktiviti,
-    masa: new Date()
-  });
-
-}
-
-// 🔥 TRACK MASUK MENU
-trackAktiviti("Menu HEALINK");
-
-// NAVIGATE
-function go(page, namaMenu){
-  trackAktiviti("Menu Klik: " + namaMenu);
+function go(page){
   window.location.href = page;
 }
 
-// HOME
 function goHome(){
-  trackAktiviti("Menu Home");
   window.location.href = "../index.html";
 }
 
-// TAB SWITCH
 function switchTab(tab){
-
-  trackAktiviti("Menu Tab: " + tab);
 
   document.getElementById("rendah").classList.add("hidden");
   document.getElementById("menengah").classList.add("hidden");
