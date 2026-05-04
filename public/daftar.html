@@ -145,50 +145,34 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
     }
   }
 
-  // FIREBASE
+  // 🔥 FIREBASE SAHAJA
   db.collection("pengunjung").add({
-    jenis, nama, organisasi, kelas,
+    jenis,
+    nama,
+    organisasi,
+    kelas,
     masa: new Date()
   })
   .then(() => {
 
-    // GOOGLE SHEETS (NO CORS ISSUE)
-    return fetch("https://script.google.com/macros/s/AKfycbwf33cGtv1AjGPfl-t2on1-Sa5-xc5C18lARv5Bwk2kXJqTArg3MLff8U9fhom5o9LTzQ/exec", {
-      method: "POST",
-      body: new URLSearchParams({
-        nama: nama,
-        sekolah: organisasi,
-        kelas: kelas,
-        aktiviti: "HEALINK",
-        jenis: jenis
-      })
-    });
-
-  })
-  .then(res => res.text())
-  .then(data => {
-
-    console.log("RESPONSE:", data);
-
-    alert("✅ Data berjaya direkod!");
-
-    // 🔥 FIX UTAMA
+    // 🔥 SIMPAN SESSION
     sessionStorage.setItem("sudahDaftar","yes");
-
     sessionStorage.setItem("nama", nama);
     sessionStorage.setItem("jenis", jenis);
     sessionStorage.setItem("kelas", kelas);
     sessionStorage.setItem("organisasi", organisasi);
-    
 
+    alert("✅ Data berjaya direkod!");
+
+    // 🔥 REDIRECT
     window.location.href = "healink.html";
-    
+
   })
   .catch(err => {
 
     console.error("ERROR:", err);
 
-    alert("⚠️ Sheets gagal, Firebase OK");
+    alert("❌ Ralat simpan data");
 
   });
 
