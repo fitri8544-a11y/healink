@@ -1511,55 +1511,84 @@ function updateChart(murid, guru, pelawat){
 }
 function generateReport(){
 
-  let report = [];
-  let total = 0;
-  let modulCount = {};
+  try {
 
-  rawData.forEach(d => {
+    // 🔥 VALIDATION
+    if(typeof rawData === "undefined" || rawData.length === 0){
+      alert("⚠️ Tiada data untuk laporan");
+      return;
+    }
 
-    if(!inRange(d.masa)) return;
+    let report = [];
+    let total = 0;
+    let modulCount = {};
 
-    total++;
+    rawData.forEach(d => {
 
-    const modul = d.module || "Lain";
+      if(!d || !d.masa) return;
+      if(typeof inRange === "function" && !inRange(d.masa)) return;
 
-    if(!modulCount[modul]) modulCount[modul] = 0;
-    modulCount[modul]++;
+      total++;
 
-    report.push({
-      nama: d.nama || "-",
-      kelas: d.kelas || "-",
-      modul: modul,
-      masa: d.masa?.toDate().toLocaleString('ms-MY') || "-"
+      const modul = d.module || "Lain";
+
+      if(!modulCount[modul]) modulCount[modul] = 0;
+      modulCount[modul]++;
+
+      report.push({
+        nama: d.nama || "-",
+        kelas: d.kelas || "-",
+        modul: modul,
+        masa: d.masa?.toDate ? d.masa.toDate().toLocaleString('ms-MY') : "-"
+      });
+
     });
 
-  });
+    if(total === 0){
+      alert("⚠️ Tiada data dalam julat tarikh dipilih");
+      return;
+    }
 
-  // ================= RINGKASAN =================
-  let summary = `LAPORAN AKTIVITI HEALINK\n\n`;
-  summary += `Jumlah Interaksi: ${total}\n\n`;
+    // ================= RINGKASAN =================
+    let summary = `LAPORAN AKTIVITI HEALINK\n`;
+    summary += `Tarikh: ${new Date().toLocaleString('ms-MY')}\n`;
+    summary += `----------------------------------------\n\n`;
 
-  summary += `Analisis Modul:\n`;
-  Object.entries(modulCount).forEach(([m,c])=>{
-    summary += `- ${m}: ${c}\n`;
-  });
+    summary += `Jumlah Interaksi: ${total}\n\n`;
 
-  summary += `\n\nSenarai Aktiviti:\n`;
+    summary += `Analisis Modul:\n`;
+    Object.entries(modulCount).forEach(([m,c])=>{
+      summary += `- ${m}: ${c}\n`;
+    });
 
-  report.forEach(r=>{
-    summary += `${r.nama} | ${r.kelas} | ${r.modul} | ${r.masa}\n`;
-  });
+    summary += `\n----------------------------------------\n`;
+    summary += `SENARAI AKTIVITI\n`;
+    summary += `----------------------------------------\n`;
 
-  // ================= DOWNLOAD =================
-  const blob = new Blob([summary], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
+    report.forEach(r=>{
+      summary += `${r.nama} | ${r.kelas} | ${r.modul} | ${r.masa}\n`;
+    });
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "laporan_healink.txt";
-  a.click();
+    // ================= DOWNLOAD =================
+    const blob = new Blob([summary], { type: "text/plain;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
 
-  URL.revokeObjectURL(url);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "laporan_healink.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+    console.log("✅ Laporan berjaya dijana");
+
+  } catch(err){
+    console.error("❌ Error generate report:", err);
+    alert("❌ Ralat semasa jana laporan");
+  }
+
 }
 function exportCSV(){
 
