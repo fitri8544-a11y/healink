@@ -601,7 +601,7 @@ function renderAll(){
 
     if(!inRange(d.masa)) return;
 
-    const modul = d.aktiviti || "Lain";
+    const modul = d.aktiviti || d.module || d.modul || "Lain";
 
     stats[modul] = (stats[modul] || 0) + 1;
     total++;
