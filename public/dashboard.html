@@ -528,7 +528,6 @@ function computeAndRender(){
 
   renderKPI(stats, total);
   renderCharts(stats);
-  renderRanking(stats);
   renderLive();
   renderAlert();
   renderPengunjung();
@@ -618,8 +617,12 @@ function renderAlert(){
   let kira = {};
 
   rawData
-.filter(d => inRange(d.masa))
-.forEach(d => {
+  .filter(d => inRange(d.masa))
+  .forEach(d => {
+
+    const nama = d.nama || "Unknown";
+    kira[nama] = (kira[nama] || 0) + 1;
+
   });
 
   Object.entries(kira).forEach(([nama,count])=>{
@@ -643,9 +646,13 @@ function renderPengunjung(){
 
   rawData.forEach(d => {
 
-  if(!inRange(d.masa)) return;
+    if(!inRange(d.masa)) return;
 
-  const jenis = (d.jenis || "").toLowerCase().trim();
+    const jenis = (d.jenis || "").toLowerCase().trim();
+
+    if(jenis === "murid") murid++;
+    else if(jenis === "guru") guru++;
+    else pelawat++;
 
   });
 
@@ -708,6 +715,19 @@ function exportCSV(){
   a.click();
 
 }
+// HEALINK VISITOR
+db.collection("stats").doc("visitors_healink")
+.onSnapshot(doc => {
+  document.getElementById("visitorHealink").innerText =
+    doc.exists ? doc.data().count : 0;
+});
+
+// PORTAL VISITOR
+db.collection("stats").doc("visitors")
+.onSnapshot(doc => {
+  document.getElementById("visitorCount").innerText =
+    doc.exists ? doc.data().count : 0;
+});
 </script>
 </body>
 </html>
