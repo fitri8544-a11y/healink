@@ -2063,12 +2063,35 @@ refHealink.get().then(doc => {
 <script>
 function trackActivity(module, komen = ""){
 
-  const nama = sessionStorage.getItem("nama");
-  const jenis = sessionStorage.getItem("jenis");
-  const kelas = sessionStorage.getItem("kelas");
-  const organisasi = sessionStorage.getItem("organisasi");
+  // 🔒 VALIDATION
+  if(!module || module.trim() === ""){
+    module = "Tidak Diketahui";
+  }
 
-  const m = (module || "").toLowerCase();
+  // 🔑 AMBIL DATA USER
+  const nama = sessionStorage.getItem("nama") || "-";
+  const jenis = sessionStorage.getItem("jenis") || "-";
+  const kelas = sessionStorage.getItem("kelas") || "-";
+  const organisasi = sessionStorage.getItem("organisasi") || "-";
+
+  // 🚀 HANTAR KE FIRESTORE
+  db.collection("aktivitiPelajar").add({
+    module: module.trim(),   // 🔥 JANGAN lowercase
+    nama: nama,
+    jenis: jenis,
+    kelas: kelas,
+    organisasi: organisasi,
+    komen: komen,
+    masa: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(()=>{
+    console.log("TRACK:", module);
+  })
+  .catch(err=>{
+    console.error("TRACK ERROR:", err);
+  });
+
+}
 
   // ================================
   // 🔥 PERLU PERHATIAN
