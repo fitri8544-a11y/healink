@@ -1442,7 +1442,6 @@ refHealink.onSnapshot(doc => {
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const refVisitor = db.collection("stats").doc("visitors_healink");
 const refAktiviti = db.collection("aktivitiPelajar");
@@ -1524,10 +1523,16 @@ function generateReport(){
 
   filtered.forEach(d => {
 
-    const masa = new Date(d.masa.seconds * 1000)
-      .toLocaleString("ms-MY");
+    // 🔥 SAFE DATE
+    let masa = "-";
+    if(d.masa?.seconds){
+      masa = new Date(d.masa.seconds * 1000).toLocaleString("ms-MY");
+    }
 
-    text += `${d.nama} | ${d.kelas} | ${d.aktiviti} | ${masa}\n`;
+    // 🔥 FIX MODULE
+    const modul = d.module || d.aktiviti || "Lain";
+
+    text += `${d.nama || "-"} | ${d.kelas || "-"} | ${modul} | ${masa}\n`;
   });
 
   const blob = new Blob([text], { type: "text/plain" });
@@ -1537,22 +1542,31 @@ function generateReport(){
   a.href = url;
   a.download = "laporan_healink.txt";
   a.click();
+
+  URL.revokeObjectURL(url);
 }
 
 // ================= CSV =================
 function exportCSV(){
 
-  let rows = [["Nama","Kelas","Aktiviti","Masa"]];
+  let rows = [["Nama","Kelas","Modul","Masa"]];
 
   rawData.forEach(d => {
 
     if(!inRange(d.masa)) return;
 
+    let masa = "-";
+    if(d.masa?.seconds){
+      masa = new Date(d.masa.seconds * 1000).toLocaleString("ms-MY");
+    }
+
+    const modul = d.module || d.aktiviti || "Lain";
+
     rows.push([
-      d.nama,
-      d.kelas,
-      d.aktiviti,
-      new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
+      d.nama || "-",
+      d.kelas || "-",
+      modul,
+      masa
     ]);
   });
 
@@ -1565,6 +1579,8 @@ function exportCSV(){
   a.href = url;
   a.download = "laporan.csv";
   a.click();
+
+  URL.revokeObjectURL(url);
 }
 </script>
 </body>
