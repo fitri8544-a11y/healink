@@ -2063,19 +2063,12 @@ refHealink.get().then(doc => {
 <script>
 function trackActivity(module, komen = ""){
 
-  // 🔒 VALIDATION
-  if(!module || module.trim() === ""){
-    module = "Tidak Diketahui";
-  }
+  const nama = sessionStorage.getItem("nama");
+  const jenis = sessionStorage.getItem("jenis");
+  const kelas = sessionStorage.getItem("kelas");
+  const organisasi = sessionStorage.getItem("organisasi");
 
-  // 🔑 USER DATA
-  const nama = sessionStorage.getItem("nama") || "-";
-  const jenis = sessionStorage.getItem("jenis") || "-";
-  const kelas = sessionStorage.getItem("kelas") || "-";
-  const organisasi = sessionStorage.getItem("organisasi") || "-";
-
-  // 🔥 NORMALIZE UNTUK ANALISIS (BUKAN SIMPAN)
-  const m = module.toLowerCase();
+  const m = (module || "").toLowerCase();
 
   // ================================
   // 🔥 PERLU PERHATIAN
@@ -2091,7 +2084,7 @@ function trackActivity(module, komen = ""){
   }
 
   // ================================
-  // 🔥 RISK SCORE
+  // 🔥 RISK SCORE (WAJIB ATAS)
   // ================================
   let riskScore = 0;
   let tahap = "RENDAH";
@@ -2106,10 +2099,10 @@ function trackActivity(module, komen = ""){
   console.log("📊 SCORE:", riskScore, tahap);
 
   // ================================
-  // 🚀 SIMPAN SEKALI SAHAJA
+  // 🔥 SIMPAN FIRESTORE (LAST)
   // ================================
   db.collection("aktivitiPelajar").add({
-    module: module.trim(),   // 🔥 SIMPAN ORIGINAL
+    module,
     nama,
     jenis,
     kelas,
@@ -2119,16 +2112,10 @@ function trackActivity(module, komen = ""){
     riskScore,
     tahap,
     masa: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(()=>{
-    console.log("TRACK:", module);
-  })
-  .catch(err=>{
-    console.error("TRACK ERROR:", err);
   });
 
 }
-</script>
+</script> 
 
 <script>
 // 🔥 BLOCK AWAL (sebelum Firebase)
