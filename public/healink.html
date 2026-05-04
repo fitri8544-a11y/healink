@@ -2068,30 +2068,14 @@ function trackActivity(module, komen = ""){
     module = "Tidak Diketahui";
   }
 
-  // 🔑 AMBIL DATA USER
+  // 🔑 USER DATA
   const nama = sessionStorage.getItem("nama") || "-";
   const jenis = sessionStorage.getItem("jenis") || "-";
   const kelas = sessionStorage.getItem("kelas") || "-";
   const organisasi = sessionStorage.getItem("organisasi") || "-";
 
-  // 🚀 HANTAR KE FIRESTORE
-  db.collection("aktivitiPelajar").add({
-    module: module.trim(),   // 🔥 JANGAN lowercase
-    nama: nama,
-    jenis: jenis,
-    kelas: kelas,
-    organisasi: organisasi,
-    komen: komen,
-    masa: firebase.firestore.FieldValue.serverTimestamp()
-  })
-  .then(()=>{
-    console.log("TRACK:", module);
-  })
-  .catch(err=>{
-    console.error("TRACK ERROR:", err);
-  });
-
-}
+  // 🔥 NORMALIZE UNTUK ANALISIS (BUKAN SIMPAN)
+  const m = module.toLowerCase();
 
   // ================================
   // 🔥 PERLU PERHATIAN
@@ -2107,7 +2091,7 @@ function trackActivity(module, komen = ""){
   }
 
   // ================================
-  // 🔥 RISK SCORE (WAJIB ATAS)
+  // 🔥 RISK SCORE
   // ================================
   let riskScore = 0;
   let tahap = "RENDAH";
@@ -2122,10 +2106,10 @@ function trackActivity(module, komen = ""){
   console.log("📊 SCORE:", riskScore, tahap);
 
   // ================================
-  // 🔥 SIMPAN FIRESTORE (LAST)
+  // 🚀 SIMPAN SEKALI SAHAJA
   // ================================
   db.collection("aktivitiPelajar").add({
-    module,
+    module: module.trim(),   // 🔥 SIMPAN ORIGINAL
     nama,
     jenis,
     kelas,
@@ -2135,10 +2119,16 @@ function trackActivity(module, komen = ""){
     riskScore,
     tahap,
     masa: firebase.firestore.FieldValue.serverTimestamp()
+  })
+  .then(()=>{
+    console.log("TRACK:", module);
+  })
+  .catch(err=>{
+    console.error("TRACK ERROR:", err);
   });
 
 }
-</script> 
+</script>
 
 <script>
 // 🔥 BLOCK AWAL (sebelum Firebase)
