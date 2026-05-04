@@ -23,7 +23,45 @@
 
 </div>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  projectId: "bimbingankaunselingskkk"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const db = firebase.firestore();
+</script>
+
+<script>
+
+function trackAktiviti(namaAktiviti){
+
+  const nama = sessionStorage.getItem("nama") || "Unknown";
+  const kelas = sessionStorage.getItem("kelas") || "-";
+  const sekolah = sessionStorage.getItem("organisasi") || "-";
+  const jenis = sessionStorage.getItem("jenis") || "-";
+
+  db.collection("aktivitiPelajar").add({
+    nama,
+    kelas,
+    sekolah,
+    jenis,
+    aktiviti: namaAktiviti,
+    masa: new Date()
+  })
+  .then(() => console.log("Aktiviti direkod:", namaAktiviti))
+  .catch(err => console.error(err));
+
+}
 let arr = [1,2,3,4,5,6,7,8,""];
 
 function render(){
@@ -45,7 +83,17 @@ function render(){
 
 function move(i){
   const empty = arr.indexOf("");
-  if(Math.abs(i-empty)===1 || Math.abs(i-empty)===3){
+
+  const row = Math.floor(i / 3);
+  const col = i % 3;
+
+  const emptyRow = Math.floor(empty / 3);
+  const emptyCol = empty % 3;
+
+  if(
+    (row === emptyRow && Math.abs(col - emptyCol) === 1) ||
+    (col === emptyCol && Math.abs(row - emptyRow) === 1)
+  ){
     [arr[i],arr[empty]]=[arr[empty],arr[i]];
     render();
     check();
@@ -64,6 +112,8 @@ function check(){
 }
 
 render();
+
+trackAktiviti("Jigsaw Puzzle");
 </script>
 
 <script>
