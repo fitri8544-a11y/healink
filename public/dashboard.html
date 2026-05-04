@@ -529,7 +529,9 @@ function generateGreeting(){
 
 }
 
-// 🔥 CONFIG (guna config cikgu)
+<script>
+
+// ================= FIREBASE =================
 const firebaseConfig = {
   apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
   authDomain: "bimbingankaunselingskkk.firebaseapp.com",
@@ -539,182 +541,139 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// STATE
+// ================= STATE =================
 let rawData = [];
-let stats = {};
 let barChart, pieChart;
 
-// 📡 REALTIME LISTENER
-db.collection("aktivitiPelajar").onSnapshot(snapshot => {
+// ================= LOAD DATA =================
+db.collection("aktivitiPelajar")
+.orderBy("masa","desc")
+.onSnapshot(snapshot => {
+
   rawData = [];
   snapshot.forEach(doc => rawData.push(doc.data()));
-  computeAndRender();
+
+  renderAll();
+
 });
 
-// 🔎 FILTER TARIKH
-function applyFilter(){
-  computeAndRender();
-}
-
+// ================= FILTER =================
 function inRange(date){
   const from = document.getElementById('fromDate').value;
   const to   = document.getElementById('toDate').value;
 
   if(!from && !to) return true;
 
-  const d = new Date(date?.seconds ? date.seconds*1000 : date);
-  if(from){
-    const f = new Date(from + "T00:00:00");
-    if(d < f) return false;
-  }
-  if(to){
-    const t = new Date(to + "T23:59:59");
-    if(d > t) return false;
-  }
+  const d = new Date(date?.seconds*1000);
+
+  if(from && d < new Date(from)) return false;
+  if(to && d > new Date(to+"T23:59:59")) return false;
+
   return true;
 }
 
-// 🧠 COMPUTE
-function computeAndRender(){
-  stats = {};
+// ================= MAIN RENDER =================
+function renderAll(){
+
+  let stats = {};
   let total = 0;
 
-  rawData.forEach(d => {
+  rawData.forEach(d=>{
     if(!inRange(d.masa)) return;
 
-    const m = d.module || "Lain";
-    if(!stats[m]) stats[m] = 0;
-    stats[m]++;
+    const m = d.aktiviti || "Lain";
+
+    stats[m] = (stats[m] || 0) + 1;
     total++;
   });
 
-  renderKPI(stats, total);
-  renderCharts(stats);
-  renderRanking(stats);
+  renderKPI(stats,total);
+  renderChart(stats);
+
 }
 
-// 📊 KPI
-function renderKPI(stats, total){
+// ================= KPI =================
+function renderKPI(stats,total){
+
   const modules = Object.keys(stats).length;
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-  const top = sorted[0]?.[0] || "-";
-  const avg = modules ? Math.round(total/modules) : 0;
+  const top = Object.entries(stats).sort((a,b)=>b[1]-a[1])[0]?.[0] || "-";
 
   document.getElementById("kpiTotal").innerText = total;
   document.getElementById("kpiModules").innerText = modules;
   document.getElementById("kpiTop").innerText = top;
-  document.getElementById("kpiAvg").innerText = avg;
+  document.getElementById("kpiAvg").innerText = modules ? Math.round(total/modules) : 0;
+
 }
 
-// 📈 CHART
-function renderCharts(stats){
+// ================= CHART =================
+function renderChart(stats){
 
   const labels = Object.keys(stats);
   const data = Object.values(stats);
 
-  // destroy lama
   if(barChart) barChart.destroy();
-  if(pieChart) pieChart.destroy();
 
-  // ================= BAR =================
-  barChart = new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: {
+  barChart = new Chart(document.getElementById("barChart"), {
+    type:'bar',
+    data:{
       labels,
-      datasets: [{
-        label: 'Jumlah Klik',
+      datasets:[{
         data,
-        backgroundColor: "rgba(255,255,255,0.3)",
-        borderRadius: 6
+        backgroundColor:"#60a5fa"
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // 🔥 WAJIB
-
-      plugins: {
-        legend: {
-          labels: {
-            color: "#ffffff",
-            font: { size: 12 } // kecilkan legend
-          }
-        }
-      },
-
-      scales: {
-        x: {
-          ticks: { 
-            color: "#ffffff",
-            font: { size: 10 } // kecilkan label bawah
-          }
-        },
-        y: {
-          ticks: { 
-            color: "#ffffff",
-            font: { size: 10 }
-          }
-        }
-      }
-    }
-  });
-
-
-  // ================= PIE =================
-  pieChart = new Chart(document.getElementById('pieChart'), {
-    type: 'pie',
-    data: {
-      labels,
-      datasets: [{
-        data,
-        backgroundColor: [
-          "#60a5fa","#f87171","#fbbf24","#34d399","#a78bfa",
-          "#f472b6","#22d3ee","#facc15","#fb923c","#4ade80"
-        ]
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false, // 🔥 WAJIB
-
-      plugins: {
-        legend: {
-          labels: {
-            color: "#ffffff",
-            font: { size: 11 } // kecilkan legend pie
-          }
-        }
-      }
+    options:{
+      responsive:true,
+      maintainAspectRatio:false
     }
   });
 
 }
 
-// 🏆 RANKING
-function renderRanking(stats){
-  const container = document.getElementById("ranking");
-  container.innerHTML = "";
+// ================= REPORT =================
+function generateReport(){
 
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-  const max = sorted[0]?.[1] || 1;
+  let text = "LAPORAN HEALINK\n\n";
 
-  sorted.forEach(([module, count], i)=>{
-    const percent = Math.round((count/max)*100);
+  rawData.forEach(d=>{
+    if(!inRange(d.masa)) return;
 
-    container.innerHTML += `
-      <div class="card">
-        <div class="flex justify-between">
-          <div>#${i+1}</div>
-          <div class="text-xs">${percent}%</div>
-        </div>
-        <div class="font-bold mt-2">${module}</div>
-        <div class="text-3xl mt-1">${count}</div>
-        <div class="w-full bg-white/20 h-2 rounded mt-3">
-          <div class="h-2 rounded bg-gradient-to-r from-yellow-400 to-pink-500" style="width:${percent}%"></div>
-        </div>
-      </div>
-    `;
+    text += `${d.nama} | ${d.kelas} | ${d.aktiviti}\n`;
   });
+
+  const blob = new Blob([text], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan.txt";
+  a.click();
+
 }
+
+// ================= CSV =================
+function exportCSV(){
+
+  let rows = [["Nama","Kelas","Modul"]];
+
+  rawData.forEach(d=>{
+    if(!inRange(d.masa)) return;
+
+    rows.push([d.nama,d.kelas,d.aktiviti]);
+  });
+
+  const csv = rows.map(r=>r.join(",")).join("\n");
+
+  const blob = new Blob([csv], {type:"text/csv"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan.csv";
+  a.click();
+
+}
+
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -1317,9 +1276,9 @@ for(let i=0; i<15; i++){
 </script>
 
 <script>
-const refVisitor = db.collection("stats").doc("visitors");
+const refVisitorMain = db.collection("stats").doc("visitors");
 
-refVisitor.onSnapshot(doc => {
+refVisitorMain.onSnapshot(doc => {
   if (doc.exists) {
     document.getElementById("visitorCount").innerText = doc.data().count;
   }
@@ -1327,7 +1286,7 @@ refVisitor.onSnapshot(doc => {
 </script>
 
 <script>
-const list = document.getElementById("aktivitiList");
+const list = document.getElementById("activityList");
 
 // ambil data dari Firestore (guna collection pengunjung Cikgu)
 db.collection("pengunjung")
@@ -1442,9 +1401,8 @@ refHealink.onSnapshot(doc => {
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const refVisitor = db.collection("stats").doc("visitors_healink");
+const refVisitorHealink = db.collection("stats").doc("visitors_healink");
 const refAktiviti = db.collection("aktivitiPelajar");
 
 let chart;
@@ -1464,7 +1422,7 @@ refAktiviti.onSnapshot(snapshot => {
   });
 
   // ambil visitor
-  refVisitor.get().then(doc => {
+  refVisitorHealink.get().then(doc => {
     const pelawat = doc.exists ? doc.data().count : 0;
 
     updateChart(murid, guru, pelawat);
@@ -1617,13 +1575,6 @@ function exportCSV(){
   a.download = "laporan_healink.csv";
   a.click();
 } 
-function generateReport(){
-  alert("TEST REPORT"); // test dulu
-}
-
-function exportCSV(){
-  alert("TEST CSV");
-}
 </script>
 </body>
 </html>
