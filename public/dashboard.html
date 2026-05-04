@@ -583,24 +583,6 @@ function renderCharts(stats){
 
 }
 
-// ================= RANKING =================
-function renderRanking(stats){
-
-  const box = document.getElementById("ranking");
-  box.innerHTML = "";
-
-  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
-
-  sorted.forEach(([m,c],i)=>{
-    box.innerHTML += `
-      <div class="card">
-        <b>#${i+1} ${m}</b><br>
-        ${c} klik
-      </div>
-    `;
-  });
-
-}
 
 // ================= LIVE =================
 function renderLive(){
@@ -608,7 +590,10 @@ function renderLive(){
   const box = document.getElementById("activityList");
   box.innerHTML = "";
 
-  rawData.slice(0,20).forEach(d => {
+  rawData
+.filter(d => inRange(d.masa))
+.slice(0,20)
+.forEach(d => {
 
     const masa = d.masa?.seconds
       ? new Date(d.masa.seconds * 1000).toLocaleString("ms-MY")
@@ -632,9 +617,9 @@ function renderAlert(){
 
   let kira = {};
 
-  rawData.forEach(d => {
-    const nama = d.nama || "Unknown";
-    kira[nama] = (kira[nama] || 0) + 1;
+  rawData
+.filter(d => inRange(d.masa))
+.forEach(d => {
   });
 
   Object.entries(kira).forEach(([nama,count])=>{
@@ -658,11 +643,9 @@ function renderPengunjung(){
 
   rawData.forEach(d => {
 
-    const jenis = (d.jenis || "").toLowerCase().trim();
+  if(!inRange(d.masa)) return;
 
-    if(jenis === "murid") murid++;
-    else if(jenis === "guru") guru++;
-    else pelawat++;
+  const jenis = (d.jenis || "").toLowerCase().trim();
 
   });
 
