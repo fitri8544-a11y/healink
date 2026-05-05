@@ -318,6 +318,17 @@ body::after {
         class="bg-white/20 rounded-lg hover:bg-white/30">
         Tapis Data
       </button>
+
+    <div class="flex gap-3 mt-4">
+
+      <input id="fromDate" type="date" class="p-2 rounded text-black">
+      <input id="toDate" type="date" class="p-2 rounded text-black">
+
+      <button onclick="exportCSV()"
+        class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
+        📊 Export Excel
+      </button>
+
     </div>
 
     <!-- ================= PENGUNJUNG ================= -->
@@ -1490,6 +1501,69 @@ function updateChart(murid, guru, pelawat){
       }
     }
   });
+
+}
+function inRange(masa){
+
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+
+  if(!masa || !masa.toDate) return false;
+
+  const tarikh = masa.toDate();
+
+  if(from && tarikh < new Date(from)) return false;
+  if(to && tarikh > new Date(to + " 23:59:59")) return false;
+
+  return true;
+}
+
+function exportCSV(){
+
+  if(!rawData || rawData.length === 0){
+    alert("Tiada data untuk export");
+    return;
+  }
+
+  let csv = "Nama,Kelas,Modul,Jenis,Masa\n";
+
+  let count = 0;
+
+  rawData.forEach(d => {
+
+    // filter tarikh
+    if(!inRange(d.masa)) return;
+
+    const nama = d.nama || "-";
+    const kelas = d.kelas || "-";
+    const modul = d.module || "-";
+    const jenis = d.jenis || "-";
+
+    const masa = d.masa?.toDate()
+      ? d.masa.toDate().toLocaleString("ms-MY")
+      : "-";
+
+    csv += `"${nama}","${kelas}","${modul}","${jenis}","${masa}"\n`;
+
+    count++;
+
+  });
+
+  if(count === 0){
+    alert("Tiada data dalam julat tarikh");
+    return;
+  }
+
+  // download file
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "laporan_healink.csv";
+  a.click();
+
+  URL.revokeObjectURL(url);
 
 }
 </script>
