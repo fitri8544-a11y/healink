@@ -1475,13 +1475,18 @@ window.exportCSV = function(){
   console.log("CLICK EXPORT");
 
   if(!rawData || rawData.length === 0){
-    alert("Tiada data (rawData kosong)");
+    alert("Tiada data untuk export");
     return;
   }
 
   let csv = "Nama,Kelas,Modul,Jenis,Masa\n";
 
+  let count = 0;
+
   rawData.forEach(d => {
+
+    // 🔥 FILTER TARIKH
+    if(!inRange(d.masa)) return;
 
     const nama = d.nama || "-";
     const kelas = d.kelas || "-";
@@ -1494,18 +1499,42 @@ window.exportCSV = function(){
 
     csv += `"${nama}","${kelas}","${modul}","${jenis}","${masa}"\n`;
 
+    count++;
+
   });
 
-  const blob = new Blob([csv], { type: "text/csv" });
+  if(count === 0){
+    alert("Tiada data dalam julat tarikh");
+    return;
+  }
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+
+  const link = document.createElement("a");
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "laporan_healink.csv";
-  a.click();
+  link.setAttribute("href", url);
+  link.setAttribute("download", "laporan_healink_filter.csv");
 
-  URL.revokeObjectURL(url);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
+}
+
+function inRange(masa){
+
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+
+  if(!masa || !masa.toDate) return false;
+
+  const tarikh = masa.toDate();
+
+  if(from && tarikh < new Date(from)) return false;
+  if(to && tarikh > new Date(to + " 23:59:59")) return false;
+
+  return true;
 }
 </script>
 
