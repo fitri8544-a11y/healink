@@ -310,20 +310,41 @@ body::after {
       </button>
     </div>
 
-    <!-- FILTER TARIKH -->
-    <div class="grid md:grid-cols-3 gap-4">
-  <input id="fromDate" type="date" class="p-2 rounded text-black">
-  <input id="toDate" type="date" class="p-2 rounded text-black">
-  <button onclick="applyFilter()" class="bg-white/20 rounded-lg hover:bg-white/30">
-    Tapis Data
-  </button>
-</div>
+   <!-- ================= JANA LAPORAN ================= -->
+<div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg mt-6">
 
-<div class="mt-4">
-  <button onclick="exportCSV()"
-    class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
-    📊 Export Excel
-  </button>
+  <!-- TAJUK -->
+  <h3 class="text-lg font-bold text-white mb-4 text-center">
+    📊 Jana Laporan HEALINK
+  </h3>
+
+  <!-- TARIKH -->
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div>
+      <label class="text-sm text-white/80">Tarikh Mula</label>
+      <input id="fromDate" type="date"
+        class="w-full p-2 rounded text-black mt-1">
+    </div>
+
+    <div>
+      <label class="text-sm text-white/80">Tarikh Tamat</label>
+      <input id="toDate" type="date"
+        class="w-full p-2 rounded text-black mt-1">
+    </div>
+
+  </div>
+
+  <!-- BUTTON -->
+  <div class="mt-6 text-center">
+    <button onclick="exportCSV()"
+      class="bg-gradient-to-r from-blue-500 to-purple-500 
+             px-6 py-3 rounded-xl font-semibold 
+             hover:scale-105 transition duration-300 shadow-lg">
+      📥 Jana & Muat Turun Laporan
+    </button>
+  </div>
+
 </div>
 
     <!-- ================= PENGUNJUNG ================= -->
