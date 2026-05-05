@@ -312,23 +312,19 @@ body::after {
 
     <!-- FILTER TARIKH -->
     <div class="grid md:grid-cols-3 gap-4">
-      <input id="fromDate" type="date" class="p-2 rounded text-black">
-      <input id="toDate" type="date" class="p-2 rounded text-black">
-      <button onclick="applyFilter()" 
-        class="bg-white/20 rounded-lg hover:bg-white/30">
-        Tapis Data
-      </button>
+  <input id="fromDate" type="date" class="p-2 rounded text-black">
+  <input id="toDate" type="date" class="p-2 rounded text-black">
+  <button onclick="applyFilter()" class="bg-white/20 rounded-lg hover:bg-white/30">
+    Tapis Data
+  </button>
+</div>
 
-    <div class="flex gap-3 mt-4">
-
-      <button onclick="exportCSV()"
-        class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
-        📊 Export Excel
-      </button>
-
-      </div>
-
-    </div>
+<div class="mt-4">
+  <button onclick="exportCSV()"
+    class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
+    📊 Export Excel
+  </button>
+</div>
 
     <!-- ================= PENGUNJUNG ================= -->
     <div class="card">
@@ -1437,35 +1433,6 @@ refHealink.onSnapshot(doc => {
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const refVisitor = db.collection("stats").doc("visitors_healink");
-const refAktiviti = db.collection("aktivitiPelajar");
-
-let chart;
-
-// ambil data real-time
-refAktiviti.onSnapshot(snapshot => {
-
-  let murid = 0;
-  let guru = 0;
-
-  snapshot.forEach(doc => {
-    const d = doc.data();
-    const jenis = (d.jenis || "").toLowerCase();
-
-    if (jenis === "murid") murid++;
-    if (jenis === "guru") guru++;
-  });
-
-  // ambil visitor
-  refVisitor.get().then(doc => {
-    const pelawat = doc.exists ? doc.data().count : 0;
-
-    updateChart(murid, guru, pelawat);
-  });
-
-});
-
-
 function updateChart(murid, guru, pelawat){
 
   const ctx = document.getElementById("healinkChart").getContext("2d");
@@ -1501,20 +1468,6 @@ function updateChart(murid, guru, pelawat){
     }
   });
 
-}
-function inRange(masa){
-
-  const from = document.getElementById("fromDate").value;
-  const to = document.getElementById("toDate").value;
-
-  if(!masa || !masa.toDate) return false;
-
-  const tarikh = masa.toDate();
-
-  if(from && tarikh < new Date(from)) return false;
-  if(to && tarikh > new Date(to + " 23:59:59")) return false;
-
-  return true;
 }
 
 window.exportCSV = function(){
@@ -1555,5 +1508,8 @@ window.exportCSV = function(){
 
 }
 </script>
+
+<div id="particles"></div>
+
 </body>
 </html>
