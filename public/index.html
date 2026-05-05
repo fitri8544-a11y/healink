@@ -56,7 +56,13 @@
 </div>
 
 <!-- 🔥 SATU SAHAJA -->
-<p id="jenisText" class="text-center text-xs text-white/70 mt-2"></p>
+<div id="jenisBox" class="mt-4 mb-4 text-center opacity-0 scale-95 transition duration-300">
+
+  <span class="bg-green-400/20 text-green-200 px-4 py-2 rounded-full text-sm font-semibold shadow">
+    ✔ Dipilih: <span id="jenisText"></span>
+  </span>
+
+</div>
 
     <!-- INPUT -->
     <input id="nama" type="text" placeholder="Nama" class="inputBox">
@@ -252,12 +258,10 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
-  // reset
   document.querySelectorAll(".btnJenis").forEach(btn=>{
     btn.classList.remove("btnActive","bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400");
   });
 
-  // highlight
   if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
   if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
   if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
@@ -268,11 +272,16 @@ function selectJenis(jenis){
     return;
   }
 
-  // 🔥 SIMPAN
-  sessionStorage.setItem("jenisDipilih", jenis);
+  // TEXT UPDATE
+  document.getElementById("jenisText").innerText = jenis;
 
-  // 🔥 FEEDBACK TEXT
-  document.getElementById("jenisText").innerText = "Dipilih: " + jenis;
+  // 🔥 SHOW BOX (ANIMATION)
+  const box = document.getElementById("jenisBox");
+  box.classList.remove("opacity-0","scale-95");
+  box.classList.add("opacity-100","scale-100");
+
+  // SAVE
+  sessionStorage.setItem("jenisDipilih", jenis);
 }
 
 document.querySelectorAll(".ripple").forEach(btn => {
