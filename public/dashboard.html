@@ -319,11 +319,6 @@ body::after {
         Tapis Data
       </button>
 
-    <div class="flex gap-3 mt-4">
-
-      <input id="fromDate" type="date" class="p-2 rounded text-black">
-      <input id="toDate" type="date" class="p-2 rounded text-black">
-
       <button onclick="exportCSV()"
         class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
         📊 Export Excel
@@ -1297,8 +1292,6 @@ function toggleSection(id){
 
 </div>
 
-<script>
-const particles = document.getElementById("particles");
 
 for(let i=0; i<15; i++){
   const p = document.createElement("div");
@@ -1520,21 +1513,18 @@ function inRange(masa){
   return true;
 }
 
-function exportCSV(){
+window.exportCSV = function(){
+
+  console.log("CLICK EXPORT");
 
   if(!rawData || rawData.length === 0){
-    alert("Tiada data untuk export");
+    alert("Tiada data (rawData kosong)");
     return;
   }
 
   let csv = "Nama,Kelas,Modul,Jenis,Masa\n";
 
-  let count = 0;
-
   rawData.forEach(d => {
-
-    // filter tarikh
-    if(!inRange(d.masa)) return;
 
     const nama = d.nama || "-";
     const kelas = d.kelas || "-";
@@ -1547,16 +1537,8 @@ function exportCSV(){
 
     csv += `"${nama}","${kelas}","${modul}","${jenis}","${masa}"\n`;
 
-    count++;
-
   });
 
-  if(count === 0){
-    alert("Tiada data dalam julat tarikh");
-    return;
-  }
-
-  // download file
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
 
