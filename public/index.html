@@ -39,21 +39,24 @@
     <p class="mb-3 text-white/90 text-sm">Jenis Pengunjung:</p>
 
     <!-- 🔥 FIX GRID -->
-    <div class="grid grid-cols-2 gap-3 mb-6">
+    <div class="grid grid-cols-2 gap-3 mb-4">
 
-      <button type="button" onclick="selectJenis('Murid')" id="btnMurid"
-        class="btnJenis">🎒 Murid</button>
+  <button type="button" onclick="selectJenis('Murid')" id="btnMurid"
+    class="btnJenis ripple">🎒 Murid</button>
 
-      <button type="button" onclick="selectJenis('Guru')" id="btnGuru"
-        class="btnJenis">👨‍🏫 Guru</button>
+  <button type="button" onclick="selectJenis('Guru')" id="btnGuru"
+    class="btnJenis ripple">👨‍🏫 Guru</button>
 
-      <button type="button" onclick="selectJenis('Pelawat')" id="btnPelawat"
-        class="btnJenis">👤 Pelawat</button>
+  <button type="button" onclick="selectJenis('Pelawat')" id="btnPelawat"
+    class="btnJenis ripple">👤 Pelawat</button>
 
-      <button type="button" onclick="selectJenis('Admin')" id="btnAdmin"
-        class="btnJenis">🛠️ Admin</button>
+  <button type="button" onclick="selectJenis('Admin')" id="btnAdmin"
+    class="btnJenis ripple">🛠️ Admin</button>
 
-    </div>
+</div>
+
+<!-- 🔥 SATU SAHAJA -->
+<p id="jenisText" class="text-center text-xs text-white/70 mt-2"></p>
 
     <!-- INPUT -->
     <input id="nama" type="text" placeholder="Nama" class="inputBox">
@@ -115,6 +118,27 @@
 .btnMain:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 25px rgba(168,85,247,0.4);
+}
+
+/* RIPPLE EFFECT */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple span {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: rippleEffect 600ms linear;
+  background: rgba(255,255,255,0.6);
+}
+
+@keyframes rippleEffect {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
 }
 </style>
 
@@ -228,23 +252,15 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
-  // reset semua
+  // reset
   document.querySelectorAll(".btnJenis").forEach(btn=>{
     btn.classList.remove("btnActive","bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400");
   });
 
-  // pilih button
-  if(jenis === "Murid"){
-    btnMurid.classList.add("btnActive","bg-green-400");
-  }
-
-  if(jenis === "Guru"){
-    btnGuru.classList.add("btnActive","bg-blue-400");
-  }
-
-  if(jenis === "Pelawat"){
-    btnPelawat.classList.add("btnActive","bg-yellow-400");
-  }
+  // highlight
+  if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
+  if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
+  if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
 
   if(jenis === "Admin"){
     btnAdmin.classList.add("btnActive","bg-red-400");
@@ -252,8 +268,42 @@ function selectJenis(jenis){
     return;
   }
 
-  // OPTIONAL: simpan pilihan
-  sessionStorage.setItem("jenis", jenis);
+  // 🔥 SIMPAN
+  sessionStorage.setItem("jenisDipilih", jenis);
+
+  // 🔥 FEEDBACK TEXT
+  document.getElementById("jenisText").innerText = "Dipilih: " + jenis;
+}
+
+document.querySelectorAll(".ripple").forEach(btn => {
+
+  btn.addEventListener("click", function(e){
+
+    const circle = document.createElement("span");
+
+    const diameter = Math.max(this.clientWidth, this.clientHeight);
+    const radius = diameter / 2;
+
+    circle.style.width = circle.style.height = `${diameter}px`;
+    circle.style.left = `${e.clientX - this.offsetLeft - radius}px`;
+    circle.style.top = `${e.clientY - this.offsetTop - radius}px`;
+
+    this.appendChild(circle);
+
+    setTimeout(() => circle.remove(), 600);
+
+  });
+
+});
+
+window.onload = function(){
+
+  const saved = sessionStorage.getItem("jenisDipilih");
+
+  if(saved){
+    selectJenis(saved);
+  }
+
 }
 
 </script>
