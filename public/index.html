@@ -14,61 +14,100 @@
 
 <body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
 
-<div class="bg-white/10 backdrop-blur-lg p-8 rounded-3xl shadow-xl w-[90%] max-w-lg">
+<div class="bg-white/10 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/20 w-[90%] max-w-md mx-auto">
 
-  <h2 class="text-2xl font-bold mb-6 text-center">
-    📝 Daftar Pengunjung
-  </h2>
+  <!-- HEADER -->
+  <div class="text-center mb-6">
+
+    <h2 class="text-2xl font-bold">
+      🧠 HEALINK 2.0
+    </h2>
+
+    <p class="text-white/70 text-sm mt-1">
+      Ekosistem Kesejahteraan Minda
+    </p>
+
+    <div class="mt-3 inline-block bg-green-400 text-black px-3 py-1 rounded-full text-xs font-semibold">
+      🚀 Versi Baharu
+    </div>
+
+  </div>
 
   <form id="formDaftar">
 
     <!-- JENIS -->
-    <p class="mb-3 text-white/90">Jenis Pengunjung:</p>
+    <p class="mb-3 text-white/90 text-sm">Jenis Pengunjung:</p>
 
-    <div class="grid grid-cols-3 gap-3 mb-6">
+    <!-- 🔥 FIX GRID -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+
       <button type="button" onclick="selectJenis('Murid')" id="btnMurid"
-        class="p-3 rounded-xl bg-white/20 hover:bg-green-400/30 transition">
-        🎒 Murid
-      </button>
+        class="btnJenis">🎒 Murid</button>
 
       <button type="button" onclick="selectJenis('Guru')" id="btnGuru"
-        class="p-3 rounded-xl bg-white/20 hover:bg-blue-400/30 transition">
-        👨‍🏫 Guru
-      </button>
+        class="btnJenis">👨‍🏫 Guru</button>
 
       <button type="button" onclick="selectJenis('Pelawat')" id="btnPelawat"
-        class="p-3 rounded-xl bg-white/20 hover:bg-yellow-400/30 transition">
-        👤 Pelawat
-      </button>
+        class="btnJenis">👤 Pelawat</button>
 
-      <!-- 🔥 TAMBAH ADMIN -->
-  <button type="button" onclick="selectJenis('Admin')" id="btnAdmin"
-    class="p-3 rounded-xl bg-white/20 hover:bg-red-400/30 transition">
-    🛠️ Admin
-  </button>
+      <button type="button" onclick="selectJenis('Admin')" id="btnAdmin"
+        class="btnJenis">🛠️ Admin</button>
+
     </div>
 
-    <!-- NAMA -->
-    <input id="nama" type="text" placeholder="Nama"
-      class="w-full p-3 mb-4 rounded-lg text-black">
+    <!-- INPUT -->
+    <input id="nama" type="text" placeholder="Nama" class="inputBox">
 
-    <!-- ORGANISASI -->
-    <input id="organisasi" type="text" placeholder="Sekolah / Organisasi"
-      class="w-full p-3 mb-4 rounded-lg text-black">
+    <input id="organisasi" type="text" placeholder="Sekolah / Organisasi" class="inputBox">
 
-    <!-- KELAS -->
-    <input id="kelas" type="text" placeholder="Kelas (contoh: 5 Bestari)"
-      class="w-full p-3 mb-6 rounded-lg text-black">
+    <input id="kelas" type="text" placeholder="Kelas (contoh: 5 Bestari)" class="inputBox">
 
     <!-- BUTTON -->
-    <button type="submit"
-      class="w-full bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-xl font-semibold hover:scale-105 transition">
+    <button type="submit" class="btnMain">
       ✨ Daftar Sekarang
     </button>
 
   </form>
 
 </div>
+
+<style>
+.inputBox {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 12px;
+  color: black;
+  font-size: 14px;
+}
+
+.btnJenis {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.15);
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.btnJenis:hover {
+  background: rgba(255,255,255,0.3);
+  transform: scale(1.03);
+}
+
+.btnMain {
+  width: 100%;
+  padding: 14px;
+  border-radius: 16px;
+  font-weight: bold;
+  background: linear-gradient(to right, #9333ea, #3b82f6);
+  transition: 0.3s;
+}
+
+.btnMain:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(168,85,247,0.4);
+}
+</style>
 
 <script>
 
@@ -177,6 +216,23 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
   });
 
 });
+
+function selectJenis(jenis){
+
+  document.querySelectorAll(".btnJenis").forEach(btn=>{
+    btn.classList.remove("bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400","text-black");
+  });
+
+  if(jenis === "Murid") btnMurid.classList.add("bg-green-400","text-black");
+  if(jenis === "Guru") btnGuru.classList.add("bg-blue-400","text-black");
+  if(jenis === "Pelawat") btnPelawat.classList.add("bg-yellow-400","text-black");
+
+  if(jenis === "Admin"){
+    btnAdmin.classList.add("bg-red-400","text-black");
+    window.location.href = "login.html";
+  }
+
+}
 
 </script>
 
