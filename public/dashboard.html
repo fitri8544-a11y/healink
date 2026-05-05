@@ -1479,13 +1479,15 @@ window.exportCSV = function(){
     return;
   }
 
-  let csv = "Nama,Kelas,Modul,Jenis,Masa\n";
+  // 🔥 LETAK DI SINI (ATAS SEKALI)
+  let csv = "LAPORAN HEALINK\n";
+  csv += "Tarikh: " + new Date().toLocaleDateString("ms-MY") + "\n\n";
+  csv += "Nama,Kelas,Modul,Jenis,Masa\n";
 
   let count = 0;
 
   rawData.forEach(d => {
 
-    // 🔥 FILTER TARIKH
     if(!inRange(d.masa)) return;
 
     const nama = d.nama || "-";
@@ -1514,7 +1516,7 @@ window.exportCSV = function(){
   const url = URL.createObjectURL(blob);
 
   link.setAttribute("href", url);
-  link.setAttribute("download", "laporan_healink_filter.csv");
+  link.setAttribute("download", "laporan_healink.csv");
 
   document.body.appendChild(link);
   link.click();
