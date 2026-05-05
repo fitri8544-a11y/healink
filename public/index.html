@@ -87,11 +87,20 @@
   background: rgba(255,255,255,0.15);
   transition: 0.3s;
   font-size: 14px;
+  border: 2px solid transparent;
 }
 
 .btnJenis:hover {
   background: rgba(255,255,255,0.3);
   transform: scale(1.03);
+}
+
+/* 🔥 ACTIVE STATE */
+.btnActive {
+  transform: scale(1.05);
+  border: 2px solid white;
+  box-shadow: 0 0 15px rgba(255,255,255,0.6);
+  color: black;
 }
 
 .btnMain {
@@ -219,19 +228,32 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
+  // reset semua
   document.querySelectorAll(".btnJenis").forEach(btn=>{
-    btn.classList.remove("bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400","text-black");
+    btn.classList.remove("btnActive","bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400");
   });
 
-  if(jenis === "Murid") btnMurid.classList.add("bg-green-400","text-black");
-  if(jenis === "Guru") btnGuru.classList.add("bg-blue-400","text-black");
-  if(jenis === "Pelawat") btnPelawat.classList.add("bg-yellow-400","text-black");
-
-  if(jenis === "Admin"){
-    btnAdmin.classList.add("bg-red-400","text-black");
-    window.location.href = "login.html";
+  // pilih button
+  if(jenis === "Murid"){
+    btnMurid.classList.add("btnActive","bg-green-400");
   }
 
+  if(jenis === "Guru"){
+    btnGuru.classList.add("btnActive","bg-blue-400");
+  }
+
+  if(jenis === "Pelawat"){
+    btnPelawat.classList.add("btnActive","bg-yellow-400");
+  }
+
+  if(jenis === "Admin"){
+    btnAdmin.classList.add("btnActive","bg-red-400");
+    window.location.href = "login.html";
+    return;
+  }
+
+  // OPTIONAL: simpan pilihan
+  sessionStorage.setItem("jenis", jenis);
 }
 
 </script>
