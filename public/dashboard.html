@@ -319,6 +319,8 @@ body::after {
         Tapis Data
       </button>
 
+    <div class="flex gap-3 mt-4">
+
       <button onclick="exportCSV()"
         class="bg-blue-500 px-4 py-2 rounded hover:bg-blue-600">
         📊 Export Excel
@@ -1292,6 +1294,8 @@ function toggleSection(id){
 
 </div>
 
+<script>
+const particles = document.getElementById("particles");
 
 for(let i=0; i<15; i++){
   const p = document.createElement("div");
