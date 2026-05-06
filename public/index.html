@@ -69,7 +69,10 @@
 
     <input id="organisasi" type="text" placeholder="Sekolah / Organisasi" class="inputBox">
 
-    <input id="kelas" type="text" placeholder="Kelas (contoh: 5 Bestari)" class="inputBox">
+    <!-- 🔥 BUNGKUS KELAS -->
+    <div id="kelasBox">
+      <input id="kelas" type="text" placeholder="Kelas (contoh: 5 Bestari)" class="inputBox">
+    </div>
 
     <!-- BUTTON -->
     <button type="submit" class="btnMain">
@@ -272,15 +275,22 @@ function selectJenis(jenis){
     return;
   }
 
-  // TEXT UPDATE
+  // 🔥 CONTROL KELAS
+  const kelasBox = document.getElementById("kelasBox");
+
+  if(jenis === "Pelawat" || jenis === "Guru"){
+    kelasBox.style.display = "none";
+  } else {
+    kelasBox.style.display = "block";
+  }
+
+  // TEXT
   document.getElementById("jenisText").innerText = jenis;
 
-  // 🔥 SHOW BOX (ANIMATION)
   const box = document.getElementById("jenisBox");
   box.classList.remove("opacity-0","scale-95");
   box.classList.add("opacity-100","scale-100");
 
-  // SAVE
   sessionStorage.setItem("jenisDipilih", jenis);
 }
 
