@@ -74,6 +74,9 @@
       <input id="kelas" type="text" placeholder="Kelas (contoh: 5 Bestari)" class="inputBox">
     </div>
 
+    <!-- 🔥 STEP 4.1 LETAK DI SINI -->
+    <p id="hintText" class="text-xs text-white/60 mt-3 text-center"></p>
+
     <!-- BUTTON -->
     <button type="submit" class="btnMain">
       ✨ Daftar Sekarang
@@ -149,6 +152,12 @@
     opacity: 0;
   }
 }
+
+.inputFocus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(59,130,246,0.6);
+  border: 2px solid #3b82f6;
+}
 </style>
 
 <script>
@@ -190,6 +199,17 @@ function selectJenis(jenis){
   } else {
     kelasField.style.display = "block";
   }
+
+  // 🎯 AUTO SCROLL & FOCUS
+  setTimeout(() => {
+  document.getElementById("nama").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+
+  document.getElementById("nama").focus();
+
+}, 200);
 }
 
 // SUBMIT
@@ -261,37 +281,51 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
-  document.querySelectorAll(".btnJenis").forEach(btn=>{
-    btn.classList.remove("btnActive","bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400");
-  });
-
-  if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
-  if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
-  if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
-
-  if(jenis === "Admin"){
-    btnAdmin.classList.add("btnActive","bg-red-400");
-    window.location.href = "login.html";
-    return;
-  }
-
-  // 🔥 CONTROL KELAS
-  const kelasBox = document.getElementById("kelasBox");
-
-  if(jenis === "Pelawat" || jenis === "Guru"){
-    kelasBox.style.display = "none";
-  } else {
-    kelasBox.style.display = "block";
-  }
-
-  // TEXT
+  // 🔥 UPDATE TEXT
   document.getElementById("jenisText").innerText = jenis;
 
+  // 🔥 SHOW BOX
   const box = document.getElementById("jenisBox");
   box.classList.remove("opacity-0","scale-95");
   box.classList.add("opacity-100","scale-100");
 
+  // 🔥 AUTO SCROLL & FOCUS
+  setTimeout(() => {
+    document.getElementById("nama").scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    document.getElementById("nama").focus();
+  }, 200);
+
+  // 🔥 SAVE SESSION
   sessionStorage.setItem("jenisDipilih", jenis);
+
+  // =========================
+  // 🔥 STEP 4.2 (BETUL DI SINI)
+  // =========================
+  let hint = "";
+
+  if(jenis === "Murid"){
+    hint = "Sila isi nama, sekolah dan kelas";
+  }
+  else if(jenis === "Guru"){
+    hint = "Sila isi nama dan sekolah";
+  }
+  else if(jenis === "Pelawat"){
+    hint = "Sila isi nama dan organisasi sahaja";
+  }
+
+  document.getElementById("hintText").innerText = hint;
+
+  // =========================
+  // 🔥 STEP 5.1 (LETak SINI)
+  // =========================
+  document.getElementById("nama").value = "";
+  document.getElementById("organisasi").value = "";
+  document.getElementById("kelas").value = "";
+
 }
 
 document.querySelectorAll(".ripple").forEach(btn => {
@@ -324,6 +358,14 @@ window.onload = function(){
   }
 
 }
+
+const namaInput = document.getElementById("nama");
+
+namaInput.classList.add("inputFocus");
+
+setTimeout(() => {
+  namaInput.classList.remove("inputFocus");
+}, 1500);
 
 </script>
 
