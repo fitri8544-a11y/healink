@@ -312,15 +312,55 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
-  // 🔥 UPDATE TEXT
+  // ======================
+  // RESET BUTTON
+  // ======================
+  document.querySelectorAll(".btnJenis").forEach(btn=>{
+    btn.classList.remove(
+      "btnActive",
+      "bg-green-400",
+      "bg-blue-400",
+      "bg-yellow-400",
+      "bg-red-400"
+    );
+  });
+
+  // ======================
+  // HIGHLIGHT
+  // ======================
+  if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
+  if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
+  if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
+
+  // ======================
+  // 🔐 ADMIN FIX (PENTING)
+  // ======================
+  if(jenis === "Admin"){
+
+    btnAdmin.classList.add("btnActive","bg-red-400");
+
+    document.getElementById("jenisText").innerText = "🔐 Membuka Login Admin...";
+
+    setTimeout(()=>{
+      window.location.href = "login.html";
+    }, 500);
+
+    return; // ❗ STOP FLOW
+  }
+
+  // ======================
+  // NORMAL USER FLOW
+  // ======================
+
+  // TEXT
   document.getElementById("jenisText").innerText = jenis;
 
-  // 🔥 SHOW BOX
+  // SHOW BOX
   const box = document.getElementById("jenisBox");
   box.classList.remove("opacity-0","scale-95");
   box.classList.add("opacity-100","scale-100");
 
-  // 🔥 AUTO SCROLL & FOCUS
+  // SCROLL
   setTimeout(() => {
     document.getElementById("nama").scrollIntoView({
       behavior: "smooth",
@@ -330,12 +370,12 @@ function selectJenis(jenis){
     document.getElementById("nama").focus();
   }, 200);
 
-  // 🔥 SAVE SESSION
+  // SAVE
   sessionStorage.setItem("jenisDipilih", jenis);
 
-  // =========================
-  // 🔥 STEP 4.2 (BETUL DI SINI)
-  // =========================
+  // ======================
+  // HINT
+  // ======================
   let hint = "";
 
   if(jenis === "Murid"){
@@ -350,9 +390,9 @@ function selectJenis(jenis){
 
   document.getElementById("hintText").innerText = hint;
 
-  // =========================
-  // 🔥 STEP 5.1 (LETak SINI)
-  // =========================
+  // ======================
+  // CLEAR INPUT
+  // ======================
   document.getElementById("nama").value = "";
   document.getElementById("organisasi").value = "";
   document.getElementById("kelas").value = "";
