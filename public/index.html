@@ -176,29 +176,52 @@ const db = firebase.firestore();
 
 let jenisDipilih = "";
 
-// PILIH JENIS
 function selectJenis(jenis){
-  jenisDipilih = jenis;
 
-  document.querySelectorAll("#btnMurid, #btnGuru, #btnPelawat, #btnAdmin")
-    .forEach(btn => btn.classList.remove(
-      "bg-green-400","bg-blue-400","bg-yellow-400","bg-red-400"
-    ));
+  // reset semua button
+  document.querySelectorAll(".btnJenis").forEach(btn=>{
+    btn.classList.remove(
+      "btnActive",
+      "bg-green-400",
+      "bg-blue-400",
+      "bg-yellow-400",
+      "bg-red-400"
+    );
+  });
 
-  if(jenis === "Murid") btnMurid.classList.add("bg-green-400");
-  if(jenis === "Guru") btnGuru.classList.add("bg-blue-400");
-  if(jenis === "Pelawat") btnPelawat.classList.add("bg-yellow-400");
+  // highlight ikut jenis
+  if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
+  if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
+  if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
 
+  // 🔐 ADMIN (FIX UTAMA)
   if(jenis === "Admin"){
-  btnAdmin.classList.add("btnActive","bg-red-400");
 
-  document.getElementById("jenisText").innerText = "🔐 Admin Login";
+    btnAdmin.classList.add("btnActive","bg-red-400");
 
-  setTimeout(()=>{
-    window.location.href = "login.html";
-  }, 500);
+    document.getElementById("jenisText").innerText = "🔐 Membuka Login Admin...";
 
-  return;
+    // optional: vibrate (mobile)
+    if(navigator.vibrate) navigator.vibrate(50);
+
+    // redirect
+    setTimeout(()=>{
+      window.location.href = "login.html";
+    }, 500);
+
+    return; // WAJIB
+  }
+
+  // ======================
+  // NORMAL USER FLOW
+  // ======================
+
+  // text
+  document.getElementById("jenisText").innerText = jenis;
+
+  // simpan
+  sessionStorage.setItem("jenisDipilih", jenis);
+
 }
 
   const kelasField = document.getElementById("kelas");
