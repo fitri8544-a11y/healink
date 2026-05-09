@@ -2145,7 +2145,7 @@ function trackActivity(module, komen = ""){
 <script>
 // 🔥 BLOCK AWAL (sebelum Firebase)
 if(!sessionStorage.getItem("sudahDaftar")){
-  window.location.href = "daftar.html";
+  window.location.href = "index.html";
 }
 firebase.auth().onAuthStateChanged(user => {
 
@@ -2154,7 +2154,7 @@ firebase.auth().onAuthStateChanged(user => {
   }
 
   if(!sessionStorage.getItem("sudahDaftar")){
-    window.location.href = "daftar.html";
+    window.location.href = "index.html";
   }
 
 });
@@ -2261,7 +2261,7 @@ firebase.auth().onAuthStateChanged(user => {
 
   // 🔥 USER BELUM DAFTAR → redirect
   if(!sessionStorage.getItem("sudahDaftar")){
-    window.location.href = "daftar.html";
+    window.location.href = "index.html";
   }
 
 });
@@ -2275,7 +2275,7 @@ function tukarUser(){
   firebase.auth().signOut();
 
   // 🔥 redirect semula ke daftar
-  window.location.href = "/";
+  window.location.href = "index.html";
 
 }
 
