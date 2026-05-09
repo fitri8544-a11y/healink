@@ -190,10 +190,16 @@ function selectJenis(jenis){
   if(jenis === "Pelawat") btnPelawat.classList.add("bg-yellow-400");
 
   if(jenis === "Admin"){
-    btnAdmin.classList.add("bg-red-400");
+  btnAdmin.classList.add("btnActive","bg-red-400");
+
+  document.getElementById("jenisText").innerText = "🔐 Admin Login";
+
+  setTimeout(()=>{
     window.location.href = "login.html";
-    return;
-  }
+  }, 500);
+
+  return;
+}
 
   const kelasField = document.getElementById("kelas");
 
