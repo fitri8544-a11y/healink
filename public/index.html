@@ -176,72 +176,6 @@ const db = firebase.firestore();
 
 let jenisDipilih = "";
 
-function selectJenis(jenis){
-
-  // reset semua button
-  document.querySelectorAll(".btnJenis").forEach(btn=>{
-    btn.classList.remove(
-      "btnActive",
-      "bg-green-400",
-      "bg-blue-400",
-      "bg-yellow-400",
-      "bg-red-400"
-    );
-  });
-
-  // highlight ikut jenis
-  if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
-  if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
-  if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
-
-  // 🔐 ADMIN (FIX UTAMA)
-  if(jenis === "Admin"){
-
-    btnAdmin.classList.add("btnActive","bg-red-400");
-
-    document.getElementById("jenisText").innerText = "🔐 Membuka Login Admin...";
-
-    // optional: vibrate (mobile)
-    if(navigator.vibrate) navigator.vibrate(50);
-
-    // redirect
-    setTimeout(()=>{
-      window.location.href = "login.html";
-    }, 500);
-
-    return; // WAJIB
-  }
-
-  // ======================
-  // NORMAL USER FLOW
-  // ======================
-
-  // text
-  document.getElementById("jenisText").innerText = jenis;
-
-  // simpan
-  sessionStorage.setItem("jenisDipilih", jenis);
-
-}
-
-  const kelasField = document.getElementById("kelas");
-
-  if(jenis === "Guru" || jenis === "Pelawat"){
-    kelasField.style.display = "none";
-  } else {
-    kelasField.style.display = "block";
-  }
-
-  // 🎯 AUTO SCROLL & FOCUS
-  setTimeout(() => {
-  document.getElementById("nama").scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
-
-  document.getElementById("nama").focus();
-
-}, 200);
 
 // SUBMIT
 document.getElementById("formDaftar").addEventListener("submit", function(e){
@@ -306,9 +240,7 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 
 function selectJenis(jenis){
 
-  // ======================
   // RESET BUTTON
-  // ======================
   document.querySelectorAll(".btnJenis").forEach(btn=>{
     btn.classList.remove(
       "btnActive",
@@ -319,18 +251,13 @@ function selectJenis(jenis){
     );
   });
 
-  // ======================
   // HIGHLIGHT
-  // ======================
   if(jenis === "Murid") btnMurid.classList.add("btnActive","bg-green-400");
   if(jenis === "Guru") btnGuru.classList.add("btnActive","bg-blue-400");
   if(jenis === "Pelawat") btnPelawat.classList.add("btnActive","bg-yellow-400");
 
-  // ======================
-  // 🔐 ADMIN FIX (PENTING)
-  // ======================
+  // 🔐 ADMIN
   if(jenis === "Admin"){
-
     btnAdmin.classList.add("btnActive","bg-red-400");
 
     document.getElementById("jenisText").innerText = "🔐 Membuka Login Admin...";
@@ -339,22 +266,27 @@ function selectJenis(jenis){
       window.location.href = "login.html";
     }, 500);
 
-    return; // ❗ STOP FLOW
+    return;
   }
-
-  // ======================
-  // NORMAL USER FLOW
-  // ======================
-
-  // TEXT
-  document.getElementById("jenisText").innerText = jenis;
 
   // SHOW BOX
   const box = document.getElementById("jenisBox");
   box.classList.remove("opacity-0","scale-95");
   box.classList.add("opacity-100","scale-100");
 
-  // SCROLL
+  // TEXT
+  document.getElementById("jenisText").innerText = jenis;
+
+  // 🔥 CONTROL KELAS (BETUL TEMPAT)
+  const kelasBox = document.getElementById("kelasBox");
+
+  if(jenis === "Guru" || jenis === "Pelawat"){
+    kelasBox.style.display = "none";
+  } else {
+    kelasBox.style.display = "block";
+  }
+
+  // SCROLL + FOCUS
   setTimeout(() => {
     document.getElementById("nama").scrollIntoView({
       behavior: "smooth",
@@ -367,9 +299,7 @@ function selectJenis(jenis){
   // SAVE
   sessionStorage.setItem("jenisDipilih", jenis);
 
-  // ======================
   // HINT
-  // ======================
   let hint = "";
 
   if(jenis === "Murid"){
@@ -384,9 +314,7 @@ function selectJenis(jenis){
 
   document.getElementById("hintText").innerText = hint;
 
-  // ======================
   // CLEAR INPUT
-  // ======================
   document.getElementById("nama").value = "";
   document.getElementById("organisasi").value = "";
   document.getElementById("kelas").value = "";
