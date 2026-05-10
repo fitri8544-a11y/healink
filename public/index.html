@@ -239,6 +239,9 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
 });
 
 function selectJenis(jenis){
+  
+  // 🔥 WAJIB ADA INI
+  jenisDipilih = jenis;
 
   // RESET BUTTON
   document.querySelectorAll(".btnJenis").forEach(btn=>{
@@ -271,8 +274,10 @@ function selectJenis(jenis){
 
   // SHOW BOX
   const box = document.getElementById("jenisBox");
+if(box){
   box.classList.remove("opacity-0","scale-95");
   box.classList.add("opacity-100","scale-100");
+}
 
   // TEXT
   document.getElementById("jenisText").innerText = jenis;
@@ -280,11 +285,13 @@ function selectJenis(jenis){
   // 🔥 CONTROL KELAS (BETUL TEMPAT)
   const kelasBox = document.getElementById("kelasBox");
 
+if(kelasBox){
   if(jenis === "Guru" || jenis === "Pelawat"){
     kelasBox.style.display = "none";
   } else {
     kelasBox.style.display = "block";
   }
+}
 
   // SCROLL + FOCUS
   setTimeout(() => {
