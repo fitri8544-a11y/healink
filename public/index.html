@@ -277,7 +277,17 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
     }
   }
 
-  // 🔥 FIREBASE SAHAJA
+  // 🔥 SIMPAN SESSION DULU (PENTING)
+  sessionStorage.setItem("sudahDaftar","yes");
+  sessionStorage.setItem("nama", nama);
+  sessionStorage.setItem("jenis", jenis);
+  sessionStorage.setItem("kelas", kelas);
+  sessionStorage.setItem("organisasi", organisasi);
+
+  // 🔥 REDIRECT TERUS (JANGAN TUNGGU FIRESTORE)
+  window.location.href = "healink.html";
+
+  // 🔥 FIRESTORE BACKGROUND (OPTIONAL)
   db.collection("pengunjung").add({
     jenis,
     nama,
@@ -285,27 +295,11 @@ document.getElementById("formDaftar").addEventListener("submit", function(e){
     kelas,
     masa: new Date()
   })
-  .then(() => {
-
-    // 🔥 SIMPAN SESSION
-    sessionStorage.setItem("sudahDaftar","yes");
-    sessionStorage.setItem("nama", nama);
-    sessionStorage.setItem("jenis", jenis);
-    sessionStorage.setItem("kelas", kelas);
-    sessionStorage.setItem("organisasi", organisasi);
-
-    alert("✅ Data berjaya direkod!");
-
-    // 🔥 REDIRECT
-    window.location.href = "healink.html";
-
+  .then(()=>{
+    console.log("DATA SAVED");
   })
-  .catch(err => {
-
+  .catch(err=>{
     console.error("ERROR:", err);
-
-    alert("❌ Ralat simpan data");
-
   });
 
 });
