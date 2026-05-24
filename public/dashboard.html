@@ -298,16 +298,34 @@ body::after {
 </div>
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center gap-3 flex-wrap">
       <div>
         <h1 class="text-2xl font-bold">📊 Dashboard Aktiviti Pelajar</h1>
         <p class="text-white/70 text-sm">Analisis penggunaan modul (Real-time)</p>
       </div>
 
-      <button onclick="logout()" 
-        class="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600">
-        🚪 Logout
-      </button>
+      <div class="flex gap-3">
+
+  <!-- LOG KEMASKINI -->
+  <button onclick="openUpdateModal()" 
+    class="bg-cyan-500 hover:bg-cyan-400
+           px-4 py-2 rounded-xl shadow-lg
+           font-semibold transition duration-300">
+
+    🚀 Log Kemaskini
+
+  </button>
+
+  <!-- LOGOUT -->
+  <button onclick="logout()" 
+    class="bg-red-500 px-4 py-2 rounded-xl 
+           hover:bg-red-600 transition duration-300">
+
+    🚪 Logout
+
+  </button>
+
+</div>
     </div>
 
    <!-- ================= JANA LAPORAN ================= -->
@@ -1559,7 +1577,146 @@ function inRange(masa){
 
   return true;
 }
+
+// ================= UPDATE MODAL =================
+
+function openUpdateModal(){
+
+  document.getElementById("updateModal")
+  .classList.remove("hidden");
+
+}
+
+function closeUpdateModal(){
+
+  document.getElementById("updateModal")
+  .classList.add("hidden");
+
+}
+
+// ================= FIRESTORE =================
+
+db.collection("systemUpdates")
+.orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+
+  const container =
+  document.getElementById("updateContainer");
+
+  if(!container) return;
+
+  container.innerHTML = "";
+
+  snapshot.forEach(doc=>{
+
+    const data = doc.data();
+
+    let list = "";
+
+    (data.description || []).forEach(item=>{
+
+      list += `
+        <li class="mb-2">
+          • ${item}
+        </li>
+      `;
+
+    });
+
+    container.innerHTML += `
+
+      <div class="bg-white/5 border border-cyan-500/20
+      rounded-3xl p-6">
+
+        <div class="inline-block bg-cyan-500/20
+        text-cyan-300 px-4 py-1 rounded-full text-sm mb-4">
+
+          ${data.date || "-"}
+
+        </div>
+
+        <h3 class="text-2xl font-bold text-white mb-3">
+
+          ${data.title || "-"}
+
+        </h3>
+
+        <div class="text-cyan-300 font-bold mb-4">
+
+          🚀 ${data.type || "UPDATE"}
+
+        </div>
+
+        <ul class="text-white/80 leading-8">
+
+          ${list}
+
+        </ul>
+
+      </div>
+
+    `;
+
+  });
+
+});
+
 </script>
+
+<!-- UPDATE MODAL -->
+<div id="updateModal"
+class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm
+z-[9999] flex items-center justify-center p-4">
+
+  <div class="bg-[#071226] border border-cyan-500/30
+  w-full max-w-4xl rounded-3xl shadow-2xl
+  max-h-[90vh] overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center
+    p-6 border-b border-white/10">
+
+      <div>
+
+        <h2 class="text-3xl font-bold text-cyan-300">
+          🚀 Log Kemaskini Sistem
+        </h2>
+
+        <p class="text-white/60">
+          Rekod penambahbaikan terbaru HEALINK
+        </p>
+
+      </div>
+
+      <button onclick="closeUpdateModal()"
+      class="text-white text-3xl">
+        ✕
+      </button>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div id="updateContainer"
+    class="p-6 space-y-8 overflow-y-auto max-h-[70vh]">
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="p-4 border-t border-white/10">
+
+      <button onclick="closeUpdateModal()"
+      class="w-full bg-cyan-600 hover:bg-cyan-500
+      text-white py-3 rounded-2xl font-bold">
+
+        Tutup
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
 <div id="particles"></div>
 
