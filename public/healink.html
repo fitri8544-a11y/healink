@@ -1206,9 +1206,13 @@ setInterval(animateSlogan, 8000);
 
 
 <!-- ================= NOTA MODAL ================= -->
-<div id="notaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+<div id="notaModal" 
+class="hidden fixed inset-0 bg-black/70 backdrop-blur-md 
+flex items-center justify-center z-[9999] p-4">
 
-  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg relative shadow-xl">
+  <div class="bg-white p-6 rounded-3xl w-[95%] md:w-[90%] 
+max-w-4xl relative shadow-2xl 
+max-h-[85vh] overflow-y-auto">
 
     <!-- CLOSE BUTTON -->
     <button onclick="closeNota()" 
@@ -1220,7 +1224,7 @@ setInterval(animateSlogan, 8000);
       📘 Nota Psikoedukasi
     </h2>
 
-    <div class="space-y-5">
+    <div class="space-y-6 pb-2">
 
   <!-- STRESS -->
   <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 shadow">
