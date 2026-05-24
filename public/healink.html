@@ -2430,33 +2430,33 @@ setGreeting();
 
 </script>
 
-<!-- ================= MODAL NOTA PSIKOEDUKASI ================= -->
+<!-- ================= MODAL PSIKO BARU ================= -->
 <div id="modalPsiko"
-class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
 
-  <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden animate-fadeIn">
+  <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden animate-slideUp max-h-[90vh] overflow-y-auto">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center px-6 py-5 border-b bg-gradient-to-r from-purple-600 to-indigo-600 text-white">
+    <div class="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
 
       <h2 class="text-2xl font-bold flex items-center gap-2">
         📘 Nota Psikoedukasi
       </h2>
 
       <button onclick="closePsiko()"
-      class="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 text-white text-xl font-bold transition">
+      class="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 transition text-white font-bold">
         ✕
       </button>
 
     </div>
 
     <!-- CONTENT -->
-    <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div class="p-6 space-y-6 bg-gradient-to-br from-pink-50 via-white to-purple-50">
 
       <!-- STRESS -->
       <div class="bg-yellow-50 border border-yellow-200 rounded-3xl p-5">
 
-        <h3 class="text-2xl font-bold text-yellow-700 mb-3">
+        <h3 class="text-2xl font-bold text-yellow-700 mb-4">
           😰 Apa itu Stress?
         </h3>
 
@@ -2478,14 +2478,14 @@ class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center 
       <!-- ANXIETY -->
       <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5">
 
-        <h3 class="text-2xl font-bold text-orange-700 mb-3">
+        <h3 class="text-2xl font-bold text-orange-700 mb-4">
           😨 Apa itu Anxiety?
         </h3>
 
         <div class="bg-white rounded-2xl p-5">
 
           <p class="text-lg leading-8 text-orange-800">
-            Anxiety ialah rasa risau atau takut yang berlebihan.
+            Anxiety ialah rasa takut atau risau berlebihan.
           </p>
 
           <p class="mt-4 text-lg text-orange-700">
@@ -2500,21 +2500,40 @@ class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center 
       <!-- DEPRESSION -->
       <div class="bg-blue-50 border border-blue-200 rounded-3xl p-5">
 
-        <h3 class="text-2xl font-bold text-blue-700 mb-3">
+        <h3 class="text-2xl font-bold text-blue-700 mb-4">
           😔 Apa itu Depression?
         </h3>
 
         <div class="bg-white rounded-2xl p-5">
 
           <p class="text-lg leading-8 text-blue-800">
-            Kemurungan menyebabkan kesedihan berpanjangan
-            dan hilang minat terhadap aktiviti harian.
+            Kemurungan menyebabkan kesedihan berpanjangan.
           </p>
 
           <p class="mt-4 text-lg text-blue-700">
             <b>Tanda-tanda:</b>
-            Sedih berterusan, tiada tenaga, masalah tidur.
+            Sedih berterusan, hilang minat, tiada tenaga.
           </p>
+
+        </div>
+
+      </div>
+
+      <!-- KESIHATAN MENTAL -->
+      <div class="bg-green-50 border border-green-200 rounded-3xl p-5">
+
+        <h3 class="text-2xl font-bold text-green-700 mb-4">
+          🧠 Kesihatan Mental
+        </h3>
+
+        <div class="bg-white rounded-2xl p-5">
+
+          <ul class="list-disc pl-6 text-green-700 text-lg space-y-2">
+            <li>Bersenam secara tetap</li>
+            <li>Tidur mencukupi</li>
+            <li>Makan makanan seimbang</li>
+            <li>Luangkan masa bersama keluarga</li>
+          </ul>
 
         </div>
 
