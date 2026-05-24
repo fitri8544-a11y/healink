@@ -2430,113 +2430,59 @@ setGreeting();
 
 </script>
 
-<!-- ================= MODAL PSIKO BARU ================= -->
+<!-- ================= MODAL PSIKO ================= -->
 <div id="modalPsiko"
 class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[99999] flex items-center justify-center p-4">
 
-  <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden animate-slideUp max-h-[90vh] overflow-y-auto">
+  <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-5 flex justify-between items-center">
 
-      <h2 class="text-2xl font-bold flex items-center gap-2">
+      <h2 class="text-2xl font-bold text-white">
         📘 Nota Psikoedukasi
       </h2>
 
       <button onclick="closePsiko()"
-      class="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 transition text-white font-bold">
+      class="bg-red-500 hover:bg-red-600 text-white w-10 h-10 rounded-full">
         ✕
       </button>
 
     </div>
 
     <!-- CONTENT -->
-    <div class="p-6 space-y-6 bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div class="p-6 bg-white max-h-[80vh] overflow-y-auto space-y-5">
 
-      <!-- STRESS -->
-      <div class="bg-yellow-50 border border-yellow-200 rounded-3xl p-5">
-
-        <h3 class="text-2xl font-bold text-yellow-700 mb-4">
-          😰 Apa itu Stress?
+      <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5">
+        <h3 class="font-bold text-yellow-700 text-xl mb-2">
+          😰 Stress
         </h3>
 
-        <div class="bg-white rounded-2xl p-5">
-
-          <p class="text-lg leading-8 text-yellow-800">
-            Stress adalah tindak balas badan terhadap tekanan atau cabaran.
-          </p>
-
-          <p class="mt-4 text-lg text-yellow-700">
-            <b>Tanda-tanda:</b>
-            Sakit kepala, susah tidur, mudah marah.
-          </p>
-
-        </div>
-
+        <p class="text-gray-700 leading-7">
+          Stress berlaku apabila seseorang menghadapi tekanan emosi,
+          pelajaran atau kehidupan harian.
+        </p>
       </div>
 
-      <!-- ANXIETY -->
-      <div class="bg-orange-50 border border-orange-200 rounded-3xl p-5">
-
-        <h3 class="text-2xl font-bold text-orange-700 mb-4">
-          😨 Apa itu Anxiety?
+      <div class="bg-orange-50 border border-orange-200 rounded-2xl p-5">
+        <h3 class="font-bold text-orange-700 text-xl mb-2">
+          😨 Anxiety
         </h3>
 
-        <div class="bg-white rounded-2xl p-5">
-
-          <p class="text-lg leading-8 text-orange-800">
-            Anxiety ialah rasa takut atau risau berlebihan.
-          </p>
-
-          <p class="mt-4 text-lg text-orange-700">
-            <b>Tanda-tanda:</b>
-            Jantung berdebar, sukar fokus, fikiran negatif.
-          </p>
-
-        </div>
-
+        <p class="text-gray-700 leading-7">
+          Anxiety menyebabkan rasa takut, risau dan gelisah berlebihan.
+        </p>
       </div>
 
-      <!-- DEPRESSION -->
-      <div class="bg-blue-50 border border-blue-200 rounded-3xl p-5">
-
-        <h3 class="text-2xl font-bold text-blue-700 mb-4">
-          😔 Apa itu Depression?
+      <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+        <h3 class="font-bold text-blue-700 text-xl mb-2">
+          😔 Depression
         </h3>
 
-        <div class="bg-white rounded-2xl p-5">
-
-          <p class="text-lg leading-8 text-blue-800">
-            Kemurungan menyebabkan kesedihan berpanjangan.
-          </p>
-
-          <p class="mt-4 text-lg text-blue-700">
-            <b>Tanda-tanda:</b>
-            Sedih berterusan, hilang minat, tiada tenaga.
-          </p>
-
-        </div>
-
-      </div>
-
-      <!-- KESIHATAN MENTAL -->
-      <div class="bg-green-50 border border-green-200 rounded-3xl p-5">
-
-        <h3 class="text-2xl font-bold text-green-700 mb-4">
-          🧠 Kesihatan Mental
-        </h3>
-
-        <div class="bg-white rounded-2xl p-5">
-
-          <ul class="list-disc pl-6 text-green-700 text-lg space-y-2">
-            <li>Bersenam secara tetap</li>
-            <li>Tidur mencukupi</li>
-            <li>Makan makanan seimbang</li>
-            <li>Luangkan masa bersama keluarga</li>
-          </ul>
-
-        </div>
-
+        <p class="text-gray-700 leading-7">
+          Depression ialah kemurungan yang berpanjangan dan memberi kesan
+          kepada emosi serta kehidupan harian.
+        </p>
       </div>
 
     </div>
