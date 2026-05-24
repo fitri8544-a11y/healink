@@ -1217,42 +1217,6 @@ setInterval(animateSlogan, 8000);
   </div>
 </div>
 
-
-<!-- ================= NOTA MODAL ================= -->
-<div id="notaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
-
-  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg relative shadow-xl">
-
-    <!-- CLOSE BUTTON -->
-    <button onclick="closeNota()" 
-      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
-      ✕
-    </button>
-
-    <h2 class="font-bold text-lg text-gray-800 mb-4">
-      📘 Nota Psikoedukasi
-    </h2>
-
-    <div class="space-y-3 text-sm font-medium">
-
-      <div class="p-3 bg-yellow-100 text-yellow-900 rounded-lg shadow">
-        😰 Stress = tekanan sementara
-      </div>
-
-      <div class="p-3 bg-orange-100 text-orange-900 rounded-lg shadow">
-        😨 Anxiety = rasa risau berlebihan
-      </div>
-
-      <div class="p-3 bg-blue-100 text-blue-900 rounded-lg shadow">
-        😔 Depression = sedih berpanjangan
-      </div>
-
-    </div>
-
-  </div>
-</div>
-
-
 <!-- ================= MINDA MODAL ================= -->
 <div id="mindaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
 
@@ -1921,6 +1885,7 @@ function closeAllModals(){
     "trackerModal",
     "statusModal",
     "emotionModal",
+    "modalPsiko",
     "detailModal" // 🔥 tambah ini
   ];
 
@@ -2023,9 +1988,15 @@ function openKawal(){
   document.getElementById("kawalModal").classList.remove("hidden");
 }
 
-function openNota(){
+function openPsiko(){
   closeAllModals();
-  document.getElementById("notaModal").classList.remove("hidden");
+  document.getElementById("modalPsiko")
+    .classList.remove("hidden");
+}
+
+function closePsiko(){
+  document.getElementById("modalPsiko")
+    .classList.add("hidden");
 }
 
 function openMinda(){
