@@ -1173,7 +1173,7 @@ setInterval(animateSlogan, 8000);
 <!-- ================= KAWAL MODAL ================= -->
 <div id="kawalModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
 
-  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-4xl relative shadow-xl max-h-[85vh] overflow-y-auto">
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg text-center relative shadow-xl">
 
     <!-- CLOSE BUTTON -->
     <button onclick="closeKawal()" 
@@ -1205,7 +1205,22 @@ setInterval(animateSlogan, 8000);
 </div>
 
 
-<div class="space-y-5">
+<!-- ================= NOTA MODAL ================= -->
+<div id="notaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg relative shadow-xl">
+
+    <!-- CLOSE BUTTON -->
+    <button onclick="closeNota()" 
+      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+      ✕
+    </button>
+
+    <h2 class="font-bold text-lg text-gray-800 mb-4">
+      📘 Nota Psikoedukasi
+    </h2>
+
+    <div class="space-y-5">
 
   <!-- STRESS -->
   <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-5 shadow">
