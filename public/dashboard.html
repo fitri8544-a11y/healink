@@ -911,6 +911,9 @@ firebase.auth().onAuthStateChanged(async user => {
       );
     }
 
+    // ================= UCAPAN ADMIN =================
+    generateGreeting();
+
     // ================= START ADMIN DATA =================
     startMainDataListener();
 
@@ -1213,8 +1216,6 @@ db.collection("aktivitiPelajar")
 
 // ================= AUTO LOAD (FINAL CLEAN VERSION) =================
 window.onload = function(){
-
-  generateGreeting();
 
   document
     .getElementById("sekolahList")
