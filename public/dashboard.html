@@ -489,12 +489,24 @@ function generateGreeting(){
 
       // ================= ROLE LOGIC =================
       if(email === SUPER_ADMIN){
+
         roleText = "Admin";
         namaPaparan = "Fitri";
+
       }
-      else if(ADMIN_EMAILS.includes(email)){
+      else if(
+        window.currentAdmin &&
+        (
+          window.currentAdmin.role === "superadmin" ||
+          window.currentAdmin.role === "schooladmin"
+        )
+      ){
+
         roleText = "Admin";
-        namaPaparan = "";
+
+        namaPaparan =
+        window.currentAdmin.nama || "";
+
       }
       else{
         const jenis = sessionStorage.getItem("jenis");
@@ -572,12 +584,66 @@ let rawData = [];
 let stats = {};
 let barChart, pieChart;
 
-// 📡 REALTIME LISTENER
-db.collection("aktivitiPelajar").onSnapshot(snapshot => {
-  rawData = [];
-  snapshot.forEach(doc => rawData.push(doc.data()));
-  computeAndRender();
-});
+// =====================================================
+// 📡 REALTIME LISTENER - ROLE BASED DATA
+// =====================================================
+
+function startMainDataListener(){
+
+  db.collection("aktivitiPelajar")
+    .onSnapshot(snapshot => {
+
+      rawData = [];
+
+      snapshot.forEach(doc => {
+
+        const d = doc.data();
+
+        // ==========================================
+        // SCHOOL ADMIN
+        // HANYA DATA SEKOLAH SENDIRI
+        // ==========================================
+        if(
+          window.currentAdmin &&
+          window.currentAdmin.role === "schooladmin"
+        ){
+
+          const sekolahAdmin =
+            (window.currentAdmin.sekolah || "")
+              .toUpperCase()
+              .trim();
+
+          const sekolahData =
+            (d.organisasi || "")
+              .toUpperCase()
+              .trim();
+
+          if(sekolahData !== sekolahAdmin){
+            return;
+          }
+        }
+
+        // ==========================================
+        // SUPERADMIN
+        // SEMUA DATA DIBENARKAN
+        // ==========================================
+
+        rawData.push(d);
+
+      });
+
+      computeAndRender();
+
+      console.log(
+        "📊 DATA HEALINK:",
+        rawData.length,
+        window.currentAdmin?.role,
+        window.currentAdmin?.sekolah
+      );
+
+    });
+
+}
 
 // 🔎 FILTER TARIKH
 function applyFilter(){
@@ -748,25 +814,126 @@ function renderRanking(stats){
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
-const ADMIN_EMAILS = [
-  "fitrieusop@moe.gov.my",
-  "g-88050609@moe-dl.edu.my"
-];
+// =====================================================
+// HEALINK ADMIN ACCESS CONTROL
+// =====================================================
 
-firebase.auth().onAuthStateChanged(user => {
+window.currentAdmin = null;
 
+firebase.auth().onAuthStateChanged(async user => {
+
+  // ================= BELUM LOGIN =================
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
-  if (!ADMIN_EMAILS.includes(user.email)) {
-    alert("Akses terhad untuk admin sahaja");
-    firebase.auth().signOut();
-    window.location.href = "login.html";
+  try {
+
+    // ================= BACA PROFIL ADMIN =================
+    const adminDoc = await db
+      .collection("adminUsers")
+      .doc(user.uid)
+      .get();
+
+    // ================= BUKAN ADMIN =================
+    if (!adminDoc.exists) {
+
+      alert("Akses terhad untuk pentadbir HEALINK sahaja.");
+
+      await firebase.auth().signOut();
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    // ================= SIMPAN PROFIL =================
+    const adminData = adminDoc.data();
+
+    window.currentAdmin = {
+      uid: user.uid,
+      email: user.email,
+      nama: adminData.nama || "Admin",
+      role: adminData.role || "",
+      sekolah: adminData.sekolah || ""
+    };
+
+    console.log(
+      "✅ HEALINK ADMIN:",
+      window.currentAdmin
+    );
+
+    // ================= VALIDASI ROLE =================
+    if (
+      window.currentAdmin.role !== "superadmin" &&
+      window.currentAdmin.role !== "schooladmin"
+    ) {
+
+      alert("Role pentadbir tidak sah.");
+
+      await firebase.auth().signOut();
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    // ================= SCHOOL ADMIN =================
+    if (window.currentAdmin.role === "schooladmin") {
+
+      if (!window.currentAdmin.sekolah) {
+
+        alert("Maklumat sekolah untuk akaun ini belum ditetapkan.");
+
+        await firebase.auth().signOut();
+
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentSekolah =
+        window.currentAdmin.sekolah
+          .toUpperCase()
+          .trim();
+
+      console.log(
+        "🏫 SCHOOL ADMIN:",
+        currentSekolah
+      );
+    }
+
+    // ================= SUPER ADMIN =================
+    if (window.currentAdmin.role === "superadmin") {
+
+      currentSekolah = "all";
+
+      console.log(
+        "👑 SUPER ADMIN — SEMUA SEKOLAH"
+      );
+    }
+
+    // ================= START ADMIN DATA =================
+    startMainDataListener();
+
+    loadData();
+    loadSidebar();
+    loadAlert();
+
+  }
+  catch(error) {
+
+    console.error(
+      "❌ ADMIN ACCESS ERROR:",
+      error
+    );
+
+    alert(
+      "Ralat semasa mendapatkan maklumat pentadbir."
+    );
+
   }
 
 });
+
 </script>
 
 <script>
@@ -854,8 +1021,33 @@ let currentSekolah = "all";
 let currentKelas = "all";
 
 function filterSekolah(s){
+
+  // ==========================================
+  // 🔐 SCHOOL ADMIN
+  // Tidak dibenarkan tukar ke sekolah lain
+  // ==========================================
+  if(
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ){
+
+    currentSekolah =
+      (window.currentAdmin.sekolah || "")
+        .toUpperCase()
+        .trim();
+
+    loadData();
+    return;
+  }
+
+  // ==========================================
+  // 👑 SUPER ADMIN
+  // Bebas memilih sekolah
+  // ==========================================
   currentSekolah = s;
+
   loadData();
+
 }
 
 function filterKelas(k){
@@ -920,11 +1112,36 @@ db.collection("aktivitiPelajar")
 
   snapshot.forEach(doc => {
 
-    const d = doc.data();
+  const d = doc.data();
 
-    // ✅ TAMBAH INI
-    kelasSet.add(d.kelas);
-    modulSet.add(d.module);
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
+
+    const sekolahAdmin =
+      (window.currentAdmin.sekolah || "")
+        .toUpperCase()
+        .trim();
+
+    const sekolahData =
+      (d.organisasi || "")
+        .toUpperCase()
+        .trim();
+
+    // Jangan paparkan data sekolah lain
+    if (sekolahData !== sekolahAdmin) {
+      return;
+    }
+  }
+
+  // ================= FILTER OPTION =================
+  kelasSet.add(d.kelas);
+  modulSet.add(d.module);
+    
 
     const time = d.masa?.toDate().toLocaleString('ms-MY', {
       day: '2-digit',
@@ -997,14 +1214,13 @@ db.collection("aktivitiPelajar")
 // ================= AUTO LOAD (FINAL CLEAN VERSION) =================
 window.onload = function(){
 
-  generateGreeting(); // 👈 sini
+  generateGreeting();
 
-  loadData();      // ✔ dashboard utama
-  loadSidebar();   // ✔ sidebar dynamic (SEKOLAH + KELAS + ORGANISASI)
-  loadAlert();     // ✔ murid perlu perhatian
-  document.getElementById("sekolahList").classList.remove("hidden");
+  document
+    .getElementById("sekolahList")
+    .classList.remove("hidden");
 
-};;
+};
 
 // ================= SEKOLAH =================
 function loadSekolah(){
@@ -1111,9 +1327,36 @@ function loadAlert(){
 
     snapshot.forEach(doc => {
 
-      const d = doc.data();
+  const d = doc.data();
 
-      if(d.perluPerhatian !== true) return; // 🔥 filter sini
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
+
+    const sekolahAdmin =
+      (window.currentAdmin.sekolah || "")
+        .toUpperCase()
+        .trim();
+
+    const sekolahData =
+      (d.organisasi || "")
+        .toUpperCase()
+        .trim();
+
+    // Jangan paparkan murid sekolah lain
+    if (sekolahData !== sekolahAdmin) {
+      return;
+    }
+  }
+
+  // ==========================================
+  // ⚠️ MURID PERLU PERHATIAN
+  // ==========================================
+  if(d.perluPerhatian !== true) return;
 
       html += `
   <div onclick="openDetail(
@@ -1195,10 +1438,37 @@ function loadSidebar(){
     const organisasiCount = {};
 
     snapshot.forEach(doc => {
-      const d = doc.data();
 
-      const orgRaw = (d.organisasi || "").toUpperCase().trim();
-      const kelas = (d.kelas || "-").toUpperCase();
+  const d = doc.data();
+
+  const orgRaw =
+    (d.organisasi || "")
+      .toUpperCase()
+      .trim();
+
+  const kelas =
+    (d.kelas || "-")
+      .toUpperCase()
+      .trim();
+
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
+
+    const sekolahAdmin =
+      (window.currentAdmin.sekolah || "")
+        .toUpperCase()
+        .trim();
+
+    // Abaikan semua sekolah lain
+    if (orgRaw !== sekolahAdmin) {
+      return;
+    }
+  }
 
       // ================= CLASSIFY =================
       let kategori = "LAIN";
@@ -1236,13 +1506,24 @@ function loadSidebar(){
     });
 
     // ================= SEKOLAH =================
-    let htmlSekolah = `
-      <div onclick="filterSekolah('all')" 
-           class="sidebar-item flex justify-between cursor-pointer">
-        <span>Semua</span>
-        <span class="badge">${snapshot.size}</span>
-      </div>
-    `;
+    let htmlSekolah = "";
+
+// ==========================================
+// 👑 "SEMUA" HANYA UNTUK SUPERADMIN
+// ==========================================
+if (
+  window.currentAdmin &&
+  window.currentAdmin.role === "superadmin"
+) {
+
+  htmlSekolah = `
+    <div onclick="filterSekolah('all')" 
+         class="sidebar-item flex justify-between cursor-pointer">
+      <span>Semua</span>
+      <span class="badge">${snapshot.size}</span>
+    </div>
+  `;
+}
 
     Object.keys(sekolahCount)
     .sort((a,b) => sekolahCount[b] - sekolahCount[a])
@@ -1513,55 +1794,224 @@ window.exportCSV = function(){
 
   console.log("CLICK EXPORT");
 
+  // =====================================================
+  // 🔐 SEMAK PROFIL ADMIN
+  // =====================================================
+  if(!window.currentAdmin){
+    alert("Maklumat pentadbir belum tersedia.");
+    return;
+  }
+
+  // =====================================================
+  // 📊 SEMAK DATA
+  // =====================================================
   if(!rawData || rawData.length === 0){
     alert("Tiada data untuk export");
     return;
   }
 
-  // 🔥 LETAK DI SINI (ATAS SEKALI)
-  let csv = "LAPORAN HEALINK\n";
-  csv += "Tarikh: " + new Date().toLocaleDateString("ms-MY") + "\n\n";
-  csv += "Nama,Kelas,Modul,Jenis,Masa\n";
+  // =====================================================
+  // 🏫 TENTUKAN SEKOLAH LAPORAN
+  // =====================================================
+  let sekolahLaporan = "SEMUA SEKOLAH";
+
+  // SCHOOL ADMIN
+  if(window.currentAdmin.role === "schooladmin"){
+
+    sekolahLaporan =
+      (window.currentAdmin.sekolah || "")
+      .toUpperCase()
+      .trim();
+
+  }
+
+  // SUPER ADMIN + SEKOLAH TERTENTU DIPILIH
+  else if(
+    window.currentAdmin.role === "superadmin" &&
+    currentSekolah !== "all"
+  ){
+
+    sekolahLaporan =
+      (currentSekolah || "")
+      .toUpperCase()
+      .trim();
+
+  }
+
+  // =====================================================
+  // 📄 HEADER CSV
+  // =====================================================
+
+  // BOM supaya Excel baca UTF-8 dengan betul
+  let csv = "\uFEFF";
+
+  csv += "LAPORAN HEALINK\n";
+
+  csv +=
+    `"Sekolah","${sekolahLaporan}"\n`;
+
+  csv +=
+    `"Tarikh Jana","${new Date().toLocaleDateString("ms-MY")}"\n\n`;
+
+  csv +=
+    "Nama,Kelas,Sekolah,Modul,Jenis,Masa\n";
 
   let count = 0;
 
+  // =====================================================
+  // 📊 PROSES DATA
+  // =====================================================
   rawData.forEach(d => {
 
-    if(!inRange(d.masa)) return;
+    // ================= FILTER TARIKH =================
+    if(!inRange(d.masa)){
+      return;
+    }
 
-    const nama = d.nama || "-";
-    const kelas = d.kelas || "-";
-    const modul = d.module || "-";
-    const jenis = d.jenis || "-";
+    const sekolahData =
+      (d.organisasi || "")
+      .toUpperCase()
+      .trim();
 
-    const masa = d.masa?.toDate()
-      ? d.masa.toDate().toLocaleString("ms-MY")
-      : "-";
+    // =================================================
+    // 🔐 SCHOOL ADMIN
+    // HANYA SEKOLAH SENDIRI
+    // =================================================
+    if(window.currentAdmin.role === "schooladmin"){
 
-    csv += `"${nama}","${kelas}","${modul}","${jenis}","${masa}"\n`;
+      const sekolahAdmin =
+        (window.currentAdmin.sekolah || "")
+        .toUpperCase()
+        .trim();
+
+      if(sekolahData !== sekolahAdmin){
+        return;
+      }
+
+    }
+
+    // =================================================
+    // 👑 SUPER ADMIN
+    // JIKA PILIH SEKOLAH TERTENTU
+    // =================================================
+    if(
+      window.currentAdmin.role === "superadmin" &&
+      currentSekolah !== "all"
+    ){
+
+      const sekolahDipilih =
+        (currentSekolah || "")
+        .toUpperCase()
+        .trim();
+
+      if(sekolahData !== sekolahDipilih){
+        return;
+      }
+
+    }
+
+    // =================================================
+    // 📋 DATA
+    // =================================================
+
+    const nama =
+      d.nama || "-";
+
+    const kelas =
+      d.kelas || "-";
+
+    const sekolah =
+      d.organisasi || "-";
+
+    const modul =
+      d.module || "-";
+
+    const jenis =
+      d.jenis || "-";
+
+    const masa =
+      d.masa?.toDate
+        ? d.masa.toDate().toLocaleString("ms-MY")
+        : "-";
+
+    // =================================================
+    // TAMBAH KE CSV
+    // =================================================
+
+    csv +=
+      `"${nama}",` +
+      `"${kelas}",` +
+      `"${sekolah}",` +
+      `"${modul}",` +
+      `"${jenis}",` +
+      `"${masa}"\n`;
 
     count++;
 
   });
 
+  // =====================================================
+  // ❌ TIADA DATA
+  // =====================================================
   if(count === 0){
-    alert("Tiada data dalam julat tarikh");
+
+    alert(
+      "Tiada data untuk sekolah dan julat tarikh yang dipilih."
+    );
+
     return;
   }
 
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  // =====================================================
+  // 📥 CIPTA FAIL CSV
+  // =====================================================
 
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
+  const blob =
+    new Blob(
+      [csv],
+      {
+        type: "text/csv;charset=utf-8;"
+      }
+    );
 
-  link.setAttribute("href", url);
-  link.setAttribute("download", "laporan_healink.csv");
+  const link =
+    document.createElement("a");
+
+  const url =
+    URL.createObjectURL(blob);
+
+  // =====================================================
+  // 🏫 NAMA FAIL MENGIKUT SEKOLAH
+  // =====================================================
+
+  const namaSekolahFail =
+    sekolahLaporan
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Z0-9_-]/gi, "");
+
+  link.setAttribute(
+    "href",
+    url
+  );
+
+  link.setAttribute(
+    "download",
+    `laporan_healink_${namaSekolahFail}.csv`
+  );
+
+  // =====================================================
+  // ⬇️ DOWNLOAD
+  // =====================================================
 
   document.body.appendChild(link);
+
   link.click();
+
   document.body.removeChild(link);
 
-}
+  URL.revokeObjectURL(url);
+
+};
 
 function inRange(masa){
 
