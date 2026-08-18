@@ -609,18 +609,18 @@ function startMainDataListener(){
         ){
 
           const sekolahAdmin =
-            (window.currentAdmin.sekolah || "")
-              .toUpperCase()
-              .trim();
+            normalizeSekolah(
+              window.currentAdmin.sekolah
+            );
 
           const sekolahData =
-            (d.organisasi || "")
-              .toUpperCase()
-              .trim();
+            normalizeSekolah(
+              d.organisasi
+            );
 
           if(sekolahData !== sekolahAdmin){
             return;
-          }
+            }
         }
 
         // ==========================================
@@ -891,9 +891,9 @@ firebase.auth().onAuthStateChanged(async user => {
       }
 
       currentSekolah =
-        window.currentAdmin.sekolah
-          .toUpperCase()
-          .trim();
+        normalizeSekolah(
+          window.currentAdmin.sekolah
+        );
 
       console.log(
         "🏫 SCHOOL ADMIN:",
@@ -1023,6 +1023,35 @@ db.collection("pengunjung").onSnapshot(snapshot => {
 let currentSekolah = "all";
 let currentKelas = "all";
 
+
+// =====================================================
+// 🏫 NORMALISASI NAMA SEKOLAH
+// =====================================================
+
+function normalizeSekolah(nama){
+
+  const value = (nama || "")
+    .toUpperCase()
+    .trim()
+    .replace(/\s+/g, " ");
+
+  const aliases = {
+
+    // ================= SK KUALA KETIL =================
+    "SKKK": "SK KUALA KETIL",
+    "SK KUALA KETIL": "SK KUALA KETIL",
+
+    // ================= SK KUALA PEGANG =================
+    "SKKP": "SK KUALA PEGANG",
+    "SK KUALA PEGANG": "SK KUALA PEGANG"
+
+  };
+
+  return aliases[value] || value;
+
+}
+
+
 function filterSekolah(s){
 
   // ==========================================
@@ -1035,9 +1064,9 @@ function filterSekolah(s){
   ){
 
     currentSekolah =
-      (window.currentAdmin.sekolah || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
 
     loadData();
     return;
@@ -1071,11 +1100,22 @@ function loadData(){
 
       const d = doc.data();
 
-      // 🔥 FILTER SEKOLAH
-      if(
-  currentSekolah !== "all" &&
-  d.organisasi?.toLowerCase().trim() !== currentSekolah.toLowerCase().trim()
-) return;
+      // =====================================================
+      // 🏫 FILTER SEKOLAH + NORMALISASI
+      // =====================================================
+      if(currentSekolah !== "all"){
+
+        const sekolahDipilih =
+        normalizeSekolah(currentSekolah);
+
+        const sekolahData =
+        normalizeSekolah(d.organisasi);
+
+        if(sekolahData !== sekolahDipilih){
+        return;
+      }
+
+  }
 
       // 🔥 FILTER KELAS
       if(
@@ -1126,14 +1166,14 @@ db.collection("aktivitiPelajar")
   ) {
 
     const sekolahAdmin =
-      (window.currentAdmin.sekolah || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+    );
 
     const sekolahData =
-      (d.organisasi || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        d.organisasi
+    );
 
     // Jangan paparkan data sekolah lain
     if (sekolahData !== sekolahAdmin) {
@@ -1339,18 +1379,18 @@ function loadAlert(){
   ) {
 
     const sekolahAdmin =
-      (window.currentAdmin.sekolah || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
 
     const sekolahData =
-      (d.organisasi || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        d.organisasi
+      );
 
     // Jangan paparkan murid sekolah lain
     if (sekolahData !== sekolahAdmin) {
-      return;
+        return;
     }
   }
 
@@ -1443,9 +1483,9 @@ function loadSidebar(){
   const d = doc.data();
 
   const orgRaw =
-    (d.organisasi || "")
-      .toUpperCase()
-      .trim();
+  normalizeSekolah(
+    d.organisasi
+  );
 
   const kelas =
     (d.kelas || "-")
@@ -1461,9 +1501,9 @@ function loadSidebar(){
   ) {
 
     const sekolahAdmin =
-      (window.currentAdmin.sekolah || "")
-        .toUpperCase()
-        .trim();
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
 
     // Abaikan semua sekolah lain
     if (orgRaw !== sekolahAdmin) {
@@ -1870,9 +1910,9 @@ window.exportCSV = function(){
     }
 
     const sekolahData =
-      (d.organisasi || "")
-      .toUpperCase()
-      .trim();
+      normalizeSekolah(
+        d.organisasi
+      );
 
     // =================================================
     // 🔐 SCHOOL ADMIN
@@ -1881,9 +1921,9 @@ window.exportCSV = function(){
     if(window.currentAdmin.role === "schooladmin"){
 
       const sekolahAdmin =
-        (window.currentAdmin.sekolah || "")
-        .toUpperCase()
-        .trim();
+        normalizeSekolah(
+          window.currentAdmin.sekolah
+        );
 
       if(sekolahData !== sekolahAdmin){
         return;
@@ -1901,9 +1941,9 @@ window.exportCSV = function(){
     ){
 
       const sekolahDipilih =
-        (currentSekolah || "")
-        .toUpperCase()
-        .trim();
+        normalizeSekolah(
+          currentSekolah
+        );
 
       if(sekolahData !== sekolahDipilih){
         return;
