@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HEALINK 2.0 | Daftar Pengunjung</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+</head>
+
+<body class="
+bg-gradient-to-br
+from-[#1e1b4b]
+via-purple-700
+to-blue-600
+min-h-screen
+flex
+items-center
+justify-center
+text-white
+px-4
+py-8
+">
+
+<!-- ================= MAIN CARD ================= -->
+
+<div class="
+bg-white/10
+backdrop-blur-xl
+p-7
+md:p-8
+rounded-3xl
+shadow-2xl
+border
+border-white/20
+w-full
+max-w-md
+mx-auto
+">
+
+    <!-- ================= HEADER ================= -->
+
+    <div class="text-center mb-7">
+
+        <div class="text-5xl mb-3">
+            🧠
+        </div>
+
+        <h1 class="
+        text-3xl
+        font-extrabold
+        bg-gradient-to-r
+        from-purple-300
+        via-pink-300
+        to-blue-300
+        bg-clip-text
+        text-transparent
+        ">
+            HEALINK 2.0
+        </h1>
+
+        <p class="text-white/80 text-sm mt-2">
+            Ekosistem Kesejahteraan Minda
+        </p>
+
+        <div class="
+        mt-4
+        inline-block
+        bg-green-400
+        text-black
+        px-3
+        py-1
+        rounded-full
+        text-xs
+        font-semibold
+        shadow
+        ">
+            🚀 Versi Baharu
+        </div>
+
+    </div>
+
+
+    <!-- ================= FORM ================= -->
+
+    <form id="formDaftar">
+
+        <!-- JENIS PENGUNJUNG -->
+
+        <p class="
+        mb-3
+        text-white/90
+        text-sm
+        font-semibold
+        ">
+            Jenis Pengunjung
+        </p>
+
+
+        <!-- MURID + GURU -->
+
+        <div class="grid grid-cols-3 gap-2 mb-4">
+
+    <button
+        type="button"
+        onclick="selectJenis('Murid')"
+        id="btnMurid"
+        class="btnJenis ripple">
+        🎒 Murid
+    </button>
+
+    <button
+        type="button"
+        onclick="selectJenis('Guru')"
+        id="btnGuru"
+        class="btnJenis ripple">
+        👨‍🏫 Guru
+    </button>
+
+    <button
+        type="button"
+        onclick="selectJenis('Pelawat')"
+        id="btnPelawat"
+        class="btnJenis ripple">
+        👤 Pelawat
+    </button>
+
+</div>
+
+
+        <!-- ================= PILIHAN AKTIF ================= -->
+
+        <div
+        id="jenisBox"
+        class="
+        mt-4
+        mb-4
+        text-center
+        opacity-0
+        scale-95
+        transition
+        duration-300
+        "
+        >
+
+            <span class="
+            inline-block
+            bg-green-400/20
+            border
+            border-green-300/30
+            text-green-200
+            px-4
+            py-2
+            rounded-full
+            text-sm
+            font-semibold
+            shadow
+            ">
+                ✔ Dipilih:
+                <span id="jenisText"></span>
+            </span>
+
+        </div>
+
+
+        <!-- ================= INPUT ================= -->
+
+        <div id="inputSection">
+
+            <input
+            id="nama"
+            type="text"
+            placeholder="Nama"
+            autocomplete="name"
+            class="inputBox"
+            >
+
+
+            <input
+            id="organisasi"
+            type="text"
+            placeholder="Sekolah / Organisasi"
+            class="inputBox"
+            >
+
+
+            <!-- KELAS - MURID SAHAJA -->
+
+            <div id="kelasBox">
+
+                <input
+                id="kelas"
+                type="text"
+                placeholder="Kelas (contoh: 5 Bestari)"
+                class="inputBox"
+                >
+
+            </div>
+
+
+            <!-- HINT -->
+
+            <p
+            id="hintText"
+            class="
+            hidden
+            text-sm
+            mt-2
+            mb-4
+            text-center
+            font-semibold
+            tracking-wide
+            bg-white/10
+            border
+            border-white/10
+            px-4
+            py-2
+            rounded-xl
+            backdrop-blur
+            "
+            >
+            </p>
+
+
+            <!-- DAFTAR -->
+
+            <button
+            type="submit"
+            class="btnMain"
+            >
+                ✨ Daftar Sekarang
+            </button>
+
+        </div>
+
+    </form>
+
+
+    <!-- ================= PEMISAH ================= -->
+
+    <div class="flex items-center gap-3 my-6">
+
+        <div class="h-px bg-white/20 flex-1"></div>
+
+        <span class="
+        text-white/50
+        text-[11px]
+        font-semibold
+        tracking-widest
+        ">
+            ATAU
+        </span>
+
+        <div class="h-px bg-white/20 flex-1"></div>
+
+    </div>
+
+
+    <!-- ================= LOGIN ADMIN ================= -->
+
+    <button
+    type="button"
+    onclick="loginAdmin()"
+    class="
+    w-full
+    py-3
+    rounded-2xl
+    bg-black/20
+    border
+    border-white/20
+    text-white
+    font-semibold
+    text-sm
+    hover:bg-black/30
+    hover:border-white/40
+    hover:scale-[1.02]
+    transition-all
+    duration-300
+    flex
+    items-center
+    justify-center
+    gap-2
+    "
+    >
+
+        <span>🔐</span>
+
+        <span>
+            Login Admin
+        </span>
+
+    </button>
+
+
+    <!-- ADMIN INFO -->
+
+    <p class="
+    text-center
+    text-white/40
+    text-[11px]
+    mt-3
+    ">
+        Akses pentadbir HEALINK
+    </p>
+
+
+    <!-- FOOTER -->
+
+    <div class="
+    text-center
+    text-white/40
+    text-[10px]
+    mt-7
+    ">
+        © 2026 HEALINK System
+        <br>
+        Sekolah Kebangsaan Kuala Ketil
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     STYLE
+===================================================== -->
+
+<style>
+
+.inputBox {
+
+    width: 100%;
+    padding: 13px 14px;
+    margin-bottom: 12px;
+
+    border-radius: 14px;
+
+    color: #111827;
+    background: rgba(255,255,255,0.95);
+
+    font-size: 14px;
+
+    border: 2px solid transparent;
+
+    transition: all 0.25s ease;
+
+}
+
+.inputBox::placeholder {
+    color: #6b7280;
+}
+
+.inputBox:focus {
+
+    outline: none;
+
+    border-color: #a855f7;
+
+    box-shadow:
+    0 0 0 3px rgba(168,85,247,0.15),
+    0 0 18px rgba(168,85,247,0.25);
+
+}
+
+
+/* ================= JENIS BUTTON ================= */
+
+.btnJenis {
+
+    padding: 13px;
+
+    border-radius: 14px;
+
+    background: rgba(255,255,255,0.12);
+
+    transition: all 0.25s ease;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    border: 2px solid transparent;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+.btnJenis:hover {
+
+    background: rgba(255,255,255,0.22);
+
+    transform: translateY(-2px);
+
+}
+
+
+/* ================= ACTIVE ================= */
+
+.btnActive {
+
+    transform: scale(1.03);
+
+    border: 2px solid rgba(255,255,255,0.8);
+
+    box-shadow:
+    0 8px 25px rgba(0,0,0,0.15),
+    0 0 15px rgba(255,255,255,0.20);
+
+}
+
+
+/* ================= MAIN BUTTON ================= */
+
+.btnMain {
+
+    width: 100%;
+
+    padding: 14px;
+
+    border-radius: 16px;
+
+    font-weight: bold;
+
+    background:
+    linear-gradient(
+        to right,
+        #9333ea,
+        #3b82f6
+    );
+
+    box-shadow:
+    0 8px 25px rgba(59,130,246,0.20);
+
+    transition: all 0.3s ease;
+
+}
+
+.btnMain:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+    0 12px 30px rgba(168,85,247,0.35);
+
+}
+
+
+/* ================= RIPPLE ================= */
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple-effect {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    transform: scale(0);
+
+    animation:
+    rippleEffect 600ms linear;
+
+    background:
+    rgba(255,255,255,0.5);
+
+    pointer-events: none;
+
+}
+
+@keyframes rippleEffect {
+
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+
+}
+
+
+/* ================= MOBILE ================= */
+
+@media(max-width: 420px){
+
+    .btnJenis {
+        font-size: 13px;
+        padding: 12px 8px;
+    }
+
+}
+
+</style>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+    authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+    projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+firebase.initializeApp(firebaseConfig);
+
+const db =
+firebase.firestore();
+
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+let jenisDipilih = "";
+
+
+/* =====================================================
+   SELECT JENIS
+===================================================== */
+
+function selectJenis(jenis){
+
+    jenisDipilih = jenis;
+
+
+    /* RESET */
+
+    document
+    .querySelectorAll(".btnJenis")
+    .forEach(btn => {
+
+        btn.classList.remove(
+            "btnActive",
+            "bg-green-400",
+            "bg-blue-400",
+            "bg-yellow-400",
+            "text-black"
+        );
+
+    });
+
+
+    /* ================= MURID ================= */
+
+    if(jenis === "Murid"){
+
+        document
+        .getElementById("btnMurid")
+        .classList.add(
+            "btnActive",
+            "bg-green-400",
+            "text-black"
+        );
+
+    }
+
+
+    /* ================= GURU ================= */
+
+    if(jenis === "Guru"){
+
+        document
+        .getElementById("btnGuru")
+        .classList.add(
+            "btnActive",
+            "bg-blue-400"
+        );
+
+    }
+
+
+    /* ================= PELAWAT ================= */
+
+    if(jenis === "Pelawat"){
+
+        document
+        .getElementById("btnPelawat")
+        .classList.add(
+            "btnActive",
+            "bg-yellow-400",
+            "text-black"
+        );
+
+    }
+
+
+    /* ================= SHOW SELECTED ================= */
+
+    const jenisBox =
+    document.getElementById("jenisBox");
+
+    jenisBox.classList.remove(
+        "opacity-0",
+        "scale-95"
+    );
+
+    jenisBox.classList.add(
+        "opacity-100",
+        "scale-100"
+    );
+
+
+    document
+    .getElementById("jenisText")
+    .innerText = jenis;
+
+
+    /* ================= KELAS ================= */
+
+    const kelasBox =
+    document.getElementById("kelasBox");
+
+    const kelasInput =
+    document.getElementById("kelas");
+
+
+    if(jenis === "Murid"){
+
+        kelasBox.style.display =
+        "block";
+
+    }
+
+    else{
+
+        kelasBox.style.display =
+        "none";
+
+        kelasInput.value = "";
+
+    }
+
+
+    /* ================= PLACEHOLDER ================= */
+
+    const organisasiInput =
+    document.getElementById("organisasi");
+
+
+    if(jenis === "Murid"){
+
+        organisasiInput.placeholder =
+        "Nama Sekolah";
+
+    }
+
+    else if(jenis === "Guru"){
+
+        organisasiInput.placeholder =
+        "Nama Sekolah";
+
+    }
+
+    else{
+
+        organisasiInput.placeholder =
+        "Sekolah / Organisasi";
+
+    }
+
+
+    /* ================= HINT ================= */
+
+    const hint =
+    document.getElementById("hintText");
+
+
+    hint.classList.remove("hidden");
+
+
+    if(jenis === "Murid"){
+
+        hint.innerText =
+        "🎒 Sila isi nama, sekolah dan kelas.";
+
+    }
+
+    else if(jenis === "Guru"){
+
+        hint.innerText =
+        "👨‍🏫 Sila isi nama dan sekolah.";
+
+    }
+
+    else if(jenis === "Pelawat"){
+
+        hint.innerText =
+        "👤 Sila isi nama dan sekolah / organisasi.";
+
+    }
+
+
+    /* ================= SAVE PILIHAN ================= */
+
+    sessionStorage.setItem(
+        "jenisDipilih",
+        jenis
+    );
+
+
+    /* ================= FOCUS ================= */
+
+    setTimeout(() => {
+
+        document
+        .getElementById("nama")
+        .focus();
+
+    },150);
+
+}
+
+
+/* =====================================================
+   SUBMIT DAFTAR
+===================================================== */
+
+document
+.getElementById("formDaftar")
+.addEventListener(
+"submit",
+function(e){
+
+    e.preventDefault();
+
+
+    const jenis =
+    jenisDipilih;
+
+
+    const nama =
+    document
+    .getElementById("nama")
+    .value
+    .trim();
+
+
+    const organisasi =
+    document
+    .getElementById("organisasi")
+    .value
+    .trim();
+
+
+    const kelas =
+    document
+    .getElementById("kelas")
+    .value
+    .trim();
+
+
+    /* ================= VALIDATION ================= */
+
+    if(!jenis){
+
+        alert(
+            "Sila pilih jenis pengunjung."
+        );
+
+        return;
+
+    }
+
+
+    if(!nama){
+
+        alert(
+            "Sila isi nama."
+        );
+
+        document
+        .getElementById("nama")
+        .focus();
+
+        return;
+
+    }
+
+
+    /* ================= MURID ================= */
+
+    if(jenis === "Murid"){
+
+        if(!organisasi){
+
+            alert(
+                "Sila isi nama sekolah."
+            );
+
+            document
+            .getElementById("organisasi")
+            .focus();
+
+            return;
+
+        }
+
+
+        if(!kelas){
+
+            alert(
+                "Sila isi kelas."
+            );
+
+            document
+            .getElementById("kelas")
+            .focus();
+
+            return;
+
+        }
+
+    }
+
+
+    /* ================= GURU / PELAWAT ================= */
+
+    if(
+        jenis === "Guru" ||
+        jenis === "Pelawat"
+    ){
+
+        if(!organisasi){
+
+            alert(
+                "Sila isi sekolah / organisasi."
+            );
+
+            document
+            .getElementById("organisasi")
+            .focus();
+
+            return;
+
+        }
+
+    }
+
+
+    /* =================================================
+       SIMPAN SESSION
+    ================================================= */
+
+    sessionStorage.setItem(
+        "sudahDaftar",
+        "yes"
+    );
+
+    sessionStorage.setItem(
+        "nama",
+        nama
+    );
+
+    sessionStorage.setItem(
+        "jenis",
+        jenis
+    );
+
+    sessionStorage.setItem(
+        "kelas",
+        kelas
+    );
+
+    sessionStorage.setItem(
+        "organisasi",
+        organisasi
+    );
+
+
+    /* =================================================
+       SIMPAN FIRESTORE
+    ================================================= */
+
+    db
+    .collection("pengunjung")
+    .add({
+
+        jenis:
+        jenis,
+
+        nama:
+        nama,
+
+        organisasi:
+        organisasi,
+
+        kelas:
+        kelas || "-",
+
+        masa:
+        firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+    })
+
+    .then(() => {
+
+        console.log(
+            "✅ Pengunjung berjaya direkodkan"
+        );
+
+    })
+
+    .catch(error => {
+
+        console.error(
+            "❌ Firestore:",
+            error
+        );
+
+    });
+
+
+    /* =================================================
+       MASUK HEALINK
+    ================================================= */
+
+    window.location.href =
+    "healink.html";
+
+});
+
+
+/* =====================================================
+   LOGIN ADMIN
+===================================================== */
+
+function loginAdmin(){
+
+    window.location.href =
+    "login.html";
+
+}
+
+
+/* =====================================================
+   RIPPLE EFFECT
+===================================================== */
+
+document
+.querySelectorAll(".ripple")
+.forEach(btn => {
+
+    btn.addEventListener(
+    "click",
+    function(e){
+
+        const rect =
+        this.getBoundingClientRect();
+
+
+        const diameter =
+        Math.max(
+            this.clientWidth,
+            this.clientHeight
+        );
+
+
+        const radius =
+        diameter / 2;
+
+
+        const circle =
+        document.createElement("span");
+
+
+        circle.classList.add(
+            "ripple-effect"
+        );
+
+
+        circle.style.width =
+        `${diameter}px`;
+
+        circle.style.height =
+        `${diameter}px`;
+
+
+        circle.style.left =
+        `${e.clientX - rect.left - radius}px`;
+
+        circle.style.top =
+        `${e.clientY - rect.top - radius}px`;
+
+
+        this.appendChild(circle);
+
+
+        setTimeout(() => {
+
+            circle.remove();
+
+        },600);
+
+    });
+
+});
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+window.addEventListener(
+"load",
+function(){
+
+    const saved =
+    sessionStorage.getItem(
+        "jenisDipilih"
+    );
+
+
+    if(
+        saved === "Murid" ||
+        saved === "Guru" ||
+        saved === "Pelawat"
+    ){
+
+        selectJenis(saved);
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
