@@ -1333,6 +1333,9 @@ hover:scale-[1.01] transition duration-300">
 
 </div>
 
+  </div>
+</div>
+
 
 <!-- ================= MINDA MODAL ================= -->
 <div id="mindaModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
@@ -2110,8 +2113,19 @@ function openNota(){
 }
 
 function openMinda(){
+
   closeAllModals();
-  document.getElementById("mindaModal").classList.remove("hidden");
+
+  const modal = document.getElementById("mindaModal");
+
+  if(!modal){
+    console.error("mindaModal tidak dijumpai");
+    return;
+  }
+
+  modal.classList.remove("hidden");
+  modal.style.display = "flex";
+
 }
 
 /* ================= CLOSE ================= */
@@ -2125,9 +2139,15 @@ function closeNota(e){
   document.getElementById("notaModal").classList.add("hidden");
 }
 
-function closeMinda(e){
-  if(e && e.target !== e.currentTarget) return;
-  document.getElementById("mindaModal").classList.add("hidden");
+function closeMinda(){
+
+  const modal = document.getElementById("mindaModal");
+
+  if(!modal) return;
+
+  modal.classList.add("hidden");
+  modal.style.display = "none";
+
 }
 </script>
 
