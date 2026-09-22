@@ -1,88 +1,2804 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>HEALINK 2.0 | Cari Perkataan</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<style>
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --cyan: #22d3ee;
+
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
+
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
+
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+html {
+  min-height: 100%;
+}
+
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding: 10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+.header-button:hover {
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 980px);
+
+  margin: 0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 650px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin: 8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   GAME PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 17px;
+
+}
+
+
+.stat {
+
+  padding: 11px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 20px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width: 0;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .3s ease;
+
+}
+
+
+/* =====================================================
+   WORD LIST
+===================================================== */
+
+.word-section {
+
+  margin-bottom: 18px;
+
+}
+
+
+.section-label {
+
+  margin-bottom: 9px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+}
+
+
+.word-list {
+
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 7px;
+
+}
+
+
+.word-chip {
+
+  padding:
+    7px 11px;
+
+  border:
+    1px solid rgba(167,139,250,.16);
+
+  border-radius: 999px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(124,58,237,.08);
+
+  font-size: 10px;
+  font-weight: 800;
+
+  transition: .2s ease;
+
+}
+
+
+.word-chip.found {
+
+  color: #86efac;
+
+  border-color:
+    rgba(34,197,94,.35);
+
+  background:
+    rgba(34,197,94,.11);
+
+  text-decoration:
+    line-through;
+
+}
+
+
+/* =====================================================
+   GRID WRAPPER
+===================================================== */
+
+.grid-wrapper {
+
+  display: flex;
+
+  justify-content: center;
+
+  padding:
+    18px 10px;
+
+  border:
+    1px solid rgba(167,139,250,.13);
+
+  border-radius: 19px;
+
+  background:
+    rgba(255,255,255,.025);
+
+  overflow-x: auto;
+
+}
+
+
+/* =====================================================
+   LETTER GRID
+===================================================== */
+
+.letter-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(8,44px);
+
+  gap: 6px;
+
+}
+
+
+.letter-cell {
+
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid rgba(167,139,250,.16);
+
+  border-radius: 10px;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(124,58,237,.08);
+
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  transition: .15s ease;
+
+}
+
+
+.letter-cell:hover {
+
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(34,211,238,.42);
+
+  background:
+    rgba(79,70,229,.19);
+
+}
+
+
+.letter-cell.start {
+
+  color: white;
+
+  border-color:
+    rgba(34,211,238,.7);
+
+  background:
+    rgba(34,211,238,.19);
+
+  box-shadow:
+    0 0 15px
+    rgba(34,211,238,.15);
+
+}
+
+
+.letter-cell.preview {
+
+  color: #fef3c7;
+
+  border-color:
+    rgba(245,158,11,.45);
+
+  background:
+    rgba(245,158,11,.13);
+
+}
+
+
+.letter-cell.found {
+
+  color: #dcfce7;
+
+  border-color:
+    rgba(34,197,94,.55);
+
+  background:
+    rgba(34,197,94,.18);
+
+}
+
+
+/* =====================================================
+   INSTRUCTION
+===================================================== */
+
+.instruction {
+
+  margin-top: 14px;
+
+  padding: 11px;
+
+  border-radius: 13px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+.instruction.success {
+  color: #86efac;
+}
+
+
+.instruction.error {
+  color: #fca5a5;
+}
+
+
+/* =====================================================
+   RESULT MODAL
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.8);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,480px);
+
+  padding:
+    34px 27px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-message {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.6;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
+  }
+
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,980px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 9px;
+
+  }
+
+
+  .letter-grid {
+
+    grid-template-columns:
+      repeat(8,36px);
+
+    gap: 4px;
+
+  }
+
+
+  .letter-cell {
+
+    width: 36px;
+    height: 36px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+}
+
+
+@media(max-width:350px) {
+
+  .letter-grid {
+
+    grid-template-columns:
+      repeat(8,32px);
+
+  }
+
+
+  .letter-cell {
+
+    width: 32px;
+    height: 32px;
+
+    font-size: 11px;
+
+  }
+
+}
+
+</style>
+
 </head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
 
-<div class="bg-white text-gray-800 p-8 rounded-xl text-center">
+<body>
 
-<h1 class="text-xl font-bold mb-4">🔍 Cari Perkataan</h1>
 
-<p class="mb-3">Cari perkataan emosi:</p>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-<div id="grid" class="grid grid-cols-6 gap-2 text-xl mb-4"></div>
+<header class="game-header">
 
-<p id="result"></p>
-
-<button onclick="reset()" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded">
-🔁 Main Lagi
-</button>
-
-</div>
-
-<script>
-const words = ["EMOSI","TENANG","MARAH"];
-const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-function generate(){
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-
-  for(let i=0;i<36;i++){
-    const div = document.createElement("div");
-    div.className = "w-10 h-10 bg-gray-200 flex items-center justify-center cursor-pointer";
-    div.innerText = letters[Math.floor(Math.random()*letters.length)];
-
-    div.onclick = ()=>{
-      div.classList.toggle("bg-green-300");
-    };
-
-    grid.appendChild(div);
-  }
-}
-
-function reset(){
-  generate();
-  document.getElementById("result").innerText="";
-}
-
-generate();
-</script>
-
-<script>
-function goBack(){
-  window.history.back();
-}
-
-function closeGame(){
-  window.location.href = "../healink.html"; 
-}
-</script>
-
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
-
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
   </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      🔍
+    </div>
+
+    <span>
+      HEALINK 2.0 • Cari Perkataan
+    </span>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
   </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="game-page">
+
+
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      🔍
+    </div>
+
+
+    <div class="hero-label">
+      Cari • Kenali • Belajar
+    </div>
+
+
+    <h1>
+      Cari Perkataan
+    </h1>
+
+
+    <p>
+      Cari lima perkataan berkaitan emosi dan
+      kesejahteraan yang tersembunyi di dalam grid.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="foundStat">
+          0/5
+        </strong>
+
+        <span>
+          Dijumpai
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="attemptStat">
+          0
+        </strong>
+
+        <span>
+          Percubaan
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="timeStat">
+          0s
+        </strong>
+
+        <span>
+          Masa
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <!-- WORD LIST -->
+
+    <div class="word-section">
+
+      <div class="section-label">
+        Perkataan Dicari
+      </div>
+
+
+      <div
+        id="wordList"
+        class="word-list"
+      ></div>
+
+    </div>
+
+
+    <!-- GRID -->
+
+    <div class="grid-wrapper">
+
+      <div
+        id="grid"
+        class="letter-grid"
+      ></div>
+
+    </div>
+
+
+    <!-- INSTRUCTION -->
+
+    <div
+      id="instruction"
+      class="instruction"
+    >
+      Pilih huruf pertama, kemudian pilih huruf
+      terakhir perkataan.
+    </div>
+
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     RESULT MODAL
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🏆
+    </div>
+
+
+    <div class="result-label">
+      Cabaran Selesai
+    </div>
+
+
+    <h2>
+      Tahniah!
+    </h2>
+
+
+    <p class="result-message">
+      Anda berjaya menemui semua perkataan
+      tersembunyi.
+    </p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalFound">
+          5/5
+        </strong>
+
+        <span>
+          Perkataan
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalAttempts">
+          0
+        </strong>
+
+        <span>
+          Percubaan
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalTime">
+          0s
+        </strong>
+
+        <span>
+          Masa
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Main Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
 
 </div>
 
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   GAME CONFIG
+===================================================== */
+
+const GRID_SIZE = 8;
+
+
+const WORDS = [
+
+  "EMOSI",
+  "TENANG",
+  "MARAH",
+  "SABAR",
+  "POSITIF"
+
+];
+
+
+const LETTERS =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+
+const DIRECTIONS = [
+
+  [0, 1],
+
+  [1, 0],
+
+  [1, 1],
+
+  [1, -1]
+
+];
+
+
+let board = [];
+
+let placements = [];
+
+let foundWords =
+  new Set();
+
+
+let firstCell =
+  null;
+
+
+let attempts = 0;
+
+let seconds = 0;
+
+let timer = null;
+
+let gameFinished =
+  false;
+
+let resultSaved =
+  false;
+
+
+/* =====================================================
+   EMPTY BOARD
+===================================================== */
+
+function createEmptyBoard() {
+
+  board =
+    Array.from(
+      {
+        length: GRID_SIZE
+      },
+      () =>
+        Array(
+          GRID_SIZE
+        ).fill("")
+    );
+
+}
+
+
+/* =====================================================
+   CHECK PLACEMENT
+===================================================== */
+
+function canPlaceWord(
+  word,
+  row,
+  col,
+  dr,
+  dc
+) {
+
+  const endRow =
+    row +
+    dr *
+    (word.length - 1);
+
+
+  const endCol =
+    col +
+    dc *
+    (word.length - 1);
+
+
+  if(
+    endRow < 0 ||
+    endRow >= GRID_SIZE ||
+    endCol < 0 ||
+    endCol >= GRID_SIZE
+  ) {
+
+    return false;
+
+  }
+
+
+  for(
+    let i = 0;
+    i < word.length;
+    i++
+  ) {
+
+    const r =
+      row + dr * i;
+
+
+    const c =
+      col + dc * i;
+
+
+    const existing =
+      board[r][c];
+
+
+    if(
+      existing &&
+      existing !== word[i]
+    ) {
+
+      return false;
+
+    }
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   PLACE WORD
+===================================================== */
+
+function placeWord(
+  word
+) {
+
+  for(
+    let attempt = 0;
+    attempt < 300;
+    attempt++
+  ) {
+
+    const [
+      dr,
+      dc
+    ] =
+      DIRECTIONS[
+        Math.floor(
+          Math.random() *
+          DIRECTIONS.length
+        )
+      ];
+
+
+    const row =
+      Math.floor(
+        Math.random() *
+        GRID_SIZE
+      );
+
+
+    const col =
+      Math.floor(
+        Math.random() *
+        GRID_SIZE
+      );
+
+
+    if(
+      !canPlaceWord(
+        word,
+        row,
+        col,
+        dr,
+        dc
+      )
+    ) {
+
+      continue;
+
+    }
+
+
+    const cells = [];
+
+
+    for(
+      let i = 0;
+      i < word.length;
+      i++
+    ) {
+
+      const r =
+        row + dr * i;
+
+
+      const c =
+        col + dc * i;
+
+
+      board[r][c] =
+        word[i];
+
+
+      cells.push({
+        row: r,
+        col: c
+      });
+
+    }
+
+
+    placements.push({
+
+      word,
+
+      cells
+
+    });
+
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================================
+   GENERATE BOARD
+===================================================== */
+
+function generateBoard() {
+
+  let generated =
+    false;
+
+
+  /*
+    Jika susunan rawak terlalu padat,
+    sistem akan membina semula grid.
+  */
+
+  while(!generated) {
+
+    createEmptyBoard();
+
+    placements = [];
+
+    generated =
+      WORDS.every(
+        word =>
+          placeWord(
+            word
+          )
+      );
+
+  }
+
+
+  for(
+    let row = 0;
+    row < GRID_SIZE;
+    row++
+  ) {
+
+    for(
+      let col = 0;
+      col < GRID_SIZE;
+      col++
+    ) {
+
+      if(
+        !board[row][col]
+      ) {
+
+        board[row][col] =
+          LETTERS[
+            Math.floor(
+              Math.random() *
+              LETTERS.length
+            )
+          ];
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER BOARD
+===================================================== */
+
+function renderBoard() {
+
+  const grid =
+    document.getElementById(
+      "grid"
+    );
+
+
+  grid.innerHTML =
+    "";
+
+
+  for(
+    let row = 0;
+    row < GRID_SIZE;
+    row++
+  ) {
+
+    for(
+      let col = 0;
+      col < GRID_SIZE;
+      col++
+    ) {
+
+      const cell =
+        document.createElement(
+          "button"
+        );
+
+
+      cell.type =
+        "button";
+
+
+      cell.className =
+        "letter-cell";
+
+
+      cell.textContent =
+        board[row][col];
+
+
+      cell.dataset.row =
+        row;
+
+
+      cell.dataset.col =
+        col;
+
+
+      cell.addEventListener(
+        "click",
+        () =>
+          selectCell(
+            row,
+            col,
+            cell
+          )
+      );
+
+
+      grid.appendChild(
+        cell
+      );
+
+    }
+
+  }
+
+
+  markFoundCells();
+
+}
+
+
+/* =====================================================
+   WORD LIST
+===================================================== */
+
+function renderWordList() {
+
+  const list =
+    document.getElementById(
+      "wordList"
+    );
+
+
+  list.innerHTML =
+    "";
+
+
+  WORDS.forEach(
+    word => {
+
+      const chip =
+        document.createElement(
+          "div"
+        );
+
+
+      chip.className =
+        "word-chip";
+
+
+      chip.id =
+        `word-${word}`;
+
+
+      chip.textContent =
+        word;
+
+
+      if(
+        foundWords.has(
+          word
+        )
+      ) {
+
+        chip.classList.add(
+          "found"
+        );
+
+      }
+
+
+      list.appendChild(
+        chip
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   SELECT CELL
+===================================================== */
+
+function selectCell(
+  row,
+  col,
+  element
+) {
+
+  if(gameFinished) {
+    return;
+  }
+
+
+  if(!firstCell) {
+
+    clearTemporarySelection();
+
+
+    firstCell = {
+      row,
+      col,
+      element
+    };
+
+
+    element.classList.add(
+      "start"
+    );
+
+
+    document.getElementById(
+      "instruction"
+    ).className =
+      "instruction";
+
+
+    document.getElementById(
+      "instruction"
+    ).textContent =
+      "Sekarang pilih huruf terakhir perkataan.";
+
+
+    return;
+
+  }
+
+
+  /*
+    Klik semula huruf pertama =
+    batalkan pilihan.
+  */
+
+  if(
+    firstCell.row === row &&
+    firstCell.col === col
+  ) {
+
+    clearTemporarySelection();
+
+    firstCell =
+      null;
+
+
+    document.getElementById(
+      "instruction"
+    ).textContent =
+      "Pilih huruf pertama, kemudian pilih huruf terakhir perkataan.";
+
+
+    return;
+
+  }
+
+
+  attempts++;
+
+
+  const selectedCells =
+    getLineCells(
+      firstCell.row,
+      firstCell.col,
+      row,
+      col
+    );
+
+
+  if(!selectedCells) {
+
+    showInvalidSelection(
+      "Pilihan perlu dibuat secara mendatar, menegak atau diagonal."
+    );
+
+
+    firstCell =
+      null;
+
+
+    updateStats();
+
+    return;
+
+  }
+
+
+  const selectedWord =
+    selectedCells
+      .map(
+        cell =>
+          board[
+            cell.row
+          ][
+            cell.col
+          ]
+      )
+      .join("");
+
+
+  const reversedWord =
+    selectedWord
+      .split("")
+      .reverse()
+      .join("");
+
+
+  const matched =
+    placements.find(
+      placement =>
+
+        !foundWords.has(
+          placement.word
+        )
+
+        &&
+
+        (
+          placement.word ===
+          selectedWord
+
+          ||
+
+          placement.word ===
+          reversedWord
+        )
+
+        &&
+
+        sameCells(
+          placement.cells,
+          selectedCells
+        )
+
+    );
+
+
+  if(matched) {
+
+    foundWords.add(
+      matched.word
+    );
+
+
+    clearTemporarySelection();
+
+
+    firstCell =
+      null;
+
+
+    renderWordList();
+
+    markFoundCells();
+
+
+    const instruction =
+      document.getElementById(
+        "instruction"
+      );
+
+
+    instruction.className =
+      "instruction success";
+
+
+    instruction.textContent =
+      `✓ Betul! Anda menemui ${matched.word}.`;
+
+
+    updateStats();
+
+
+    if(
+      foundWords.size ===
+      WORDS.length
+    ) {
+
+      finishGame();
+
+    }
+
+  }
+
+  else {
+
+    showInvalidSelection(
+      "Belum tepat. Cuba cari perkataan lain."
+    );
+
+
+    firstCell =
+      null;
+
+
+    updateStats();
+
+  }
+
+}
+
+
+/* =====================================================
+   GET LINE CELLS
+===================================================== */
+
+function getLineCells(
+  startRow,
+  startCol,
+  endRow,
+  endCol
+) {
+
+  const rowDiff =
+    endRow -
+    startRow;
+
+
+  const colDiff =
+    endCol -
+    startCol;
+
+
+  const absRow =
+    Math.abs(
+      rowDiff
+    );
+
+
+  const absCol =
+    Math.abs(
+      colDiff
+    );
+
+
+  /*
+    Hanya:
+    - horizontal
+    - vertical
+    - diagonal
+  */
+
+  if(
+    !(
+      rowDiff === 0 ||
+      colDiff === 0 ||
+      absRow === absCol
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  const steps =
+    Math.max(
+      absRow,
+      absCol
+    );
+
+
+  if(steps === 0) {
+    return null;
+  }
+
+
+  const dr =
+    rowDiff === 0
+      ? 0
+      : rowDiff / absRow;
+
+
+  const dc =
+    colDiff === 0
+      ? 0
+      : colDiff / absCol;
+
+
+  const cells = [];
+
+
+  for(
+    let i = 0;
+    i <= steps;
+    i++
+  ) {
+
+    cells.push({
+
+      row:
+        startRow +
+        dr * i,
+
+      col:
+        startCol +
+        dc * i
+
+    });
+
+  }
+
+
+  return cells;
+
+}
+
+
+/* =====================================================
+   SAME CELLS
+===================================================== */
+
+function sameCells(
+  a,
+  b
+) {
+
+  if(
+    a.length !==
+    b.length
+  ) {
+
+    return false;
+
+  }
+
+
+  const key =
+    cell =>
+      `${cell.row}-${cell.col}`;
+
+
+  const setA =
+    new Set(
+      a.map(key)
+    );
+
+
+  return b.every(
+    cell =>
+      setA.has(
+        key(cell)
+      )
+  );
+
+}
+
+
+/* =====================================================
+   CLEAR TEMP
+===================================================== */
+
+function clearTemporarySelection() {
+
+  document
+    .querySelectorAll(
+      ".letter-cell.start, .letter-cell.preview"
+    )
+    .forEach(
+      cell => {
+
+        cell.classList.remove(
+          "start",
+          "preview"
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   INVALID
+===================================================== */
+
+function showInvalidSelection(
+  message
+) {
+
+  clearTemporarySelection();
+
+
+  const instruction =
+    document.getElementById(
+      "instruction"
+    );
+
+
+  instruction.className =
+    "instruction error";
+
+
+  instruction.textContent =
+    message;
+
+}
+
+
+/* =====================================================
+   MARK FOUND
+===================================================== */
+
+function markFoundCells() {
+
+  document
+    .querySelectorAll(
+      ".letter-cell"
+    )
+    .forEach(
+      cell => {
+
+        cell.classList.remove(
+          "found"
+        );
+
+      }
+    );
+
+
+  placements.forEach(
+    placement => {
+
+      if(
+        !foundWords.has(
+          placement.word
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      placement.cells.forEach(
+        position => {
+
+          const selector =
+            `.letter-cell[data-row="${position.row}"][data-col="${position.col}"]`;
+
+
+          const element =
+            document.querySelector(
+              selector
+            );
+
+
+          if(element) {
+
+            element.classList.add(
+              "found"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+function updateStats() {
+
+  document.getElementById(
+    "foundStat"
+  ).textContent =
+    `${foundWords.size}/${WORDS.length}`;
+
+
+  document.getElementById(
+    "attemptStat"
+  ).textContent =
+    attempts;
+
+
+  document.getElementById(
+    "timeStat"
+  ).textContent =
+    `${seconds}s`;
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${
+      (
+        foundWords.size /
+        WORDS.length
+      ) *
+      100
+    }%`;
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startTimer() {
+
+  clearInterval(
+    timer
+  );
+
+
+  timer =
+    setInterval(
+      () => {
+
+        if(gameFinished) {
+          return;
+        }
+
+
+        seconds++;
+
+
+        document.getElementById(
+          "timeStat"
+        ).textContent =
+          `${seconds}s`;
+
+      },
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  clearInterval(
+    timer
+  );
+
+
+  foundWords =
+    new Set();
+
+
+  firstCell =
+    null;
+
+
+  attempts =
+    0;
+
+
+  seconds =
+    0;
+
+
+  gameFinished =
+    false;
+
+
+  resultSaved =
+    false;
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "instruction"
+  ).className =
+    "instruction";
+
+
+  document.getElementById(
+    "instruction"
+  ).textContent =
+    "Pilih huruf pertama, kemudian pilih huruf terakhir perkataan.";
+
+
+  generateBoard();
+
+  renderBoard();
+
+  renderWordList();
+
+  updateStats();
+
+  startTimer();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishGame() {
+
+  if(gameFinished) {
+    return;
+  }
+
+
+  gameFinished =
+    true;
+
+
+  clearInterval(
+    timer
+  );
+
+
+  document.getElementById(
+    "finalFound"
+  ).textContent =
+    `${foundWords.size}/${WORDS.length}`;
+
+
+  document.getElementById(
+    "finalAttempts"
+  ).textContent =
+    attempts;
+
+
+  document.getElementById(
+    "finalTime"
+  ).textContent =
+    `${seconds}s`;
+
+
+  setTimeout(
+    () => {
+
+      document.getElementById(
+        "resultModal"
+      ).classList.add(
+        "show"
+      );
+
+    },
+    350
+  );
+
+
+  await saveResult();
+
+}
+
+
+/* =====================================================
+   SAVE FIRESTORE
+===================================================== */
+
+async function saveResult() {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan keputusan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Cari Perkataan",
+
+    permainan:
+      "Cari Perkataan",
+
+    jumlahPerkataan:
+      WORDS.length,
+
+    perkataanDijumpai:
+      foundWords.size,
+
+    percubaan:
+      attempts,
+
+    tempohSaat:
+      seconds,
+
+    komen:
+      `${foundWords.size}/${WORDS.length} perkataan ditemui dalam ${seconds} saat`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Cari Perkataan result saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Keputusan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Cari Perkataan Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Keputusan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  clearInterval(
+    timer
+  );
+
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
+</script>
+
+
 </body>
+
 </html>

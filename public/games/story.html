@@ -1,109 +1,3113 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<title>HEALINK - Life Scenario</title>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>HEALINK 2.0 | Life Scenario</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<style>
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --cyan: #22d3ee;
+
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
+
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding: 10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
+}
+
+
+.header-button:hover {
+  background: rgba(255,255,255,.11);
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 920px);
+
+  margin: 0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 700px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin: 8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   CHAPTER FLOW
+===================================================== */
+
+.chapter-flow {
+
+  max-width: 760px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(6,1fr);
+
+  gap: 6px;
+
+  margin:
+    0 auto 13px;
+
+}
+
+
+.chapter-dot {
+
+  padding: 8px 5px;
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  border-radius: 11px;
+
+  color: #64748b;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-align: center;
+
+  transition: .2s ease;
+
+}
+
+
+.chapter-dot.active {
+
+  color: #e0f2fe;
+
+  border-color:
+    rgba(34,211,238,.3);
+
+  background:
+    rgba(34,211,238,.08);
+
+}
+
+
+.chapter-dot.done {
+
+  color: #bbf7d0;
+
+  border-color:
+    rgba(34,197,94,.2);
+
+  background:
+    rgba(34,197,94,.06);
+
+}
+
+
+/* =====================================================
+   STORY PANEL
+===================================================== */
+
+.story-panel {
+
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+
+}
+
+
+.stat {
+
+  padding: 11px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 20px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .3s ease;
+
+}
+
+
+/* =====================================================
+   SCENE
+===================================================== */
+
+.scene-card {
+
+  position: relative;
+
+  overflow: hidden;
+
+  padding: 24px;
+
+  margin-bottom: 14px;
+
+  border:
+    1px solid rgba(167,139,250,.14);
+
+  border-radius: 20px;
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.scene-card::after {
+
+  content: "📖";
+
+  position: absolute;
+
+  right: 20px;
+  bottom: 7px;
+
+  font-size: 72px;
+
+  opacity: .035;
+
+}
+
+
+.scene-time {
+
+  margin-bottom: 7px;
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-transform: uppercase;
+
+}
+
+
+.scene-title {
+
+  margin:
+    0 0 10px;
+
+  color: white;
+
+  font-size:
+    clamp(18px,3vw,23px);
+
+  line-height: 1.4;
+
+}
+
+
+.scene-text {
+
+  position: relative;
+
+  z-index: 2;
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.8;
+
+}
+
+
+/* =====================================================
+   CHOICES
+===================================================== */
+
+.choice-title {
+
+  margin:
+    18px 0 9px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .1em;
+
+  text-transform: uppercase;
+
+}
+
+
+.choices {
+
+  display: grid;
+
+  gap: 9px;
+
+}
+
+
+.choice-button {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(167,139,250,.15);
+
+  border-radius: 14px;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(124,58,237,.07);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.5;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .18s ease;
+
+}
+
+
+.choice-button:hover:not(:disabled) {
+
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(34,211,238,.35);
+
+  background:
+    rgba(79,70,229,.16);
+
+}
+
+
+.choice-letter {
+
+  width: 30px;
+  height: 30px;
+
+  flex:
+    0 0 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: #c4b5fd;
+
+  background:
+    rgba(124,58,237,.18);
+
+  font-size: 10px;
+  font-weight: 800;
+
+}
+
+
+.choice-button.strong {
+
+  color: #dcfce7;
+
+  border-color:
+    rgba(34,197,94,.45);
+
+  background:
+    rgba(34,197,94,.13);
+
+}
+
+
+.choice-button.partial {
+
+  color: #fef3c7;
+
+  border-color:
+    rgba(245,158,11,.42);
+
+  background:
+    rgba(245,158,11,.11);
+
+}
+
+
+.choice-button.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.4);
+
+  background:
+    rgba(239,68,68,.10);
+
+}
+
+
+.choice-button:disabled {
+  cursor: default;
+}
+
+
+/* =====================================================
+   CONSEQUENCE
+===================================================== */
+
+.consequence {
+
+  display: none;
+
+  margin-top: 14px;
+
+  padding:
+    14px;
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  border-radius: 15px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.7;
+
+}
+
+
+.consequence.show {
+  display: block;
+}
+
+
+.consequence.strong {
+
+  color: #bbf7d0;
+
+  border-color:
+    rgba(34,197,94,.18);
+
+  background:
+    rgba(34,197,94,.055);
+
+}
+
+
+.consequence.partial {
+
+  color: #fde68a;
+
+  border-color:
+    rgba(245,158,11,.18);
+
+  background:
+    rgba(245,158,11,.055);
+
+}
+
+
+.consequence.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.17);
+
+  background:
+    rgba(239,68,68,.045);
+
+}
+
+
+.consequence-title {
+
+  display: block;
+
+  margin-bottom: 4px;
+
+  font-weight: 800;
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+.next-area {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 12px;
+
+}
+
+
+.next-button {
+
+  display: none;
+
+  padding:
+    10px 17px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #4f46e5,
+      #0891b2
+    );
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.next-button.show {
+  display: block;
+}
+
+
+/* =====================================================
+   NOTE
+===================================================== */
+
+.education-note {
+
+  max-width: 760px;
+
+  margin:
+    13px auto 0;
+
+  padding:
+    11px 14px;
+
+  border:
+    1px solid rgba(34,211,238,.09);
+
+  border-radius: 13px;
+
+  color: #94a3b8;
+
+  background:
+    rgba(34,211,238,.025);
+
+  font-size: 9px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.84);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,530px);
+
+  max-height:
+    calc(100vh - 30px);
+
+  overflow-y: auto;
+
+  padding:
+    32px 26px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+  scrollbar-width: thin;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-message {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    20px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+/* =====================================================
+   JOURNEY SUMMARY
+===================================================== */
+
+.journey-summary {
+
+  display: grid;
+
+  gap: 6px;
+
+  margin-bottom: 16px;
+
+  text-align: left;
+
+}
+
+
+.journey-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  padding:
+    8px 10px;
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  border-radius: 10px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 9px;
+
+}
+
+
+.journey-icon {
+
+  width: 23px;
+  height: 23px;
+
+  flex:
+    0 0 23px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  background:
+    rgba(124,58,237,.15);
+
+}
+
+
+.result-tip {
+
+  margin-bottom: 17px;
+
+  padding:
+    12px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.12);
+
+  border-radius: 14px;
+
+  color: #bae6fd;
+
+  background:
+    rgba(34,211,238,.045);
+
+  font-size: 10px;
+
+  line-height: 1.7;
+
+  text-align: left;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
+  }
+
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,920px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .story-panel {
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .scene-card {
+    padding: 17px;
+  }
+
+
+  .chapter-flow {
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+}
+
+</style>
+
 </head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
 
-<!-- HEADER -->
-<div class="fixed top-0 left-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
-  <button onclick="history.back()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
-  <div>📖 Life Scenario</div>
-  <button onclick="location.href='menu.html'" class="bg-red-500 px-3 py-1 rounded">✕ Tutup</button>
-</div>
+<body>
 
-<div id="storyBox" class="mt-20 bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl">
 
-  <p id="story" class="mb-6 text-lg"></p>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-  <div id="choices" class="space-y-3"></div>
+<header class="game-header">
 
-</div>
-
-<script>
-const storyData = [
-{
-text:"Ali berasa tertekan kerana banyak kerja sekolah.",
-choices:[
-{t:"Rehat dan buat jadual", next:1},
-{t:"Abaikan semua kerja", next:2}
-]
-},
-{
-text:"Ali berjaya mengurus masa dengan baik dan stress berkurang.",
-choices:[{t:"Tamat", next:-1}]
-},
-{
-text:"Ali semakin tertekan kerana kerja semakin banyak.",
-choices:[{t:"Tamat", next:-1}]
-}
-];
-
-let current=0;
-
-function load(){
-const s=storyData[current];
-
-document.getElementById("story").innerText=s.text;
-
-const box=document.getElementById("choices");
-box.innerHTML="";
-
-s.choices.forEach(c=>{
-const btn=document.createElement("button");
-btn.innerText=c.t;
-btn.className="w-full p-3 rounded-lg bg-white/10 hover:bg-white/20";
-
-btn.onclick=()=>{
-if(c.next==-1){
-document.getElementById("storyBox").innerHTML="<h2>🎉 Tamat Cerita</h2>";
-}else{
-current=c.next;
-load();
-}
-};
-
-box.appendChild(btn);
-});
-}
-
-load();
-</script>
-
-<script>
-function goBack(){
-  window.history.back();
-}
-
-function closeGame(){
-  window.location.href = "../healink.html"; 
-}
-</script>
-
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
-
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
   </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      📖
+    </div>
+
+    <span>
+      HEALINK 2.0 • Life Scenario
+    </span>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
   </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="game-page">
+
+
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      📖
+    </div>
+
+
+    <div class="hero-label">
+      Pilih • Alami • Pelajari
+    </div>
+
+
+    <h1>
+      Life Scenario
+    </h1>
+
+
+    <p>
+      Ikuti satu hari persekolahan dan lihat bagaimana
+      pilihan kecil boleh mempengaruhi perjalanan
+      seterusnya.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- CHAPTER FLOW -->
+
+  <section
+    id="chapterFlow"
+    class="chapter-flow"
+  ></section>
+
+
+  <!-- STORY -->
+
+  <section class="story-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="chapterStat">
+          1/6
+        </strong>
+
+        <span>
+          Babak
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="scoreStat">
+          0
+        </strong>
+
+        <span>
+          Skor Pilihan
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="strongStat">
+          0
+        </strong>
+
+        <span>
+          Pilihan Membina
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <article class="scene-card">
+
+      <div
+        id="sceneTime"
+        class="scene-time"
+      ></div>
+
+
+      <h2
+        id="sceneTitle"
+        class="scene-title"
+      ></h2>
+
+
+      <p
+        id="sceneText"
+        class="scene-text"
+      ></p>
+
+    </article>
+
+
+    <div class="choice-title">
+      Apa yang anda akan lakukan?
+    </div>
+
+
+    <div
+      id="choices"
+      class="choices"
+    ></div>
+
+
+    <div
+      id="consequence"
+      class="consequence"
+    ></div>
+
+
+    <div class="next-area">
+
+      <button
+        id="nextButton"
+        type="button"
+        class="next-button"
+        onclick="nextScene()"
+      >
+        Teruskan Cerita →
+      </button>
+
+    </div>
+
+
+  </section>
+
+
+  <div class="education-note">
+
+    Life Scenario ialah aktiviti pembelajaran berasaskan
+    situasi. Tiada keputusan yang menentukan personaliti
+    atau keadaan emosi sebenar seseorang.
+
+  </div>
+
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      📚
+    </div>
+
+
+    <div class="result-label">
+      Cerita Tamat
+    </div>
+
+
+    <h2>
+      Perjalanan Hari Ini
+    </h2>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalScore">
+          0/60
+        </strong>
+
+        <span>
+          Skor Pilihan
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalStrong">
+          0/6
+        </strong>
+
+        <span>
+          Pilihan Membina
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalPercent">
+          0%
+        </strong>
+
+        <span>
+          Pencapaian
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="journeySummary"
+      class="journey-summary"
+    ></div>
+
+
+    <div
+      id="resultTip"
+      class="result-tip"
+    ></div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Main Semula
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
 
 </div>
 
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user profile error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   STORY DATA
+===================================================== */
+
+const scenes = [
+
+  {
+
+    time:
+      "7:20 PAGI • SEBELUM KELAS",
+
+    title:
+      "Hari yang sibuk bermula",
+
+    text:
+      "Hari ini anda mempunyai latihan sukan selepas sekolah, satu tugasan perlu dihantar esok dan kuiz pada waktu tengah hari. Anda mula memikirkan semuanya serentak.",
+
+    choices: [
+
+      {
+        text:
+          "Semak apa yang perlu dilakukan dan tentukan keutamaan untuk hari ini.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Anda mendapat gambaran yang lebih jelas tentang perkara yang perlu diberi perhatian terlebih dahulu.",
+
+        summary:
+          "Menyusun keutamaan"
+      },
+
+      {
+        text:
+          "Terus fikir tentang semua perkara tanpa menentukan apa yang perlu dibuat dahulu.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Anda masih sedar tentang semua tanggungjawab, tetapi fikiran terasa lebih berserabut kerana tiada susunan yang jelas.",
+
+        summary:
+          "Belum menyusun tugasan"
+      },
+
+      {
+        text:
+          "Abaikan semua perkara sehingga nanti.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Anda mendapat kelegaan sementara, tetapi perkara yang perlu dilakukan masih menunggu.",
+
+        summary:
+          "Menangguhkan perancangan"
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    time:
+      "10:15 PAGI • DALAM KELAS",
+
+    title:
+      "Kesilapan semasa menjawab",
+
+    text:
+      "Guru meminta anda menjawab satu soalan. Jawapan anda kurang tepat dan beberapa rakan ketawa kecil.",
+
+    choices: [
+
+      {
+        text:
+          "Tarik nafas, dengar penerangan guru dan teruskan pembelajaran.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Anda memberi ruang kepada diri untuk kembali fokus dan menggunakan kesilapan itu sebagai sebahagian daripada proses belajar.",
+
+        summary:
+          "Kembali fokus"
+      },
+
+      {
+        text:
+          "Diam sepanjang kelas kerana masih memikirkan kejadian tadi.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Anda mengelakkan situasi tambahan, tetapi fikiran masih tertumpu pada kejadian yang telah berlaku.",
+
+        summary:
+          "Masih memikirkan kesilapan"
+      },
+
+      {
+        text:
+          "Balas ejekan rakan ketika kelas sedang berlangsung.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Tumpuan kelas beralih kepada konflik dan keadaan boleh menjadi lebih tegang.",
+
+        summary:
+          "Bertindak ketika emosi kuat"
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    time:
+      "12:30 TENGAH HARI • SELEPAS KUIZ",
+
+    title:
+      "Keputusan tidak seperti diharapkan",
+
+    text:
+      "Anda mendapati beberapa jawapan dalam kuiz tadi mungkin salah. Anda mula kecewa dengan prestasi sendiri.",
+
+    choices: [
+
+      {
+        text:
+          "Catat bahagian yang sukar dan rancang untuk menyemaknya semula.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Kekecewaan itu ditukar menjadi satu tindakan yang boleh membantu pembelajaran seterusnya.",
+
+        summary:
+          "Belajar daripada pengalaman"
+      },
+
+      {
+        text:
+          "Cuba lupakan kuiz itu tanpa melihat apa yang boleh diperbaiki.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Memberi ruang kepada diri boleh membantu, tetapi peluang untuk mengenal pasti perkara yang perlu dipelajari semula mungkin terlepas.",
+
+        summary:
+          "Memberi ruang sementara"
+      },
+
+      {
+        text:
+          "Anggap anda memang tidak pandai dalam subjek tersebut.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Satu pengalaman belum menggambarkan keseluruhan kebolehan anda. Masih ada ruang untuk belajar dan mencuba strategi lain.",
+
+        summary:
+          "Membuat kesimpulan terlalu awal"
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    time:
+      "2:15 PETANG • AKTIVITI KUMPULAN",
+
+    title:
+      "Perbezaan pendapat",
+
+    text:
+      "Semasa aktiviti kumpulan, seorang rakan tidak bersetuju dengan idea anda dan mencadangkan cara lain.",
+
+    choices: [
+
+      {
+        text:
+          "Dengar cadangannya dan bincangkan kekuatan kedua-dua idea.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Perbincangan menjadi lebih terbuka dan kumpulan mempunyai lebih banyak pilihan untuk dipertimbangkan.",
+
+        summary:
+          "Mendengar perspektif lain"
+      },
+
+      {
+        text:
+          "Terus mengalah tanpa menerangkan idea anda.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Konflik mungkin dielakkan, tetapi kumpulan tidak mendapat peluang mendengar pandangan anda.",
+
+        summary:
+          "Mengalah tanpa berbincang"
+      },
+
+      {
+        text:
+          "Tolak cadangannya tanpa mendengar penjelasan.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Rakan mungkin merasakan pandangannya tidak didengar dan kerjasama boleh menjadi lebih sukar.",
+
+        summary:
+          "Menolak pandangan lain"
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    time:
+      "5:30 PETANG • DI RUMAH",
+
+    title:
+      "Tenaga mula berkurang",
+
+    text:
+      "Selepas pulang daripada aktiviti sekolah, anda masih mempunyai tugasan yang perlu dibuat tetapi badan terasa letih.",
+
+    choices: [
+
+      {
+        text:
+          "Berehat seketika, makan atau minum dan sambung tugasan dengan sasaran kecil.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Anda memberi ruang kepada badan untuk berehat sebelum kembali kepada tugasan secara berperingkat.",
+
+        summary:
+          "Rehat dan sambung berperingkat"
+      },
+
+      {
+        text:
+          "Paksa diri menyiapkan semuanya sekaligus walaupun sudah sukar memberi tumpuan.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Anda masih berusaha, tetapi bekerja ketika terlalu letih boleh menyebabkan tumpuan semakin berkurang.",
+
+        summary:
+          "Terus bekerja tanpa rehat"
+      },
+
+      {
+        text:
+          "Tinggalkan semuanya tanpa menentukan bila mahu menyambung.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Berehat boleh membantu, tetapi tanpa rancangan untuk menyambung, tugasan mungkin menjadi lebih sukar diurus kemudian.",
+
+        summary:
+          "Berehat tanpa rancangan"
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    time:
+      "9:00 MALAM • AKHIR HARI",
+
+    title:
+      "Satu perkara masih mengganggu fikiran",
+
+    text:
+      "Walaupun hari hampir berakhir, anda masih memikirkan beberapa perkara yang berlaku dan berasa sukar menentukan apa yang perlu dilakukan seterusnya.",
+
+    choices: [
+
+      {
+        text:
+          "Pilih satu perkara yang boleh dilakukan sekarang dan berbincang dengan orang yang dipercayai jika memerlukan sokongan.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        effect:
+          "Anda menumpukan perhatian kepada satu langkah yang boleh dilakukan dan menyedari bahawa sokongan juga boleh digunakan apabila diperlukan.",
+
+        summary:
+          "Ambil satu langkah dan cari sokongan"
+      },
+
+      {
+        text:
+          "Simpan semuanya sendiri dan terus fikirkan semua masalah serentak.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        effect:
+          "Memikirkan banyak perkara serentak boleh membuatkan langkah seterusnya sukar dilihat. Tidak semua perkara perlu diurus seorang diri.",
+
+        summary:
+          "Memendam semua perkara"
+      },
+
+      {
+        text:
+          "Tangguhkan dahulu dan berharap esok semuanya terasa lebih mudah.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        effect:
+          "Memberi ruang dan berehat boleh membantu. Jika perkara itu masih mengganggu kemudian, pertimbangkan satu tindakan kecil atau berbincang dengan seseorang.",
+
+        summary:
+          "Memberi ruang sementara"
+      }
+
+    ]
+
+  }
+
+];
+
+
+const TOTAL =
+  scenes.length;
+
+
+const MAX_SCORE =
+  TOTAL * 10;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let current = 0;
+
+let score = 0;
+
+let strongCount = 0;
+
+let answered = false;
+
+let resultSaved = false;
+
+let journey = [];
+
+
+/* =====================================================
+   CHAPTER FLOW
+===================================================== */
+
+function renderChapterFlow() {
+
+  const container =
+    document.getElementById(
+      "chapterFlow"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  scenes.forEach(
+    (_,index) => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "chapter-dot";
+
+
+      if(index < current) {
+
+        item.classList.add(
+          "done"
+        );
+
+      }
+
+      else if(
+        index === current
+      ) {
+
+        item.classList.add(
+          "active"
+        );
+
+      }
+
+
+      item.textContent =
+        index < current
+          ? `✓ Babak ${index + 1}`
+          : `Babak ${index + 1}`;
+
+
+      container.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   LOAD SCENE
+===================================================== */
+
+function loadScene() {
+
+  answered =
+    false;
+
+
+  const scene =
+    scenes[current];
+
+
+  document.getElementById(
+    "chapterStat"
+  ).textContent =
+    `${current + 1}/${TOTAL}`;
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "strongStat"
+  ).textContent =
+    strongCount;
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${
+      ((current + 1) / TOTAL) *
+      100
+    }%`;
+
+
+  document.getElementById(
+    "sceneTime"
+  ).textContent =
+    scene.time;
+
+
+  document.getElementById(
+    "sceneTitle"
+  ).textContent =
+    scene.title;
+
+
+  document.getElementById(
+    "sceneText"
+  ).textContent =
+    scene.text;
+
+
+  const choices =
+    document.getElementById(
+      "choices"
+    );
+
+
+  choices.innerHTML =
+    "";
+
+
+  const letters =
+    ["A","B","C"];
+
+
+  scene.choices.forEach(
+    (choice,index) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "choice-button";
+
+
+      button.innerHTML =
+        `
+          <span class="choice-letter">
+            ${letters[index]}
+          </span>
+
+          <span>
+            ${choice.text}
+          </span>
+        `;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          chooseOption(
+            choice,
+            button
+          )
+      );
+
+
+      choices.appendChild(
+        button
+      );
+
+    }
+  );
+
+
+  const consequence =
+    document.getElementById(
+      "consequence"
+    );
+
+
+  consequence.className =
+    "consequence";
+
+
+  consequence.innerHTML =
+    "";
+
+
+  document.getElementById(
+    "nextButton"
+  ).classList.remove(
+    "show"
+  );
+
+
+  renderChapterFlow();
+
+}
+
+
+/* =====================================================
+   CHOOSE
+===================================================== */
+
+function chooseOption(
+  choice,
+  selectedButton
+) {
+
+  if(answered) {
+    return;
+  }
+
+
+  answered =
+    true;
+
+
+  score +=
+    choice.points;
+
+
+  if(
+    choice.type ===
+    "strong"
+  ) {
+
+    strongCount++;
+
+  }
+
+
+  journey.push({
+
+    babak:
+      current + 1,
+
+    title:
+      scenes[current].title,
+
+    choice:
+      choice.summary,
+
+    type:
+      choice.type,
+
+    points:
+      choice.points
+
+  });
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".choice-button"
+    );
+
+
+  buttons.forEach(
+    button => {
+
+      button.disabled =
+        true;
+
+    }
+  );
+
+
+  selectedButton.classList.add(
+    choice.type
+  );
+
+
+  /*
+    Tunjukkan pilihan pembelajaran
+    utama jika pengguna memilih
+    pilihan lain.
+  */
+
+  if(
+    choice.type !==
+    "strong"
+  ) {
+
+    const strongIndex =
+      scenes[current]
+        .choices
+        .findIndex(
+          item =>
+            item.type ===
+            "strong"
+        );
+
+
+    if(
+      strongIndex >= 0 &&
+      buttons[strongIndex]
+    ) {
+
+      buttons[
+        strongIndex
+      ].classList.add(
+        "strong"
+      );
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "strongStat"
+  ).textContent =
+    strongCount;
+
+
+  const consequence =
+    document.getElementById(
+      "consequence"
+    );
+
+
+  consequence.className =
+    `consequence show ${choice.type}`;
+
+
+  let title;
+
+
+  if(
+    choice.type ===
+    "strong"
+  ) {
+
+    title =
+      "✓ Pilihan yang membina";
+
+  }
+
+  else if(
+    choice.type ===
+    "partial"
+  ) {
+
+    title =
+      "◐ Pilihan ini ada manfaat, tetapi boleh diperkukuh";
+
+  }
+
+  else {
+
+    title =
+      "💡 Lihat apa yang mungkin berlaku seterusnya";
+
+  }
+
+
+  consequence.innerHTML =
+    `
+      <span class="consequence-title">
+        ${title}
+      </span>
+
+      ${choice.effect}
+    `;
+
+
+  const nextButton =
+    document.getElementById(
+      "nextButton"
+    );
+
+
+  nextButton.textContent =
+    current === TOTAL - 1
+      ? "Tamatkan Cerita →"
+      : "Teruskan Cerita →";
+
+
+  nextButton.classList.add(
+    "show"
+  );
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextScene() {
+
+  if(!answered) {
+    return;
+  }
+
+
+  current++;
+
+
+  if(
+    current >= TOTAL
+  ) {
+
+    finishStory();
+
+    return;
+
+  }
+
+
+  loadScene();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishStory() {
+
+  const percent =
+    Math.round(
+      (
+        score /
+        MAX_SCORE
+      ) *
+      100
+    );
+
+
+  document.getElementById(
+    "finalScore"
+  ).textContent =
+    `${score}/${MAX_SCORE}`;
+
+
+  document.getElementById(
+    "finalStrong"
+  ).textContent =
+    `${strongCount}/${TOTAL}`;
+
+
+  document.getElementById(
+    "finalPercent"
+  ).textContent =
+    `${percent}%`;
+
+
+  const message =
+    document.getElementById(
+      "resultMessage"
+    );
+
+
+  const tip =
+    document.getElementById(
+      "resultTip"
+    );
+
+
+  if(percent >= 80) {
+
+    message.textContent =
+      "Sepanjang cerita ini, anda banyak memilih tindakan yang membantu mengurus cabaran secara teratur dan membina.";
+
+
+    tip.textContent =
+      "🌟 Kehidupan sebenar tidak selalu mempunyai satu jawapan sempurna. Berhenti seketika, fikirkan pilihan, pertimbangkan kesannya dan dapatkan sokongan apabila perlu.";
+
+  }
+
+  else if(percent >= 50) {
+
+    message.textContent =
+      "Anda sudah menggunakan beberapa strategi yang membina. Ada juga beberapa situasi yang boleh diterokai dengan pendekatan berbeza.";
+
+
+    tip.textContent =
+      "🌱 Cuba main semula dan lihat bagaimana pilihan lain memberi kesan yang berbeza. Matlamat aktiviti ini ialah belajar daripada proses membuat keputusan.";
+
+  }
+
+  else {
+
+    message.textContent =
+      "Setiap pilihan dalam cerita memberi peluang untuk belajar. Cuba semula dan perhatikan penerangan selepas setiap keputusan.";
+
+
+    tip.textContent =
+      "💡 Apabila sesuatu terasa sukar, anda tidak perlu menyelesaikan semuanya sekaligus. Kenal pasti satu langkah kecil dan berbincang dengan orang yang dipercayai jika memerlukan sokongan.";
+
+  }
+
+
+  renderJourneySummary();
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.add(
+    "show"
+  );
+
+
+  await saveResult(
+    percent
+  );
+
+}
+
+
+/* =====================================================
+   JOURNEY SUMMARY
+===================================================== */
+
+function renderJourneySummary() {
+
+  const container =
+    document.getElementById(
+      "journeySummary"
+    );
+
+
+  container.innerHTML =
+    "";
+
+
+  journey.forEach(
+    item => {
+
+      const row =
+        document.createElement(
+          "div"
+        );
+
+
+      row.className =
+        "journey-item";
+
+
+      let icon =
+        "💡";
+
+
+      if(
+        item.type ===
+        "strong"
+      ) {
+
+        icon =
+          "✓";
+
+      }
+
+      else if(
+        item.type ===
+        "partial"
+      ) {
+
+        icon =
+          "◐";
+
+      }
+
+
+      row.innerHTML =
+        `
+          <div class="journey-icon">
+            ${icon}
+          </div>
+
+          <div>
+            <strong>
+              Babak ${item.babak}
+            </strong>
+            • ${item.choice}
+          </div>
+        `;
+
+
+      container.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   FIRESTORE
+===================================================== */
+
+async function saveResult(
+  percent
+) {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan perjalanan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Life Scenario",
+
+    permainan:
+      "Life Scenario",
+
+    jumlahBabak:
+      TOTAL,
+
+    pilihanMembina:
+      strongCount,
+
+    skorPilihan:
+      score,
+
+    skorMaksimum:
+      MAX_SCORE,
+
+    peratus:
+      percent,
+
+    perjalanan:
+      journey.map(
+        item => ({
+          babak:
+            item.babak,
+
+          pilihan:
+            item.choice,
+
+          mata:
+            item.points
+        })
+      ),
+
+    komen:
+      `${strongCount}/${TOTAL} pilihan membina • skor ${score}/${MAX_SCORE}`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Life Scenario saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Perjalanan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Life Scenario Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Perjalanan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  current = 0;
+
+  score = 0;
+
+  strongCount = 0;
+
+  answered = false;
+
+  resultSaved = false;
+
+  journey = [];
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "strongStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  loadScene();
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
+</script>
+
+
 </body>
+
 </html>

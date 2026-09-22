@@ -262,6 +262,89 @@ body::after {
 
 </div>
 
+<!-- ================= MAKLUM BALAS PENGGUNA ================= -->
+
+<div class="mt-5">
+
+  <div
+    id="feedbackSidebarButton"
+    onclick="openFeedbackManagement()"
+    class="
+      group
+      cursor-pointer
+      rounded-xl
+      border border-white/10
+      bg-white/5
+      px-3 py-3
+      transition duration-300
+      hover:bg-white/10
+      hover:border-cyan-300/30
+    "
+  >
+
+    <div class="flex items-center justify-between gap-3">
+
+      <!-- LEFT -->
+      <div class="flex items-center gap-3 min-w-0">
+
+        <div
+          class="
+            w-9 h-9
+            rounded-lg
+            flex items-center justify-center
+            bg-gradient-to-br
+            from-violet-500/30
+            to-cyan-500/20
+            border border-white/10
+            text-lg
+          "
+        >
+          💬
+        </div>
+
+
+        <div class="min-w-0">
+
+          <div class="text-sm font-semibold text-white">
+            Maklum Balas
+          </div>
+
+          <div class="text-[10px] text-white/50 mt-0.5">
+            Komen & cadangan pengguna
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BADGE -->
+      <span
+        id="feedbackNewBadge"
+        class="
+          hidden
+          min-w-[25px]
+          h-[25px]
+          px-2
+          rounded-full
+          items-center justify-center
+          bg-yellow-400
+          text-black
+          text-[11px]
+          font-extrabold
+          shadow-lg
+        "
+      >
+        0
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
     <!-- ================= SEKOLAH ================= -->
     <div onclick="toggleSection('sekolahList')" 
          class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
@@ -291,13 +374,532 @@ body::after {
   <!-- ================= CONTENT ================= -->
   <div class="flex-1 p-6 space-y-6 overflow-y-auto">
 
-  <div class="mb-4">
+ <div class="mb-4">
   <h2 id="greetingText"
     class="text-lg font-semibold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
-</h2>
+  </h2>
 </div>
 
-    <!-- HEADER -->
+
+<!-- =====================================================
+     💬 PENGURUSAN MAKLUM BALAS PENGGUNA
+===================================================== -->
+
+<section
+  id="feedbackManagementPanel"
+  class="hidden"
+>
+
+  <!-- ================= HEADER ================= -->
+
+  <div
+    class="
+      bg-white/10
+      backdrop-blur-xl
+      border border-white/10
+      rounded-2xl
+      p-6
+      shadow-xl
+      mb-6
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-col
+        md:flex-row
+        md:items-center
+        md:justify-between
+        gap-4
+      "
+    >
+
+      <div>
+
+        <div
+          class="
+            flex
+            items-center
+            gap-3
+          "
+        >
+
+          <div
+            class="
+              w-12 h-12
+              rounded-xl
+              flex
+              items-center
+              justify-center
+              text-2xl
+              bg-gradient-to-br
+              from-violet-500/40
+              to-cyan-500/30
+              border border-white/10
+            "
+          >
+            💬
+          </div>
+
+          <div>
+
+            <h2
+              class="
+                text-xl
+                md:text-2xl
+                font-bold
+                text-white
+              "
+            >
+              Maklum Balas Pengguna
+            </h2>
+
+            <p
+              class="
+                text-sm
+                text-white/60
+                mt-1
+              "
+            >
+              Urus komen, cadangan dan pengalaman pengguna HEALINK.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- KEMBALI -->
+
+      <button
+        type="button"
+        onclick="closeFeedbackManagement()"
+        class="
+          px-4
+          py-2.5
+          rounded-xl
+          bg-white/10
+          border border-white/10
+          text-sm
+          font-semibold
+          text-white
+          hover:bg-white/20
+          transition
+        "
+      >
+        ← Kembali ke Dashboard
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= KPI ================= -->
+
+  <div
+    class="
+      grid
+      grid-cols-2
+      lg:grid-cols-4
+      gap-4
+      mb-6
+    "
+  >
+
+    <!-- JUMLAH -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Jumlah
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-violet-500/20
+          "
+        >
+          💬
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiTotal"
+        class="
+          text-3xl
+          font-extrabold
+          text-white
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Semua maklum balas
+      </div>
+
+    </div>
+
+
+    <!-- BARU -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-yellow-300/20
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Baru
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-yellow-400/20
+          "
+        >
+          🔔
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiNew"
+        class="
+          text-3xl
+          font-extrabold
+          text-yellow-300
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Belum disemak
+      </div>
+
+    </div>
+
+
+    <!-- RATING -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Purata Rating
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-orange-400/20
+          "
+        >
+          ⭐
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiRating"
+        class="
+          text-3xl
+          font-extrabold
+          text-orange-300
+        "
+      >
+        0.0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Daripada 5 bintang
+      </div>
+
+    </div>
+
+
+    <!-- SELESAI -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-emerald-300/20
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Selesai
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-emerald-400/20
+          "
+        >
+          ✓
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiDone"
+        class="
+          text-3xl
+          font-extrabold
+          text-emerald-300
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Telah diselesaikan
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= FILTER ================= -->
+
+  <div
+    class="
+      bg-white/5
+      border border-white/10
+      rounded-2xl
+      p-4
+      mb-5
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-wrap
+        gap-2
+      "
+    >
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white
+          text-purple-800
+          text-sm
+          font-bold
+        "
+        data-feedback-filter="Semua"
+      >
+        Semua
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Baru"
+      >
+        Baru
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Telah Dibaca"
+      >
+        Telah Dibaca
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Dalam Tindakan"
+      >
+        Dalam Tindakan
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Selesai"
+      >
+        Selesai
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= SENARAI ================= -->
+
+  <div
+    id="feedbackManagementList"
+    class="space-y-4"
+  >
+    <div class="bg-white/10 border border-white/10 rounded-2xl p-6 text-center text-white/60">
+      Memuatkan maklum balas...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     📊 KANDUNGAN DASHBOARD UTAMA
+===================================================== -->
+
+<div id="mainDashboardContent" class="space-y-6">
+
+
+<!-- HEADER -->
     <div class="flex justify-between items-center gap-3 flex-wrap">
       <div>
         <h1 class="text-2xl font-bold">📊 Dashboard Aktiviti Pelajar</h1>
@@ -464,10 +1066,27 @@ body::after {
 </div>
 
 <!-- ================= RANKING ================= -->
+
 <div class="card mt-6">
-  <div class="title">🏆 Ranking Modul</div>
-  <div id="ranking" class="grid md:grid-cols-3 gap-4"></div>
+
+  <div class="title">
+    🏆 Ranking Modul
+  </div>
+
+  <div
+    id="ranking"
+    class="grid md:grid-cols-3 gap-4">
+  </div>
+
 </div>
+
+
+<!-- =====================================================
+     📊 TAMAT KANDUNGAN DASHBOARD UTAMA
+===================================================== -->
+
+</div>
+
 
 <script>
 
@@ -915,27 +1534,741 @@ firebase.auth().onAuthStateChanged(async user => {
     generateGreeting();
 
     // ================= START ADMIN DATA =================
+
     startMainDataListener();
 
     loadData();
     loadSidebar();
     loadAlert();
 
+
+    // ================= MAKLUM BALAS =================
+
+    startFeedbackBadgeListener();
+
+    startFeedbackManagementListener();
+
+    }
+    catch(error) {
+
+      console.error(
+        "❌ ADMIN ACCESS ERROR:",
+        error
+      );
+
+      alert(
+        "Ralat semasa mendapatkan maklumat pentadbir."
+      );
+
+    }
+
+    });
+
+
+    // =====================================================
+// 💬 OPEN FEEDBACK MANAGEMENT
+// =====================================================
+
+function openFeedbackManagement() {
+
+  const dashboard =
+    document.getElementById(
+      "mainDashboardContent"
+    );
+
+  const feedbackPanel =
+    document.getElementById(
+      "feedbackManagementPanel"
+    );
+
+
+  if(!dashboard || !feedbackPanel) {
+
+    console.error(
+      "❌ Panel Maklum Balas tidak dijumpai."
+    );
+
+    return;
+  }
+
+
+  // ================= SEMBUNYIKAN DASHBOARD =================
+
+  dashboard.classList.add(
+    "hidden"
+  );
+
+
+  // ================= PAPARKAN FEEDBACK =================
+
+  feedbackPanel.classList.remove(
+    "hidden"
+  );
+
+
+  // ================= SCROLL ATAS =================
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+
+  console.log(
+    "💬 Pengurusan Maklum Balas dibuka"
+  );
+
+}
+
+
+
+// =====================================================
+// ← KEMBALI KE DASHBOARD
+// =====================================================
+
+function closeFeedbackManagement() {
+
+  const dashboard =
+    document.getElementById(
+      "mainDashboardContent"
+    );
+
+  const feedbackPanel =
+    document.getElementById(
+      "feedbackManagementPanel"
+    );
+
+
+  if(!dashboard || !feedbackPanel) {
+    return;
+  }
+
+
+  // ================= TUTUP FEEDBACK =================
+
+  feedbackPanel.classList.add(
+    "hidden"
+  );
+
+
+  // ================= PAPARKAN DASHBOARD =================
+
+  dashboard.classList.remove(
+    "hidden"
+  );
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+
+  console.log(
+    "📊 Kembali ke Dashboard"
+  );
+
+}
+
+</script>
+
+<script>
+// =====================================================
+// 💬 PENGURUSAN MAKLUM BALAS - FIRESTORE REALTIME
+// =====================================================
+
+let feedbackManagementData = [];
+let feedbackManagementFilter = "Semua";
+let feedbackManagementListenerStarted = false;
+
+function startFeedbackManagementListener() {
+
+  if (feedbackManagementListenerStarted) return;
+
+  feedbackManagementListenerStarted = true;
+
+  db.collection("maklumBalasPengguna")
+    .orderBy("masa", "desc")
+    .onSnapshot(
+      snapshot => {
+
+        feedbackManagementData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        renderFeedbackManagement();
+
+      },
+      error => {
+
+        console.error(
+          "❌ Gagal membaca maklum balas:",
+          error
+        );
+
+        const list =
+          document.getElementById("feedbackManagementList");
+
+        if (list) {
+          list.innerHTML = `
+            <div class="bg-red-500/10 border border-red-300/20 rounded-2xl p-6 text-center text-red-100">
+              Maklum balas tidak dapat dimuatkan. Sila cuba semula.
+            </div>
+          `;
+        }
+
+      }
+    );
+}
+
+
+function renderFeedbackManagement() {
+
+  const total = feedbackManagementData.length;
+
+  const totalBaru =
+    feedbackManagementData.filter(
+      item => item.status === "Baru"
+    ).length;
+
+  const totalSelesai =
+    feedbackManagementData.filter(
+      item => item.status === "Selesai"
+    ).length;
+
+  const ratings =
+    feedbackManagementData
+      .map(item => Number(item.rating))
+      .filter(rating =>
+        Number.isFinite(rating) &&
+        rating >= 1 &&
+        rating <= 5
+      );
+
+  const purataRating =
+    ratings.length
+      ? (
+          ratings.reduce(
+            (sum, rating) => sum + rating,
+            0
+          ) / ratings.length
+        ).toFixed(1)
+      : "0.0";
+
+
+  setFeedbackText("feedbackKpiTotal", total);
+  setFeedbackText("feedbackKpiNew", totalBaru);
+  setFeedbackText("feedbackKpiRating", purataRating);
+  setFeedbackText("feedbackKpiDone", totalSelesai);
+
+
+  const list =
+    document.getElementById("feedbackManagementList");
+
+  if (!list) return;
+
+
+  const filtered =
+    feedbackManagementFilter === "Semua"
+      ? feedbackManagementData
+      : feedbackManagementData.filter(
+          item =>
+            item.status === feedbackManagementFilter
+        );
+
+
+  if (!filtered.length) {
+
+    list.innerHTML = `
+      <div class="bg-white/10 border border-white/10 rounded-2xl p-8 text-center">
+        <div class="text-4xl mb-3">💬</div>
+        <div class="font-semibold text-white">
+          Tiada maklum balas
+        </div>
+        <div class="text-sm text-white/50 mt-1">
+          Tiada rekod untuk status yang dipilih.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    filtered.map(
+      item => createFeedbackManagementCard(item)
+    ).join("");
+
+}
+
+
+function createFeedbackManagementCard(item) {
+
+  const category =
+    escapeFeedbackHTML(
+      item.kategori || "Lain-lain"
+    );
+
+  const comment =
+    escapeFeedbackHTML(
+      item.komen || "-"
+    );
+
+  const name =
+    escapeFeedbackHTML(
+      item.nama || "Pengguna"
+    );
+
+  const type =
+    escapeFeedbackHTML(
+      item.jenis || "-"
+    );
+
+  const organisation =
+    escapeFeedbackHTML(
+      item.organisasi || "-"
+    );
+
+  const className =
+    escapeFeedbackHTML(
+      item.kelas || "-"
+    );
+
+  const status =
+    normaliseFeedbackStatus(
+      item.status
+    );
+
+  const rating =
+    Math.max(
+      0,
+      Math.min(
+        5,
+        Number(item.rating) || 0
+      )
+    );
+
+  const stars =
+    "★".repeat(rating) +
+    "☆".repeat(5 - rating);
+
+  const time =
+    formatFeedbackTime(item.masa);
+
+  const statusClass =
+    getFeedbackStatusClass(status);
+
+
+  return `
+    <article
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5 md:p-6
+        shadow-lg
+      "
+    >
+
+      <div
+        class="
+          flex
+          flex-col
+          lg:flex-row
+          lg:items-start
+          lg:justify-between
+          gap-4
+        "
+      >
+
+        <div class="min-w-0">
+
+          <div class="flex flex-wrap items-center gap-2">
+
+            <span
+              class="
+                inline-flex
+                px-3 py-1
+                rounded-full
+                bg-violet-400/20
+                border border-violet-300/20
+                text-violet-100
+                text-xs
+                font-semibold
+              "
+            >
+              ${category}
+            </span>
+
+            <span
+              class="
+                inline-flex
+                px-3 py-1
+                rounded-full
+                border
+                text-xs
+                font-semibold
+                ${statusClass}
+              "
+            >
+              ${escapeFeedbackHTML(status)}
+            </span>
+
+          </div>
+
+          <div
+            class="
+              text-yellow-300
+              mt-3
+              tracking-wider
+              text-lg
+            "
+            aria-label="${rating} daripada 5 bintang"
+          >
+            ${stars}
+          </div>
+
+        </div>
+
+
+        <div class="w-full lg:w-auto">
+
+          <label
+            class="
+              block
+              text-[11px]
+              uppercase
+              tracking-wide
+              text-white/40
+              mb-1
+            "
+          >
+            Status
+          </label>
+
+          <select
+            onchange="updateFeedbackStatus('${item.id}', this.value)"
+            class="
+              w-full
+              lg:w-48
+              bg-purple-950/70
+              border border-white/10
+              text-white
+              text-sm
+              rounded-xl
+              px-3 py-2.5
+              outline-none
+              focus:border-cyan-300/40
+            "
+          >
+            ${feedbackStatusOptions(status)}
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <p
+        class="
+          text-white
+          text-base
+          leading-relaxed
+          mt-5
+          whitespace-pre-wrap
+          break-words
+        "
+      >${comment}</p>
+
+
+      <div
+        class="
+          mt-5
+          pt-4
+          border-t
+          border-white/10
+          grid
+          md:grid-cols-2
+          xl:grid-cols-4
+          gap-3
+          text-xs
+          text-white/55
+        "
+      >
+
+        <div>
+          👤 ${name} • ${type}
+        </div>
+
+        <div>
+          🏫 ${organisation}
+        </div>
+
+        <div>
+          🎓 ${className}
+        </div>
+
+        <div class="md:text-right">
+          🕐 ${escapeFeedbackHTML(time)}
+        </div>
+
+      </div>
+
+    </article>
+  `;
+
+}
+
+
+function feedbackStatusOptions(currentStatus) {
+
+  const statuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  return statuses
+    .map(status => `
+      <option
+        value="${status}"
+        ${status === currentStatus ? "selected" : ""}
+      >
+        ${status}
+      </option>
+    `)
+    .join("");
+
+}
+
+
+async function updateFeedbackStatus(
+  feedbackId,
+  newStatus
+) {
+
+  const allowedStatuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  if (!allowedStatuses.includes(newStatus)) {
+    return;
+  }
+
+  try {
+
+    await db
+      .collection("maklumBalasPengguna")
+      .doc(feedbackId)
+      .update({
+        status: newStatus
+      });
+
+    console.log(
+      "✅ Status maklum balas:",
+      newStatus
+    );
+
   }
   catch(error) {
 
     console.error(
-      "❌ ADMIN ACCESS ERROR:",
+      "❌ Gagal kemas kini status:",
       error
     );
 
     alert(
-      "Ralat semasa mendapatkan maklumat pentadbir."
+      "Status maklum balas tidak dapat dikemas kini."
     );
+
+    renderFeedbackManagement();
 
   }
 
-});
+}
+
+
+function setFeedbackManagementFilter(filter) {
+
+  const allowedFilters = [
+    "Semua",
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  if (!allowedFilters.includes(filter)) {
+    return;
+  }
+
+  feedbackManagementFilter = filter;
+
+  document
+    .querySelectorAll(".feedback-filter-btn")
+    .forEach(button => {
+
+      const active =
+        button.dataset.feedbackFilter === filter;
+
+      button.classList.toggle(
+        "bg-white",
+        active
+      );
+
+      button.classList.toggle(
+        "text-purple-800",
+        active
+      );
+
+      button.classList.toggle(
+        "font-bold",
+        active
+      );
+
+      button.classList.toggle(
+        "bg-white/10",
+        !active
+      );
+
+      button.classList.toggle(
+        "text-white/70",
+        !active
+      );
+
+    });
+
+  renderFeedbackManagement();
+
+}
+
+
+function initFeedbackManagementFilters() {
+
+  document
+    .querySelectorAll(".feedback-filter-btn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          setFeedbackManagementFilter(
+            button.dataset.feedbackFilter
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+function setFeedbackText(id, value) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
+
+}
+
+
+function normaliseFeedbackStatus(status) {
+
+  const allowedStatuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  return allowedStatuses.includes(status)
+    ? status
+    : "Baru";
+
+}
+
+
+function getFeedbackStatusClass(status) {
+
+  if (status === "Selesai") {
+    return "bg-emerald-400/20 border-emerald-300/20 text-emerald-100";
+  }
+
+  if (status === "Dalam Tindakan") {
+    return "bg-cyan-400/20 border-cyan-300/20 text-cyan-100";
+  }
+
+  if (status === "Telah Dibaca") {
+    return "bg-blue-400/20 border-blue-300/20 text-blue-100";
+  }
+
+  return "bg-yellow-400/20 border-yellow-300/20 text-yellow-100";
+
+}
+
+
+function formatFeedbackTime(timestamp) {
+
+  if (!timestamp) return "-";
+
+  let date;
+
+  if (
+    timestamp &&
+    typeof timestamp.toDate === "function"
+  ) {
+    date = timestamp.toDate();
+  }
+  else {
+    date = new Date(timestamp);
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "ms-MY",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+
+}
+
+
+function escapeFeedbackHTML(value) {
+
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initFeedbackManagementFilters
+);
 
 </script>
 
@@ -1085,6 +2418,92 @@ function filterSekolah(s){
 function filterKelas(k){
   currentKelas = k;
   loadData();
+}
+
+// =====================================================
+// 💬 MAKLUM BALAS PENGGUNA - REALTIME BADGE
+// =====================================================
+
+let feedbackBadgeListenerStarted = false;
+
+
+function startFeedbackBadgeListener() {
+
+  if(feedbackBadgeListenerStarted) {
+    return;
+  }
+
+
+  feedbackBadgeListenerStarted = true;
+
+
+  db.collection("maklumBalasPengguna")
+    .where("status", "==", "Baru")
+    .onSnapshot(
+
+      snapshot => {
+
+        const badge =
+          document.getElementById(
+            "feedbackNewBadge"
+          );
+
+
+        if(!badge) {
+          return;
+        }
+
+
+        const totalBaru =
+          snapshot.size;
+
+
+        badge.textContent =
+          totalBaru;
+
+
+        if(totalBaru > 0) {
+
+          badge.classList.remove(
+            "hidden"
+          );
+
+          badge.classList.add(
+            "flex"
+          );
+
+        }
+        else {
+
+          badge.classList.add(
+            "hidden"
+          );
+
+          badge.classList.remove(
+            "flex"
+          );
+
+        }
+
+
+        console.log(
+          "💬 Maklum Balas Baru:",
+          totalBaru
+        );
+
+      },
+
+      error => {
+
+        console.error(
+          "❌ Gagal membaca badge maklum balas:",
+          error
+        );
+
+      }
+
+    );
+
 }
 
 // ================= LOAD DATA (KPI + FILTER) =================

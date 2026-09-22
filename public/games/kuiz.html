@@ -1,354 +1,2489 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HEALINK Kuiz Minda Sihat</title>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+  HEALINK 2.0 | Kuiz Minda Sihat
+</title>
+
+
+<!-- =====================================================
+     FONT
+===================================================== -->
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
+
+<script
+  src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+</script>
+
+<script
+  src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js">
+</script>
+
 
 <style>
-@keyframes fadeIn {
-  from {opacity:0; transform: translateY(10px);}
-  to {opacity:1; transform: translateY(0);}
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --bg:
+    #0b0826;
+
+  --purple:
+    #7c3aed;
+
+  --violet:
+    #9333ea;
+
+  --indigo:
+    #4f46e5;
+
+  --cyan:
+    #22d3ee;
+
+  --green:
+    #22c55e;
+
+  --red:
+    #fb7185;
+
+  --text:
+    #f8fafc;
+
+  --muted:
+    #94a3b8;
+
 }
-.fadeIn {
-  animation: fadeIn 0.4s ease;
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+
+  box-sizing:
+    border-box;
+
 }
+
+
+html {
+
+  min-height:
+    100%;
+
+}
+
+
+body {
+
+  margin:
+    0;
+
+  min-height:
+    100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color:
+    var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 4%,
+      rgba(124,58,237,.22),
+      transparent 27%
+    ),
+
+    radial-gradient(
+      circle at 92% 94%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x:
+    hidden;
+
+}
+
+
+/* =====================================================
+   BACKGROUND GLOW
+===================================================== */
+
+body::before {
+
+  content:
+    "";
+
+  position:
+    fixed;
+
+  width:
+    420px;
+
+  height:
+    420px;
+
+  top:
+    -180px;
+
+  right:
+    -120px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(37,99,235,.15);
+
+  filter:
+    blur(80px);
+
+  pointer-events:
+    none;
+
+}
+
+
+body::after {
+
+  content:
+    "";
+
+  position:
+    fixed;
+
+  width:
+    380px;
+
+  height:
+    380px;
+
+  bottom:
+    -180px;
+
+  left:
+    -120px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(124,58,237,.17);
+
+  filter:
+    blur(80px);
+
+  pointer-events:
+    none;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.quiz-header {
+
+  position:
+    sticky;
+
+  top:
+    0;
+
+  z-index:
+    100;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items:
+    center;
+
+  gap:
+    20px;
+
+  padding:
+    16px 28px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.72);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-brand {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    10px;
+
+  font-weight:
+    800;
+
+}
+
+
+.header-brand-icon {
+
+  width:
+    38px;
+
+  height:
+    38px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width:
+    fit-content;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius:
+    12px;
+
+  padding:
+    10px 15px;
+
+  color:
+    white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family:
+    inherit;
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  transition:
+    .2s ease;
+
+}
+
+
+.header-button:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.header-close {
+
+  justify-self:
+    end;
+
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.quiz-page {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  width:
+    min(100% - 32px, 820px);
+
+  margin:
+    0 auto;
+
+  padding:
+    55px 0 70px;
+
+}
+
+
+/* =====================================================
+   INTRO
+===================================================== */
+
+.quiz-intro {
+
+  text-align:
+    center;
+
+  margin-bottom:
+    28px;
+
+}
+
+
+.quiz-label {
+
+  color:
+    #67e8f9;
+
+  font-size:
+    12px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    .18em;
+
+  text-transform:
+    uppercase;
+
+}
+
+
+.quiz-intro h1 {
+
+  margin:
+    10px 0 8px;
+
+  font-size:
+    clamp(28px,5vw,42px);
+
+  line-height:
+    1.15;
+
+}
+
+
+.quiz-intro p {
+
+  max-width:
+    600px;
+
+  margin:
+    auto;
+
+  color:
+    #cbd5e1;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.7;
+
+}
+
+
+/* =====================================================
+   QUIZ CARD
+===================================================== */
+
+.quiz-card {
+
+  position:
+    relative;
+
+  overflow:
+    hidden;
+
+  padding:
+    32px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius:
+    28px;
+
+  background:
+
+    linear-gradient(
+      145deg,
+      rgba(37,28,85,.92),
+      rgba(18,29,73,.82)
+    );
+
+  box-shadow:
+
+    inset 0 1px 0
+    rgba(255,255,255,.06),
+
+    0 30px 70px
+    rgba(0,0,0,.32);
+
+  backdrop-filter:
+    blur(18px);
+
+}
+
+
+.quiz-card::before {
+
+  content:
+    "";
+
+  position:
+    absolute;
+
+  width:
+    230px;
+
+  height:
+    230px;
+
+  top:
+    -120px;
+
+  right:
+    -100px;
+
+  border-radius:
+    50%;
+
+  background:
+    rgba(124,58,237,.18);
+
+  filter:
+    blur(30px);
+
+  pointer-events:
+    none;
+
+}
+
+
+/* =====================================================
+   META
+===================================================== */
+
+.quiz-meta {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    15px;
+
+  margin-bottom:
+    17px;
+
+  color:
+    #cbd5e1;
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+}
+
+
+.score-pill {
+
+  padding:
+    8px 12px;
+
+  border:
+    1px solid rgba(34,211,238,.18);
+
+  border-radius:
+    999px;
+
+  color:
+    #a5f3fc;
+
+  background:
+    rgba(34,211,238,.07);
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  width:
+    100%;
+
+  height:
+    8px;
+
+  margin-bottom:
+    30px;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width:
+    0;
+
+  height:
+    100%;
+
+  border-radius:
+    inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  box-shadow:
+    0 0 15px
+    rgba(34,211,238,.3);
+
+  transition:
+    width .35s ease;
+
+}
+
+
+/* =====================================================
+   QUESTION
+===================================================== */
+
+.question {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  margin:
+    0 0 24px;
+
+  font-size:
+    clamp(19px,3vw,24px);
+
+  line-height:
+    1.5;
+
+}
+
+
+/* =====================================================
+   ANSWERS
+===================================================== */
+
+.answers {
+
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  display:
+    grid;
+
+  gap:
+    12px;
+
+}
+
+
+.answer-button {
+
+  width:
+    100%;
+
+  border:
+    1px solid rgba(167,139,250,.18);
+
+  border-radius:
+    15px;
+
+  padding:
+    15px 17px;
+
+  color:
+    #f8fafc;
+
+  background:
+    rgba(255,255,255,.045);
+
+  font-family:
+    inherit;
+
+  font-size:
+    14px;
+
+  font-weight:
+    600;
+
+  line-height:
+    1.5;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    .18s ease;
+
+}
+
+
+.answer-button:hover:not(:disabled) {
+
+  transform:
+    translateX(4px);
+
+  border-color:
+    rgba(34,211,238,.42);
+
+  background:
+    rgba(124,58,237,.14);
+
+}
+
+
+.answer-button:disabled {
+
+  cursor:
+    default;
+
+}
+
+
+.answer-correct {
+
+  border-color:
+    rgba(34,197,94,.6) !important;
+
+  color:
+    #dcfce7 !important;
+
+  background:
+    rgba(34,197,94,.18) !important;
+
+}
+
+
+.answer-wrong {
+
+  border-color:
+    rgba(251,113,133,.55) !important;
+
+  color:
+    #ffe4e6 !important;
+
+  background:
+    rgba(244,63,94,.16) !important;
+
+}
+
+
+/* =====================================================
+   RESULT MODAL
+===================================================== */
+
+.result-modal {
+
+  position:
+    fixed;
+
+  inset:
+    0;
+
+  z-index:
+    999;
+
+  display:
+    none;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    20px;
+
+  background:
+    rgba(5,3,24,.82);
+
+  backdrop-filter:
+    blur(12px);
+
+}
+
+
+.result-modal.show {
+
+  display:
+    flex;
+
+}
+
+
+.result-card {
+
+  position:
+    relative;
+
+  width:
+    min(100%,520px);
+
+  overflow:
+    hidden;
+
+  padding:
+    35px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius:
+    28px;
+
+  text-align:
+    center;
+
+  background:
+
+    linear-gradient(
+      145deg,
+      #251b59,
+      #121d49
+    );
+
+  box-shadow:
+    0 30px 90px
+    rgba(0,0,0,.55);
+
+}
+
+
+.result-icon {
+
+  width:
+    72px;
+
+  height:
+    72px;
+
+  margin:
+    0 auto 18px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    22px;
+
+  font-size:
+    34px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(147,51,234,.3),
+      rgba(34,211,238,.16)
+    );
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    0 0 8px;
+
+  font-size:
+    28px;
+
+}
+
+
+.final-score {
+
+  margin:
+    15px 0 8px;
+
+  font-size:
+    35px;
+
+  font-weight:
+    800;
+
+  background:
+    linear-gradient(
+      90deg,
+      #c084fc,
+      #67e8f9
+    );
+
+  -webkit-background-clip:
+    text;
+
+  color:
+    transparent;
+
+}
+
+
+.result-message {
+
+  margin:
+    0 auto 22px;
+
+  max-width:
+    400px;
+
+  color:
+    #cbd5e1;
+
+  font-size:
+    14px;
+
+  line-height:
+    1.7;
+
+}
+
+
+.save-status {
+
+  min-height:
+    20px;
+
+  margin-bottom:
+    15px;
+
+  color:
+    #86efac;
+
+  font-size:
+    12px;
+
+  font-weight:
+    700;
+
+}
+
+
+.result-actions {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:
+    10px;
+
+}
+
+
+.result-button {
+
+  border:
+    0;
+
+  border-radius:
+    13px;
+
+  padding:
+    13px;
+
+  font-family:
+    inherit;
+
+  font-weight:
+    800;
+
+  cursor:
+    pointer;
+
+}
+
+
+.result-primary {
+
+  color:
+    white;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #2563eb
+    );
+
+}
+
+
+.result-secondary {
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  color:
+    white;
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:650px) {
+
+  .quiz-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    padding:
+      12px;
+
+  }
+
+
+  .header-brand {
+
+    font-size:
+      12px;
+
+  }
+
+
+  .header-brand-icon {
+
+    display:
+      none;
+
+  }
+
+
+  .header-button {
+
+    padding:
+      9px 10px;
+
+    font-size:
+      11px;
+
+  }
+
+
+  .quiz-page {
+
+    width:
+      min(100% - 22px,820px);
+
+    padding-top:
+      30px;
+
+  }
+
+
+  .quiz-card {
+
+    padding:
+      22px 18px;
+
+    border-radius:
+      22px;
+
+  }
+
+
+  .result-card {
+
+    padding:
+      28px 20px;
+
+  }
+
+
+  .result-actions {
+
+    grid-template-columns:
+      1fr;
+
+  }
+
+}
+
 </style>
 
 </head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
 
-<!-- HEADER -->
-<div class="fixed top-0 left-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
-  <button onclick="history.back()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
-  <div>🧠 Kuiz Minda Sihat</div>
-  <button onclick="goHome()" class="bg-red-500 px-3 py-1 rounded">✕ Tutup</button>
-</div>
+<body>
 
-<!-- QUIZ BOX -->
-<div id="quizBox" class="mt-20 bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl fadeIn">
 
-  <!-- TOP -->
-  <div class="flex justify-between mb-4 text-sm">
-    <span id="noSoalan"></span>
-    <span>⭐ Skor: <span id="score">0</span></span>
-  </div>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-  <!-- PROGRESS -->
-  <div class="w-full bg-white/20 rounded-full h-2 mb-6">
-    <div id="progressBar" class="bg-green-400 h-2 rounded-full transition-all"></div>
-  </div>
+<header class="quiz-header">
 
-  <!-- QUESTION -->
-  <h3 id="question" class="mb-6 font-semibold text-lg"></h3>
+  <button
+    type="button"
+    class="header-button"
+    onclick="history.back()"
+  >
+    ← Kembali
+  </button>
 
-  <!-- ANSWERS -->
-  <div id="answers" class="space-y-3"></div>
 
-</div>
+  <div class="header-brand">
 
-<!-- RESULT POPUP -->
-<div id="resultBox" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
+    <div class="header-brand-icon">
+      ✦
+    </div>
 
-  <div class="bg-white text-gray-800 p-8 rounded-xl text-center shadow-xl">
-
-    <h2 class="text-2xl font-bold text-purple-600 mb-3">🎉 Keputusan</h2>
-
-    <p id="finalScore" class="mb-4 text-lg"></p>
-
-    <button onclick="restartGame()" class="px-6 py-2 bg-purple-600 text-white rounded-lg">
-      🔁 Cuba Lagi
-    </button>
+    <span>
+      HEALINK 2.0 • Kuiz Minda Sihat
+    </span>
 
   </div>
 
+
+  <button
+    type="button"
+    class="header-button header-close"
+    onclick="goHome()"
+  >
+    ✕ Tutup
+  </button>
+
+</header>
+
+
+<!-- =====================================================
+     PAGE
+===================================================== -->
+
+<main class="quiz-page">
+
+
+  <section class="quiz-intro">
+
+    <div class="quiz-label">
+      Pembelajaran Kendiri
+    </div>
+
+    <h1>
+      🧠 Kuiz Minda Sihat
+    </h1>
+
+    <p>
+      Uji pengetahuan anda tentang penjagaan emosi,
+      sokongan sosial dan amalan kesejahteraan diri.
+    </p>
+
+  </section>
+
+
+  <!-- =================================================
+       QUIZ
+  ================================================== -->
+
+  <section
+    id="quizBox"
+    class="quiz-card"
+  >
+
+    <div class="quiz-meta">
+
+      <span id="noSoalan">
+        Soalan 1/20
+      </span>
+
+      <span class="score-pill">
+        ⭐ Skor:
+        <span id="score">
+          0
+        </span>
+      </span>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <h2
+      id="question"
+      class="question"
+    ></h2>
+
+
+    <div
+      id="answers"
+      class="answers"
+    ></div>
+
+  </section>
+
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="resultBox"
+  class="result-modal"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🎉
+    </div>
+
+
+    <h2>
+      Kuiz Selesai!
+    </h2>
+
+
+    <div
+      id="finalScore"
+      class="final-score"
+    >
+      0 / 20
+    </div>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div
+      id="quizSaveStatus"
+      class="save-status"
+    ></div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button result-primary"
+        onclick="restartGame()"
+      >
+        🔁 Cuba Lagi
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button result-secondary"
+        onclick="goHome()"
+      >
+        ← Kembali HEALINK
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
+
 
 <script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   QUESTIONS
+===================================================== */
+
 const soalan = [
+
 {
-q: "Apakah yang patut dilakukan apabila berasa tertekan?",
-answers: [
-{text:"Menyimpan sendiri", correct:false},
-{text:"Berkongsi dengan orang dipercayai", correct:true},
-{text:"Marah kepada semua orang", correct:false},
-{text:"Tidak tidur", correct:false}
-]
+  q:
+    "Apakah yang patut dilakukan apabila berasa tertekan?",
+
+  answers: [
+    {
+      text:"Menyimpan sendiri",
+      correct:false
+    },
+    {
+      text:"Berkongsi dengan orang dipercayai",
+      correct:true
+    },
+    {
+      text:"Marah kepada semua orang",
+      correct:false
+    },
+    {
+      text:"Tidak tidur",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah cara terbaik mengawal emosi?",
-answers: [
-{text:"Tarik nafas dalam", correct:true},
-{text:"Jerit kuat", correct:false},
-{text:"Abaikan semua", correct:false},
-{text:"Marah orang lain", correct:false}
-]
+  q:
+    "Apakah cara terbaik mengawal emosi?",
+
+  answers: [
+    {
+      text:"Tarik nafas dalam",
+      correct:true
+    },
+    {
+      text:"Jerit kuat",
+      correct:false
+    },
+    {
+      text:"Abaikan semua",
+      correct:false
+    },
+    {
+      text:"Marah orang lain",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah tanda emosi tidak stabil?",
-answers: [
-{text:"Tenang", correct:false},
-{text:"Mudah marah", correct:true},
-{text:"Gembira", correct:false},
-{text:"Fokus", correct:false}
-]
+  q:
+    "Apakah tanda seseorang mungkin sedang mengalami emosi yang sukar?",
+
+  answers: [
+    {
+      text:"Mudah marah",
+      correct:true
+    },
+    {
+      text:"Sentiasa fokus",
+      correct:false
+    },
+    {
+      text:"Sentiasa tenang",
+      correct:false
+    },
+    {
+      text:"Sentiasa gembira",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah yang boleh membantu menenangkan fikiran?",
-answers: [
-{text:"Tarik nafas perlahan", correct:true},
-{text:"Menjerit kuat", correct:false},
-{text:"Memukul barang", correct:false},
-{text:"Tidak bercakap dengan sesiapa", correct:false}
-]
+  q:
+    "Apakah yang boleh membantu menenangkan fikiran?",
+
+  answers: [
+    {
+      text:"Tarik nafas perlahan",
+      correct:true
+    },
+    {
+      text:"Menjerit kuat",
+      correct:false
+    },
+    {
+      text:"Memukul barang",
+      correct:false
+    },
+    {
+      text:"Tidak bercakap dengan sesiapa",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apa yang patut dilakukan apabila sedih?",
-answers: [
-{text:"Pendam perasaan", correct:false},
-{text:"Berkongsi dengan orang dipercayai", correct:true},
-{text:"Marah semua orang", correct:false},
-{text:"Tidak makan", correct:false}
-]
+  q:
+    "Apa yang boleh dilakukan apabila berasa sedih?",
+
+  answers: [
+    {
+      text:"Pendam perasaan",
+      correct:false
+    },
+    {
+      text:"Berkongsi dengan orang dipercayai",
+      correct:true
+    },
+    {
+      text:"Marah semua orang",
+      correct:false
+    },
+    {
+      text:"Tidak makan",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Antara berikut, yang manakah aktiviti sihat untuk emosi?",
-answers: [
-{text:"Tidur lewat setiap hari", correct:false},
-{text:"Bermain tanpa henti", correct:false},
-{text:"Bersenam dan berehat", correct:true},
-{text:"Mengasingkan diri", correct:false}
-]
+  q:
+    "Antara berikut, yang manakah aktiviti sihat untuk kesejahteraan diri?",
+
+  answers: [
+    {
+      text:"Tidur lewat setiap hari",
+      correct:false
+    },
+    {
+      text:"Bermain tanpa henti",
+      correct:false
+    },
+    {
+      text:"Bersenam dan berehat",
+      correct:true
+    },
+    {
+      text:"Mengasingkan diri",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah tanda seseorang mengalami tekanan emosi?",
-answers: [
-{text:"Mudah marah", correct:true},
-{text:"Sentiasa fokus", correct:false},
-{text:"Sangat tenang", correct:false},
-{text:"Gembira sepanjang masa", correct:false}
-]
+  q:
+    "Apakah antara perubahan yang mungkin berlaku apabila seseorang berasa tertekan?",
+
+  answers: [
+    {
+      text:"Lebih mudah marah",
+      correct:true
+    },
+    {
+      text:"Sentiasa fokus",
+      correct:false
+    },
+    {
+      text:"Sentiasa tenang",
+      correct:false
+    },
+    {
+      text:"Gembira sepanjang masa",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Bagaimanakah cara mengawal kemarahan?",
-answers: [
-{text:"Menarik nafas dalam", correct:true},
-{text:"Menengking orang", correct:false},
-{text:"Memukul meja", correct:false},
-{text:"Menyalahkan semua orang", correct:false}
-]
+  q:
+    "Bagaimanakah cara yang lebih baik untuk mengurus kemarahan?",
+
+  answers: [
+    {
+      text:"Menarik nafas dalam",
+      correct:true
+    },
+    {
+      text:"Menengking orang",
+      correct:false
+    },
+    {
+      text:"Memukul meja",
+      correct:false
+    },
+    {
+      text:"Menyalahkan semua orang",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah yang perlu dilakukan jika rasa terlalu risau?",
-answers: [
-{text:"Berdiam diri selamanya", correct:false},
-{text:"Berkongsi dengan guru atau keluarga", correct:true},
-{text:"Ponteng sekolah", correct:false},
-{text:"Mengasingkan diri", correct:false}
-]
+  q:
+    "Apakah yang boleh dilakukan jika rasa terlalu risau?",
+
+  answers: [
+    {
+      text:"Berdiam diri selamanya",
+      correct:false
+    },
+    {
+      text:"Berkongsi dengan guru atau keluarga",
+      correct:true
+    },
+    {
+      text:"Ponteng sekolah",
+      correct:false
+    },
+    {
+      text:"Mengasingkan diri",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Mengapa tidur mencukupi penting?",
-answers: [
-{text:"Membantu kesihatan mental", correct:true},
-{text:"Menyebabkan cepat marah", correct:false},
-{text:"Membuat badan lemah", correct:false},
-{text:"Menghilangkan fokus", correct:false}
-]
+  q:
+    "Mengapa tidur mencukupi penting?",
+
+  answers: [
+    {
+      text:"Membantu kesejahteraan tubuh dan minda",
+      correct:true
+    },
+    {
+      text:"Menyebabkan cepat marah",
+      correct:false
+    },
+    {
+      text:"Membuat badan lemah",
+      correct:false
+    },
+    {
+      text:"Menghilangkan fokus",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah aktiviti yang membantu mengurangkan stress?",
-answers: [
-{text:"Bersenam", correct:true},
-{text:"Memendam emosi", correct:false},
-{text:"Tidak tidur", correct:false},
-{text:"Marah orang lain", correct:false}
-]
+  q:
+    "Apakah aktiviti yang boleh membantu mengurangkan tekanan?",
+
+  answers: [
+    {
+      text:"Bersenam",
+      correct:true
+    },
+    {
+      text:"Memendam emosi",
+      correct:false
+    },
+    {
+      text:"Tidak tidur",
+      correct:false
+    },
+    {
+      text:"Marah orang lain",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Siapakah yang boleh membantu apabila menghadapi masalah emosi?",
-answers: [
-{text:"Guru Kaunseling", correct:true},
-{text:"Tiada siapa", correct:false},
-{text:"Orang tidak dikenali", correct:false},
-{text:"Media sosial sahaja", correct:false}
-]
+  q:
+    "Siapakah yang boleh membantu apabila menghadapi masalah emosi?",
+
+  answers: [
+    {
+      text:"Guru Bimbingan dan Kaunseling",
+      correct:true
+    },
+    {
+      text:"Tiada siapa",
+      correct:false
+    },
+    {
+      text:"Orang tidak dikenali",
+      correct:false
+    },
+    {
+      text:"Media sosial sahaja",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah kesan positif berkongsi masalah?",
-answers: [
-{text:"Membantu rasa lega", correct:true},
-{text:"Menambah stress", correct:false},
-{text:"Membuat lebih marah", correct:false},
-{text:"Tiada perubahan", correct:false}
-]
+  q:
+    "Apakah kesan positif berkongsi masalah dengan orang yang dipercayai?",
+
+  answers: [
+    {
+      text:"Boleh membantu seseorang berasa lebih lega dan mendapat sokongan",
+      correct:true
+    },
+    {
+      text:"Sentiasa menambah tekanan",
+      correct:false
+    },
+    {
+      text:"Pasti membuat lebih marah",
+      correct:false
+    },
+    {
+      text:"Tidak pernah memberi apa-apa manfaat",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah contoh gaya hidup sihat?",
-answers: [
-{text:"Tidur awal", correct:true},
-{text:"Main game sepanjang malam", correct:false},
-{text:"Tidak makan", correct:false},
-{text:"Ponteng sekolah", correct:false}
-]
+  q:
+    "Apakah contoh rutin harian yang menyokong kesejahteraan diri?",
+
+  answers: [
+    {
+      text:"Mendapat tidur yang mencukupi",
+      correct:true
+    },
+    {
+      text:"Main game sepanjang malam",
+      correct:false
+    },
+    {
+      text:"Tidak makan",
+      correct:false
+    },
+    {
+      text:"Ponteng sekolah",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah yang boleh meningkatkan keyakinan diri?",
-answers: [
-{text:"Berfikiran positif", correct:true},
-{text:"Menghina diri sendiri", correct:false},
-{text:"Takut mencuba", correct:false},
-{text:"Mengasingkan diri", correct:false}
-]
+  q:
+    "Apakah yang boleh membantu membina keyakinan diri?",
+
+  answers: [
+    {
+      text:"Menghargai kekuatan diri dan berfikiran membina",
+      correct:true
+    },
+    {
+      text:"Menghina diri sendiri",
+      correct:false
+    },
+    {
+      text:"Takut mencuba semua perkara",
+      correct:false
+    },
+    {
+      text:"Mengasingkan diri",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Bagaimanakah cara menenangkan diri semasa marah?",
-answers: [
-{text:"Berehat seketika", correct:true},
-{text:"Jerit kuat", correct:false},
-{text:"Membaling barang", correct:false},
-{text:"Menyalahkan orang", correct:false}
-]
+  q:
+    "Apakah yang boleh dilakukan untuk memberi ruang kepada diri ketika marah?",
+
+  answers: [
+    {
+      text:"Berehat seketika",
+      correct:true
+    },
+    {
+      text:"Jerit kuat",
+      correct:false
+    },
+    {
+      text:"Membaling barang",
+      correct:false
+    },
+    {
+      text:"Menyalahkan orang",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah manfaat bersenam?",
-answers: [
-{text:"Meningkatkan kesihatan mental", correct:true},
-{text:"Menyebabkan stress", correct:false},
-{text:"Membuat cepat marah", correct:false},
-{text:"Mengurangkan fokus", correct:false}
-]
+  q:
+    "Apakah antara manfaat aktiviti fizikal?",
+
+  answers: [
+    {
+      text:"Boleh menyokong kesejahteraan fizikal dan emosi",
+      correct:true
+    },
+    {
+      text:"Sentiasa menyebabkan tekanan",
+      correct:false
+    },
+    {
+      text:"Pasti membuat cepat marah",
+      correct:false
+    },
+    {
+      text:"Sentiasa mengurangkan fokus",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apa yang perlu dilakukan jika kawan kelihatan sedih?",
-answers: [
-{text:"Memberi sokongan", correct:true},
-{text:"Mengejek", correct:false},
-{text:"Mengabaikan", correct:false},
-{text:"Marah kepadanya", correct:false}
-]
+  q:
+    "Apa yang boleh dilakukan jika kawan kelihatan sedih?",
+
+  answers: [
+    {
+      text:"Memberi sokongan dan mendengar dengan baik",
+      correct:true
+    },
+    {
+      text:"Mengejek",
+      correct:false
+    },
+    {
+      text:"Mengabaikan",
+      correct:false
+    },
+    {
+      text:"Marah kepadanya",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Mengapa penting menjaga kesihatan mental?",
-answers: [
-{text:"Membantu kehidupan lebih seimbang", correct:true},
-{text:"Tidak penting", correct:false},
-{text:"Hanya untuk orang dewasa", correct:false},
-{text:"Sekadar trend", correct:false}
-]
+  q:
+    "Mengapa penting menjaga kesejahteraan mental dan emosi?",
+
+  answers: [
+    {
+      text:"Ia membantu menyokong kehidupan yang lebih seimbang",
+      correct:true
+    },
+    {
+      text:"Tidak penting",
+      correct:false
+    },
+    {
+      text:"Hanya untuk orang dewasa",
+      correct:false
+    },
+    {
+      text:"Sekadar trend",
+      correct:false
+    }
+  ]
 },
 
 {
-q: "Apakah aktiviti yang boleh membantu relaks?",
-answers: [
-{text:"Mendengar muzik tenang", correct:true},
-{text:"Bergaduh", correct:false},
-{text:"Menjerit", correct:false},
-{text:"Menyendiri sepanjang masa", correct:false}
-]
+  q:
+    "Apakah aktiviti yang boleh membantu seseorang berehat?",
+
+  answers: [
+    {
+      text:"Mendengar muzik yang menenangkan",
+      correct:true
+    },
+    {
+      text:"Bergaduh",
+      correct:false
+    },
+    {
+      text:"Menjerit",
+      correct:false
+    },
+    {
+      text:"Mengasingkan diri sepanjang masa",
+      correct:false
+    }
+  ]
 }
 
 ];
 
-let index = 0;
-let score = 0;
 
-function loadSoalan(){
+/* =====================================================
+   STATE
+===================================================== */
 
-  const q = soalan[index];
+let index =
+  0;
 
-  document.getElementById("question").innerText = q.q;
-  document.getElementById("noSoalan").innerText = `Soalan ${index+1}/${soalan.length}`;
-  document.getElementById("score").innerText = score;
+let score =
+  0;
 
-  // progress bar
-  let percent = ((index)/soalan.length)*100;
-  document.getElementById("progressBar").style.width = percent + "%";
+let quizAnswered =
+  false;
 
-  const box = document.getElementById("answers");
-  box.innerHTML = "";
+let quizResultSaved =
+  false;
 
-  q.answers.forEach(ans=>{
-    const btn = document.createElement("button");
 
-    btn.innerText = ans.text;
-    btn.className = "w-full p-3 border border-white/30 rounded-lg bg-white/10 hover:bg-white/20 transition text-left";
+/* =====================================================
+   LOAD QUESTION
+===================================================== */
 
-    btn.onclick = ()=>jawab(btn, ans);
+function loadSoalan() {
 
-    box.appendChild(btn);
-  });
+  quizAnswered =
+    false;
+
+
+  const q =
+    soalan[index];
+
+
+  document
+    .getElementById("question")
+    .textContent =
+      q.q;
+
+
+  document
+    .getElementById("noSoalan")
+    .textContent =
+      `Soalan ${index + 1}/${soalan.length}`;
+
+
+  document
+    .getElementById("score")
+    .textContent =
+      score;
+
+
+  const percent =
+    (index / soalan.length) *
+    100;
+
+
+  document
+    .getElementById("progressBar")
+    .style.width =
+      percent + "%";
+
+
+  const box =
+    document.getElementById(
+      "answers"
+    );
+
+
+  box.innerHTML =
+    "";
+
+
+  q.answers.forEach(
+    ans => {
+
+      const btn =
+        document.createElement(
+          "button"
+        );
+
+
+      btn.type =
+        "button";
+
+
+      btn.textContent =
+        ans.text;
+
+
+      btn.className =
+        "answer-button";
+
+
+      btn.onclick =
+        () => jawab(
+          btn,
+          ans
+        );
+
+
+      box.appendChild(
+        btn
+      );
+
+    }
+  );
+
 }
 
-function jawab(btn, ans){
+
+/* =====================================================
+   ANSWER
+===================================================== */
+
+function jawab(
+  btn,
+  ans
+) {
+
+  if(quizAnswered) {
+    return;
+  }
+
+
+  quizAnswered =
+    true;
+
 
   disableAll();
 
-  if(ans.correct){
-    btn.classList.add("bg-green-400","text-black");
+
+  if(ans.correct) {
+
+    btn.classList.add(
+      "answer-correct"
+    );
+
     score++;
-  } else {
-    btn.classList.add("bg-red-400","text-black");
+
   }
 
-  // highlight jawapan betul
-  document.querySelectorAll("#answers button").forEach(b=>{
-    if(b.innerText === soalan[index].answers.find(a=>a.correct).text){
-      b.classList.add("bg-green-400","text-black");
+  else {
+
+    btn.classList.add(
+      "answer-wrong"
+    );
+
+  }
+
+
+  document
+    .querySelectorAll(
+      "#answers button"
+    )
+    .forEach(button => {
+
+      const correctAnswer =
+        soalan[index]
+          .answers
+          .find(
+            answer =>
+              answer.correct
+          );
+
+
+      if(
+        correctAnswer &&
+        button.textContent ===
+        correctAnswer.text
+      ) {
+
+        button.classList.add(
+          "answer-correct"
+        );
+
+      }
+
+    });
+
+
+  document
+    .getElementById("score")
+    .textContent =
+      score;
+
+
+  setTimeout(
+    () => {
+
+      index++;
+
+
+      if(
+        index <
+        soalan.length
+      ) {
+
+        loadSoalan();
+
+      }
+
+      else {
+
+        showResult();
+
+      }
+
+    },
+    850
+  );
+
+}
+
+
+/* =====================================================
+   DISABLE ANSWERS
+===================================================== */
+
+function disableAll() {
+
+  document
+    .querySelectorAll(
+      "#answers button"
+    )
+    .forEach(
+      button => {
+
+        button.disabled =
+          true;
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+async function showResult() {
+
+  document
+    .getElementById(
+      "progressBar"
+    )
+    .style.width =
+      "100%";
+
+
+  document
+    .getElementById(
+      "finalScore"
+    )
+    .textContent =
+      `${score} / ${soalan.length}`;
+
+
+  const percent =
+    Math.round(
+      (
+        score /
+        soalan.length
+      ) * 100
+    );
+
+
+  let message =
+    "";
+
+
+  if(percent >= 80) {
+
+    message =
+      "Tahniah! Anda menunjukkan pemahaman yang sangat baik tentang amalan kesejahteraan diri.";
+
+  }
+
+  else if(percent >= 60) {
+
+    message =
+      "Bagus! Teruskan meneroka HEALINK untuk mengukuhkan lagi pengetahuan tentang penjagaan emosi dan kesejahteraan diri.";
+
+  }
+
+  else {
+
+    message =
+      "Teruskan belajar. Anda boleh mencuba semula kuiz dan meneroka aktiviti HEALINK untuk memahami topik ini dengan lebih baik.";
+
+  }
+
+
+  document
+    .getElementById(
+      "resultMessage"
+    )
+    .textContent =
+      message;
+
+
+  document
+    .getElementById(
+      "resultBox"
+    )
+    .classList.add(
+      "show"
+    );
+
+
+  await saveQuizResult(
+    percent
+  );
+
+}
+
+
+/* =====================================================
+   SAVE QUIZ RESULT
+===================================================== */
+
+async function saveQuizResult(
+  percent
+) {
+
+  if(quizResultSaved) {
+
+    return;
+
+  }
+
+
+  quizResultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "quizSaveStatus"
+    );
+
+
+  if(status) {
+
+    status.textContent =
+      "⏳ Menyimpan keputusan...";
+
+  }
+
+
+  /* =================================================
+    HEALINK USER PROFILE
+  ================================================= */
+
+  let healinkUser = {};
+
+
+  try {
+
+    healinkUser =
+      JSON.parse(
+        sessionStorage.getItem(
+          "healinkUser"
+        )
+      ) || {};
+
+  }
+  catch(error) {
+
+    console.error(
+      "HEALINK user profile error:",
+      error
+    );
+
+  }
+
+
+  /* =================================================
+    USER DATA
+    Fallback kepada session lama jika diperlukan
+  ================================================= */
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  console.log(
+    "🧠 KUIZ USER:",
+    {
+      nama,
+      jenis,
+      kelas,
+      organisasi
     }
-  });
+  );
 
-  setTimeout(()=>{
-    index++;
 
-    if(index < soalan.length){
-      loadSoalan();
-    } else {
-      showResult();
+  const dataAktiviti = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Kuiz Minda Sihat",
+
+    aktiviti:
+      "Kuiz Pembelajaran",
+
+    skor:
+      score,
+
+    jumlahSoalan:
+      soalan.length,
+
+    peratus:
+      percent,
+
+    komen:
+      `${score}/${soalan.length} jawapan betul`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        dataAktiviti
+      );
+
+
+    if(status) {
+
+      status.textContent =
+        "✓ Keputusan berjaya direkodkan.";
+
     }
 
-  },1000);
+
+    console.log(
+      "🧠 Kuiz result saved:",
+      dataAktiviti
+    );
+
+  }
+
+  catch(error) {
+
+    quizResultSaved =
+      false;
+
+
+    if(status) {
+
+      status.textContent =
+        "⚠ Keputusan belum dapat direkodkan.";
+
+    }
+
+
+    console.error(
+      "Kuiz Firestore error:",
+      error
+    );
+
+  }
+
 }
 
-function disableAll(){
-  document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  index =
+    0;
+
+  score =
+    0;
+
+  quizAnswered =
+    false;
+
+  quizResultSaved =
+    false;
+
+
+  document
+    .getElementById(
+      "resultBox"
+    )
+    .classList.remove(
+      "show"
+    );
+
+
+  document
+    .getElementById(
+      "quizSaveStatus"
+    )
+    .textContent =
+      "";
+
+
+  document
+    .getElementById(
+      "score"
+    )
+    .textContent =
+      "0";
+
+
+  loadSoalan();
+
 }
 
-function showResult(){
-  document.getElementById("resultBox").classList.remove("hidden");
-  document.getElementById("finalScore").innerText = `Skor anda: ${score}/${soalan.length}`;
+
+/* =====================================================
+   HOME
+===================================================== */
+
+function goHome() {
+
+  window.location.href =
+    "../healink-v2.html";
+
 }
 
-function restartGame(){
-  location.reload();
+
+/* =====================================================
+   CHECK HEALINK SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  const profile =
+    sessionStorage.getItem(
+      "healinkUser"
+    );
+
+
+  if(
+    !nama &&
+    !profile
+  ) {
+
+    console.warn(
+      "Tiada sesi pengguna HEALINK."
+    );
+
+
+    window.location.href =
+      "../register.html";
+
+
+    return false;
+
+  }
+
+
+  return true;
+
 }
 
-function goHome(){
-  window.location.href = "../index.html";
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadSoalan();
+
 }
 
-loadSoalan();
 </script>
 
+
 </body>
+
 </html>

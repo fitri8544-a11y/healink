@@ -1,102 +1,2160 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>HEALINK 2.0 | Jigsaw Puzzle</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<style>
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --blue: #2563eb;
+  --cyan: #22d3ee;
+
+  --green: #22c55e;
+  --amber: #f59e0b;
+
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
+
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding:
+    14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding:
+    10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
+}
+
+
+.header-button:hover {
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 900px);
+
+  margin:
+    0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 650px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin:
+    8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   GAME PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 620px;
+
+  margin: 0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 19px;
+
+}
+
+
+.stat {
+
+  padding:
+    11px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PUZZLE AREA
+===================================================== */
+
+.puzzle-stage {
+
+  padding:
+    21px;
+
+  border:
+    1px solid rgba(167,139,250,.13);
+
+  border-radius: 20px;
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.puzzle-label {
+
+  margin-bottom: 15px;
+
+  color: #a5b4fc;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+}
+
+
+.puzzle-grid {
+
+  width:
+    min(100%, 330px);
+
+  aspect-ratio: 1;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    0 auto;
+
+}
+
+
+.puzzle-tile {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 18px;
+
+  color: white;
+
+  background:
+
+    linear-gradient(
+      145deg,
+      rgba(124,58,237,.42),
+      rgba(37,99,235,.27)
+    );
+
+  box-shadow:
+
+    inset 0 1px 0
+    rgba(255,255,255,.08),
+
+    0 8px 18px
+    rgba(5,3,25,.18);
+
+  font-family: inherit;
+
+  font-size:
+    clamp(26px,7vw,42px);
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+
+}
+
+
+.puzzle-tile:hover {
+
+  transform:
+    translateY(-2px);
+
+  border-color:
+    rgba(34,211,238,.5);
+
+  background:
+
+    linear-gradient(
+      145deg,
+      rgba(124,58,237,.58),
+      rgba(37,99,235,.38)
+    );
+
+}
+
+
+.puzzle-tile.movable {
+
+  border-color:
+    rgba(34,211,238,.4);
+
+  box-shadow:
+
+    inset 0 1px 0
+    rgba(255,255,255,.08),
+
+    0 0 17px
+    rgba(34,211,238,.08);
+
+}
+
+
+.puzzle-tile.empty {
+
+  border:
+    1px dashed
+    rgba(165,243,252,.16);
+
+  background:
+    rgba(6,182,212,.025);
+
+  box-shadow: none;
+
+  cursor: default;
+
+}
+
+
+.puzzle-tile.empty:hover {
+  transform: none;
+}
+
+
+/* =====================================================
+   GUIDE
+===================================================== */
+
+.guide {
+
+  margin-top: 16px;
+
+  padding: 11px;
+
+  border-radius: 13px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+.guide.success {
+  color: #86efac;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.game-actions {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  margin-top: 14px;
+
+}
+
+
+.action-button {
+
+  padding:
+    10px 15px;
+
+  border:
+    1px solid rgba(167,139,250,.18);
+
+  border-radius: 12px;
+
+  color: #ddd6fe;
+
+  background:
+    rgba(124,58,237,.09);
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.action-button:hover {
+
+  background:
+    rgba(124,58,237,.18);
+
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.8);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,480px);
+
+  padding:
+    34px 27px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-card p {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
+  }
+
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,900px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .puzzle-stage {
+    padding: 14px;
+  }
+
+
+  .puzzle-grid {
+    gap: 6px;
+  }
+
+
+  .puzzle-tile {
+    border-radius: 14px;
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+}
+
+</style>
+
 </head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
 
-<div class="bg-white text-gray-800 p-8 rounded-xl text-center">
+<body>
 
-<h1 class="text-xl font-bold mb-4">🧩 Jigsaw Puzzle</h1>
 
-<p class="mb-4">Susun nombor dengan betul</p>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-<div id="grid" class="grid grid-cols-3 gap-2 mb-4"></div>
+<header class="game-header">
 
-<button onclick="shuffle()" class="px-4 py-2 bg-purple-600 text-white rounded">
-🔀 Shuffle
-</button>
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
+  </button>
 
-<p id="status" class="mt-3"></p>
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      🧩
+    </div>
+
+    <span>
+      HEALINK 2.0 • Jigsaw Puzzle
+    </span>
+
+  </div>
+
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
+  </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="game-page">
+
+
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      🧩
+    </div>
+
+
+    <div class="hero-label">
+      Fokus • Susun • Selesaikan
+    </div>
+
+
+    <h1>
+      Jigsaw Puzzle
+    </h1>
+
+
+    <p>
+      Susun jubin nombor 1 hingga 8 mengikut
+      turutan dengan menggerakkan jubin ke ruang kosong.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME PANEL
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="moveStat">
+          0
+        </strong>
+
+        <span>
+          Langkah
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="timeStat">
+          0s
+        </strong>
+
+        <span>
+          Masa
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="progressStat">
+          0/8
+        </strong>
+
+        <span>
+          Kedudukan Betul
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="puzzle-stage">
+
+      <div class="puzzle-label">
+        Sliding Puzzle • 3 × 3
+      </div>
+
+
+      <div
+        id="grid"
+        class="puzzle-grid"
+      ></div>
+
+    </div>
+
+
+    <div
+      id="guide"
+      class="guide"
+    >
+      Klik jubin yang berada di sebelah ruang kosong
+      untuk menggerakkannya.
+    </div>
+
+
+    <div class="game-actions">
+
+      <button
+        type="button"
+        class="action-button"
+        onclick="restartGame()"
+      >
+        🔀 Puzzle Baharu
+      </button>
+
+    </div>
+
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     RESULT MODAL
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🏆
+    </div>
+
+
+    <div class="result-label">
+      Puzzle Selesai
+    </div>
+
+
+    <h2>
+      Tahniah!
+    </h2>
+
+
+    <p>
+      Anda berjaya menyusun semua jubin
+      mengikut turutan yang betul.
+    </p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalMoves">
+          0
+        </strong>
+
+        <span>
+          Langkah
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalTime">
+          0s
+        </strong>
+
+        <span>
+          Masa
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong>
+          8/8
+        </strong>
+
+        <span>
+          Selesai
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Main Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
 
 </div>
 
+
 <script>
-let arr = [1,2,3,4,5,6,7,8,""];
 
-function render(){
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
+/* =====================================================
+   FIREBASE
+===================================================== */
 
-  arr.forEach((n,i)=>{
-    const div = document.createElement("div");
+const firebaseConfig = {
 
-    div.className="w-16 h-16 bg-blue-200 flex items-center justify-center text-xl cursor-pointer";
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
 
-    div.innerText = n;
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
 
-    div.onclick = ()=>move(i);
+  projectId:
+    "bimbingankaunselingskkk"
 
-    grid.appendChild(div);
-  });
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
 }
 
-function move(i){
-  const empty = arr.indexOf("");
-  if(Math.abs(i-empty)===1 || Math.abs(i-empty)===3){
-    [arr[i],arr[empty]]=[arr[empty],arr[i]];
-    render();
-    check();
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER PROFILE
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user profile error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
   }
+
+
+  return true;
+
 }
 
-function shuffle(){
-  arr.sort(()=>0.5-Math.random());
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+
+const SOLVED = [
+  1,2,3,
+  4,5,6,
+  7,8,""
+];
+
+
+let arr = [
+  ...SOLVED
+];
+
+
+let moves = 0;
+
+let seconds = 0;
+
+let timer = null;
+
+let timerStarted =
+  false;
+
+let gameFinished =
+  false;
+
+let resultSaved =
+  false;
+
+
+/* =====================================================
+   VALID NEIGHBOURS
+===================================================== */
+
+function getNeighbours(
+  emptyIndex
+) {
+
+  const row =
+    Math.floor(
+      emptyIndex / 3
+    );
+
+
+  const col =
+    emptyIndex % 3;
+
+
+  const neighbours = [];
+
+
+  if(row > 0) {
+    neighbours.push(
+      emptyIndex - 3
+    );
+  }
+
+
+  if(row < 2) {
+    neighbours.push(
+      emptyIndex + 3
+    );
+  }
+
+
+  if(col > 0) {
+    neighbours.push(
+      emptyIndex - 1
+    );
+  }
+
+
+  if(col < 2) {
+    neighbours.push(
+      emptyIndex + 1
+    );
+  }
+
+
+  return neighbours;
+
+}
+
+
+/* =====================================================
+   SOLVABLE SHUFFLE
+===================================================== */
+
+function createSolvablePuzzle() {
+
+  /*
+    Bermula daripada keadaan selesai.
+
+    Kemudian lakukan pergerakan sah secara rawak.
+    Oleh sebab setiap langkah sah, puzzle yang
+    terhasil sentiasa boleh diselesaikan.
+  */
+
+  arr = [
+    ...SOLVED
+  ];
+
+
+  let previousEmpty =
+    -1;
+
+
+  for(
+    let i = 0;
+    i < 70;
+    i++
+  ) {
+
+    const empty =
+      arr.indexOf("");
+
+
+    let neighbours =
+      getNeighbours(
+        empty
+      );
+
+
+    /*
+      Kurangkan kemungkinan bergerak terus
+      balik ke kedudukan sebelumnya.
+    */
+
+    const filtered =
+      neighbours.filter(
+        index =>
+          index !==
+          previousEmpty
+      );
+
+
+    if(filtered.length) {
+      neighbours = filtered;
+    }
+
+
+    const tileIndex =
+      neighbours[
+        Math.floor(
+          Math.random() *
+          neighbours.length
+        )
+      ];
+
+
+    previousEmpty =
+      empty;
+
+
+    [
+      arr[tileIndex],
+      arr[empty]
+    ] =
+    [
+      arr[empty],
+      arr[tileIndex]
+    ];
+
+  }
+
+
+  /*
+    Sangat jarang shuffle kembali ke solved.
+    Jika berlaku, bina semula.
+  */
+
+  if(isSolved()) {
+
+    createSolvablePuzzle();
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function render() {
+
+  const grid =
+    document.getElementById(
+      "grid"
+    );
+
+
+  grid.innerHTML =
+    "";
+
+
+  const empty =
+    arr.indexOf("");
+
+
+  const movable =
+    getNeighbours(
+      empty
+    );
+
+
+  arr.forEach(
+    (value,index) => {
+
+      const tile =
+        document.createElement(
+          "button"
+        );
+
+
+      tile.type =
+        "button";
+
+
+      if(value === "") {
+
+        tile.className =
+          "puzzle-tile empty";
+
+
+        tile.disabled =
+          true;
+
+      }
+
+      else {
+
+        tile.className =
+          "puzzle-tile";
+
+
+        tile.textContent =
+          value;
+
+
+        if(
+          movable.includes(
+            index
+          )
+        ) {
+
+          tile.classList.add(
+            "movable"
+          );
+
+        }
+
+
+        tile.addEventListener(
+          "click",
+          () => moveTile(
+            index
+          )
+        );
+
+      }
+
+
+      grid.appendChild(
+        tile
+      );
+
+    }
+  );
+
+
+  updateStats();
+
+}
+
+
+/* =====================================================
+   MOVE
+===================================================== */
+
+function moveTile(
+  index
+) {
+
+  if(gameFinished) {
+    return;
+  }
+
+
+  const empty =
+    arr.indexOf("");
+
+
+  const validMoves =
+    getNeighbours(
+      empty
+    );
+
+
+  /*
+    Betulkan bug versi lama:
+    hanya jubin yang benar-benar bersebelahan
+    boleh bergerak.
+  */
+
+  if(
+    !validMoves.includes(
+      index
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  startTimer();
+
+
+  [
+    arr[index],
+    arr[empty]
+  ] =
+  [
+    arr[empty],
+    arr[index]
+  ];
+
+
+  moves++;
+
+
   render();
-}
 
-function check(){
-  if(arr.join()=="1,2,3,4,5,6,7,8,"){
-    document.getElementById("status").innerText="🎉 Selesai!";
+
+  if(isSolved()) {
+
+    finishGame();
+
   }
+
 }
 
-render();
+
+/* =====================================================
+   CHECK SOLVED
+===================================================== */
+
+function isSolved() {
+
+  return SOLVED.every(
+    (value,index) =>
+      arr[index] === value
+  );
+
+}
+
+
+/* =====================================================
+   CORRECT POSITIONS
+===================================================== */
+
+function getCorrectPositions() {
+
+  let count = 0;
+
+
+  for(
+    let i = 0;
+    i < 8;
+    i++
+  ) {
+
+    if(
+      arr[i] ===
+      SOLVED[i]
+    ) {
+
+      count++;
+
+    }
+
+  }
+
+
+  return count;
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+function updateStats() {
+
+  document.getElementById(
+    "moveStat"
+  ).textContent =
+    moves;
+
+
+  document.getElementById(
+    "timeStat"
+  ).textContent =
+    `${seconds}s`;
+
+
+  document.getElementById(
+    "progressStat"
+  ).textContent =
+    `${getCorrectPositions()}/8`;
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startTimer() {
+
+  if(timerStarted) {
+    return;
+  }
+
+
+  timerStarted =
+    true;
+
+
+  timer =
+    setInterval(
+      () => {
+
+        if(gameFinished) {
+          return;
+        }
+
+
+        seconds++;
+
+
+        document.getElementById(
+          "timeStat"
+        ).textContent =
+          `${seconds}s`;
+
+      },
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  clearInterval(
+    timer
+  );
+
+
+  moves = 0;
+
+  seconds = 0;
+
+  timer = null;
+
+  timerStarted =
+    false;
+
+  gameFinished =
+    false;
+
+  resultSaved =
+    false;
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  const guide =
+    document.getElementById(
+      "guide"
+    );
+
+
+  guide.className =
+    "guide";
+
+
+  guide.textContent =
+    "Klik jubin yang berada di sebelah ruang kosong untuk menggerakkannya.";
+
+
+  createSolvablePuzzle();
+
+  render();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishGame() {
+
+  if(gameFinished) {
+    return;
+  }
+
+
+  gameFinished =
+    true;
+
+
+  clearInterval(
+    timer
+  );
+
+
+  document.getElementById(
+    "guide"
+  ).className =
+    "guide success";
+
+
+  document.getElementById(
+    "guide"
+  ).textContent =
+    "✓ Semua jubin telah disusun dengan betul!";
+
+
+  document.getElementById(
+    "finalMoves"
+  ).textContent =
+    moves;
+
+
+  document.getElementById(
+    "finalTime"
+  ).textContent =
+    `${seconds}s`;
+
+
+  setTimeout(
+    () => {
+
+      document.getElementById(
+        "resultModal"
+      ).classList.add(
+        "show"
+      );
+
+    },
+    350
+  );
+
+
+  await saveResult();
+
+}
+
+
+/* =====================================================
+   SAVE FIRESTORE
+===================================================== */
+
+async function saveResult() {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan keputusan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Jigsaw Puzzle",
+
+    permainan:
+      "Sliding Puzzle 3x3",
+
+    tahapPermainan:
+      "3x3",
+
+    statusPermainan:
+      "Selesai",
+
+    langkah:
+      moves,
+
+    tempohSaat:
+      seconds,
+
+    komen:
+      `Puzzle selesai dalam ${moves} langkah dan ${seconds} saat`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Jigsaw result saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Keputusan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Jigsaw Firestore error:",
+      error
+    );
+
+
+    /*
+      Benarkan retry jika Firestore gagal.
+    */
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Keputusan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  clearInterval(
+    timer
+  );
+
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
 </script>
 
-<script>
-function goBack(){
-  window.history.back();
-}
-
-function closeGame(){
-  window.location.href = "../healink.html"; 
-}
-</script>
-
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
-
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
-  </button>
-
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
-  </div>
-
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
-  </button>
-
-</div> 
 
 </body>
+
 </html>

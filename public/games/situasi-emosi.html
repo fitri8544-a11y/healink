@@ -1,178 +1,2379 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<title>Situasi Emosi HEALINK</title>
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-<div class="bg-white text-gray-800 p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl text-center">
+<title>HEALINK 2.0 | Situasi Emosi</title>
 
-  <h1 class="text-2xl font-bold mb-2">🧠 Situasi Emosi</h1>
-  <p class="text-gray-500 mb-4">Pilih tindakan terbaik berdasarkan situasi</p>
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
 
-  <!-- SCORE -->
-  <div class="mb-4 font-semibold">
-    ⭐ Skor: <span id="score">0</span>
-  </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-  <!-- QUESTION -->
-  <div id="question" class="text-lg font-semibold mb-6"></div>
 
-  <!-- OPTIONS -->
-  <div id="options" class="space-y-3"></div>
+<style>
 
-  <!-- RESULT -->
-  <p id="result" class="mt-4 font-semibold"></p>
+/* =====================================================
+   ROOT
+===================================================== */
 
-</div>
+:root {
 
-<!-- WIN -->
-<div id="winBox" class="hidden fixed inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --blue: #2563eb;
+  --cyan: #22d3ee;
 
-  <div class="bg-white p-8 rounded-2xl text-center shadow-xl text-gray-800">
+  --green: #22c55e;
+  --red: #ef4444;
+  --amber: #f59e0b;
 
-    <h2 class="text-2xl font-bold text-purple-700 mb-3">
-      🎉 Tahniah!
-    </h2>
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
 
-    <p class="mb-4">Anda berjaya membuat keputusan yang baik!</p>
-
-    <p id="motivasi" class="italic text-purple-500 mb-6"></p>
-
-    <button onclick="restartGame()" 
-      class="px-6 py-2 bg-purple-600 text-white rounded-lg">
-      🔁 Main Lagi
-    </button>
-
-  </div>
-
-</div>
-
-<script>
-const situasi = [
-{
-q: "Kawan mengejek anda di kelas.",
-options: [
-{ text:"Marah balik", correct:false, msg:"Tindakan ini boleh memburukkan keadaan." },
-{ text:"Abaikan dan kekal tenang", correct:true, msg:"Bagus! Anda mengawal emosi dengan baik." },
-{ text:"Menangis", correct:false, msg:"Ini menunjukkan emosi tidak terkawal." }
-]
-},
-{
-q: "Anda gagal dalam ujian penting.",
-options: [
-{ text:"Putus asa", correct:false, msg:"Jangan mudah berputus asa." },
-{ text:"Belajar dari kesilapan", correct:true, msg:"Hebat! Ini sikap positif." },
-{ text:"Salahkan orang lain", correct:false, msg:"Ini tidak membantu perkembangan diri." }
-]
-},
-{
-q: "Rakan tidak mahu bercakap dengan anda.",
-options: [
-{ text:"Terus marah", correct:false, msg:"Ini boleh merosakkan hubungan." },
-{ text:"Tanya dengan baik", correct:true, msg:"Bagus! Komunikasi penting." },
-{ text:"Abaikan terus", correct:false, msg:"Masalah tidak akan selesai." }
-]
-}
-];
-
-let index = 0;
-let score = 0;
-
-const motivasiList = [
-"Anda semakin matang dalam mengawal emosi.",
-"Keputusan anda menunjukkan kebijaksanaan.",
-"Teruskan sikap positif ini!"
-];
-
-function loadQuestion(){
-  const q = situasi[index];
-  document.getElementById("question").innerText = q.q;
-
-  const optDiv = document.getElementById("options");
-  optDiv.innerHTML = "";
-
-  q.options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.innerText = option.text;
-    btn.className = "w-full p-3 rounded-lg bg-purple-100 hover:bg-purple-200 transition";
-
-    btn.onclick = () => checkAnswer(option);
-
-    optDiv.appendChild(btn);
-  });
 }
 
-function checkAnswer(option){
 
-  document.getElementById("result").innerText = option.msg;
+* {
+  box-sizing: border-box;
+}
 
-  if(option.correct){
-    score += 10;
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding:
+    14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding:
+    10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+}
+
+
+.header-button:hover {
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 900px);
+
+  margin:
+    0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 650px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin:
+    8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 720px;
+
+  margin:
+    0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+
+}
+
+
+.stat {
+
+  padding:
+    10px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 21px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width: 16.66%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .3s ease;
+
+}
+
+
+/* =====================================================
+   SCENARIO
+===================================================== */
+
+.scenario-box {
+
+  padding:
+    22px;
+
+  margin-bottom: 15px;
+
+  border:
+    1px solid rgba(167,139,250,.14);
+
+  border-radius: 19px;
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.scenario-label {
+
+  margin-bottom: 10px;
+
+  color: #a5b4fc;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-transform: uppercase;
+
+}
+
+
+.scenario-question {
+
+  margin: 0;
+
+  color: white;
+
+  font-size:
+    clamp(16px,3vw,20px);
+
+  font-weight: 700;
+
+  line-height: 1.55;
+
+}
+
+
+/* =====================================================
+   OPTIONS
+===================================================== */
+
+.options {
+
+  display: grid;
+
+  gap: 9px;
+
+}
+
+
+.option-button {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(167,139,250,.15);
+
+  border-radius: 14px;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(124,58,237,.07);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.5;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .18s ease;
+
+}
+
+
+.option-button:hover:not(:disabled) {
+
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(34,211,238,.35);
+
+  background:
+    rgba(79,70,229,.16);
+
+}
+
+
+.option-letter {
+
+  width: 29px;
+  height: 29px;
+
+  flex: 0 0 29px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: #c4b5fd;
+
+  background:
+    rgba(124,58,237,.18);
+
+  font-size: 10px;
+  font-weight: 800;
+
+}
+
+
+.option-button.correct {
+
+  color: #dcfce7;
+
+  border-color:
+    rgba(34,197,94,.45);
+
+  background:
+    rgba(34,197,94,.13);
+
+}
+
+
+.option-button.incorrect {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.4);
+
+  background:
+    rgba(239,68,68,.11);
+
+}
+
+
+.option-button:disabled {
+  cursor: default;
+}
+
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+.feedback {
+
+  min-height: 62px;
+
+  margin-top: 14px;
+
+  padding:
+    12px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.05);
+
+  border-radius: 14px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.65;
+
+}
+
+
+.feedback.success {
+
+  color: #bbf7d0;
+
+  border-color:
+    rgba(34,197,94,.18);
+
+  background:
+    rgba(34,197,94,.055);
+
+}
+
+
+.feedback.learning {
+
+  color: #fde68a;
+
+  border-color:
+    rgba(245,158,11,.18);
+
+  background:
+    rgba(245,158,11,.055);
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+.next-area {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 12px;
+
+}
+
+
+.next-button {
+
+  display: none;
+
+  padding:
+    10px 17px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #4f46e5,
+      #0891b2
+    );
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.next-button.show {
+  display: block;
+}
+
+
+/* =====================================================
+   RESULT MODAL
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.8);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,480px);
+
+  padding:
+    34px 27px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-message {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
   }
 
-  document.getElementById("score").innerText = score;
 
-  setTimeout(()=>{
-    index++;
+  .header-logo {
+    display: none;
+  }
 
-    if(index < situasi.length){
-      loadQuestion();
-      document.getElementById("result").innerText = "";
-    } else {
-      showWin();
-    }
 
-  }, 1200);
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,900px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .stats {
+
+    gap: 5px;
+
+  }
+
+
+  .scenario-box {
+
+    padding: 17px;
+
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
 }
 
-function showWin(){
-  const msg = motivasiList[Math.floor(Math.random()*motivasiList.length)];
-  document.getElementById("motivasi").innerText = msg;
-  document.getElementById("winBox").classList.remove("hidden");
-}
+</style>
 
-function restartGame(){
-  location.reload();
-}
+</head>
 
-loadQuestion();
-</script>
 
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+<body>
 
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="game-header">
+
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
   </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      🎭
+    </div>
+
+    <span>
+      HEALINK 2.0 • Situasi Emosi
+    </span>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
   </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="game-page">
+
+
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      🎭
+    </div>
+
+
+    <div class="hero-label">
+      Fikir • Pilih • Belajar
+    </div>
+
+
+    <h1>
+      Situasi Emosi
+    </h1>
+
+
+    <p>
+      Terokai situasi harian dan pilih tindakan
+      yang membantu mengurus emosi serta hubungan
+      dengan lebih baik.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="questionStat">
+          1/6
+        </strong>
+
+        <span>
+          Situasi
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="scoreStat">
+          0
+        </strong>
+
+        <span>
+          Skor
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="correctStat">
+          0
+        </strong>
+
+        <span>
+          Pilihan Sesuai
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <div class="scenario-box">
+
+      <div
+        id="scenarioLabel"
+        class="scenario-label"
+      >
+        Situasi 1
+      </div>
+
+
+      <p
+        id="question"
+        class="scenario-question"
+      ></p>
+
+    </div>
+
+
+    <div
+      id="options"
+      class="options"
+    ></div>
+
+
+    <div
+      id="feedback"
+      class="feedback"
+    >
+      Pilih tindakan yang anda fikir paling sesuai.
+    </div>
+
+
+    <div class="next-area">
+
+      <button
+        id="nextButton"
+        type="button"
+        class="next-button"
+        onclick="nextQuestion()"
+      >
+        Seterusnya →
+      </button>
+
+    </div>
+
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🌟
+    </div>
+
+
+    <div class="result-label">
+      Aktiviti Selesai
+    </div>
+
+
+    <h2>
+      Syabas!
+    </h2>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalScore">
+          0
+        </strong>
+
+        <span>
+          Skor
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalCorrect">
+          0/6
+        </strong>
+
+        <span>
+          Pilihan Sesuai
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalPercent">
+          0%
+        </strong>
+
+        <span>
+          Pencapaian
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Main Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
 
 </div>
 
+
 <script>
-function goBack(){
-  window.history.back();
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
 }
 
-function closeGame(){
-  window.location.href = "../healink.html"; 
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
 }
+catch(error) {
+
+  console.error(
+    "HEALINK user error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   DATA
+===================================================== */
+
+const situations = [
+
+  {
+
+    question:
+      "Seorang rakan mengejek anda di hadapan kelas. Apakah tindakan yang lebih sesuai?",
+
+    options: [
+
+      {
+        text:
+          "Mengejeknya semula supaya dia tahu perasaan anda.",
+
+        correct:
+          false,
+
+        feedback:
+          "Membalas ejekan boleh menyebabkan konflik menjadi lebih besar. Cuba beri ruang kepada diri untuk bertenang sebelum bertindak."
+      },
+
+      {
+        text:
+          "Bertenang, elakkan membalas dan dapatkan bantuan jika ejekan berterusan.",
+
+        correct:
+          true,
+
+        feedback:
+          "Pilihan yang baik. Bertenang dan mendapatkan sokongan daripada orang yang dipercayai boleh membantu menangani keadaan dengan lebih selamat."
+      },
+
+      {
+        text:
+          "Simpan semuanya sendiri walaupun perkara itu berulang.",
+
+        correct:
+          false,
+
+        feedback:
+          "Anda tidak semestinya perlu menghadapi perkara yang berulang seorang diri. Bercakap dengan guru, kaunselor atau orang dewasa yang dipercayai boleh membantu."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda mendapat keputusan ujian yang lebih rendah daripada jangkaan. Apakah langkah yang lebih membantu?",
+
+    options: [
+
+      {
+        text:
+          "Anggap diri tidak mampu dan berhenti mencuba.",
+
+        correct:
+          false,
+
+        feedback:
+          "Satu keputusan tidak menentukan keseluruhan kemampuan seseorang. Kenal pasti bahagian yang perlu diperbaiki dan cuba lagi."
+      },
+
+      {
+        text:
+          "Semak kesilapan dan rancang cara belajar yang lebih sesuai.",
+
+        correct:
+          true,
+
+        feedback:
+          "Bagus. Melihat kesilapan sebagai maklumat untuk penambahbaikan membantu proses pembelajaran."
+      },
+
+      {
+        text:
+          "Salahkan rakan atau guru atas keputusan tersebut.",
+
+        correct:
+          false,
+
+        feedback:
+          "Menyalahkan orang lain tidak banyak membantu. Lebih bermanfaat untuk mengenal pasti perkara yang boleh kita usahakan."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Rakan rapat tiba-tiba kelihatan diam dan kurang bercakap dengan anda. Apa yang boleh anda lakukan?",
+
+    options: [
+
+      {
+        text:
+          "Terus membuat kesimpulan bahawa dia sudah tidak mahu berkawan.",
+
+        correct:
+          false,
+
+        feedback:
+          "Kita belum tentu mengetahui sebab sebenar. Elakkan membuat kesimpulan sebelum mendapat penjelasan."
+      },
+
+      {
+        text:
+          "Tanya dengan baik sama ada dia okay dan beri ruang jika diperlukan.",
+
+        correct:
+          true,
+
+        feedback:
+          "Bagus. Komunikasi yang menghormati perasaan dan ruang orang lain boleh membantu menjaga hubungan."
+      },
+
+      {
+        text:
+          "Sebarkan kepada rakan lain bahawa dia sedang bermasalah.",
+
+        correct:
+          false,
+
+        feedback:
+          "Hal peribadi seseorang perlu dihormati. Lebih baik bercakap terus dengannya dengan cara yang baik."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda berasa sangat marah selepas berlaku salah faham dengan rakan. Apakah tindakan yang lebih membantu sebelum berbincang?",
+
+    options: [
+
+      {
+        text:
+          "Terus menghantar mesej ketika masih sangat marah.",
+
+        correct:
+          false,
+
+        feedback:
+          "Apabila emosi sedang kuat, kita mungkin menulis sesuatu yang kemudian disesali. Beri sedikit masa untuk bertenang dahulu."
+      },
+
+      {
+        text:
+          "Ambil masa bertenang dan fikirkan apa yang ingin disampaikan.",
+
+        correct:
+          true,
+
+        feedback:
+          "Bagus. Memberi ruang kepada diri sebelum berbincang boleh membantu komunikasi menjadi lebih jelas dan terkawal."
+      },
+
+      {
+        text:
+          "Putuskan persahabatan tanpa berbincang.",
+
+        correct:
+          false,
+
+        feedback:
+          "Salah faham kadangkala boleh diselesaikan melalui komunikasi yang tenang dan saling mendengar."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda perlu membuat pembentangan di hadapan kelas dan mula berasa gementar. Apakah tindakan yang boleh membantu?",
+
+    options: [
+
+      {
+        text:
+          "Terus anggap pembentangan pasti akan gagal.",
+
+        correct:
+          false,
+
+        feedback:
+          "Rasa gementar sebelum pembentangan boleh berlaku. Cuba fokus pada persediaan dan perkara yang berada dalam kawalan anda."
+      },
+
+      {
+        text:
+          "Tarik nafas perlahan, semak nota dan mulakan satu langkah pada satu masa.",
+
+        correct:
+          true,
+
+        feedback:
+          "Bagus. Persediaan dan pernafasan perlahan boleh membantu anda memberi perhatian kepada tugasan yang sedang dilakukan."
+      },
+
+      {
+        text:
+          "Bandingkan diri dengan rakan yang lebih yakin.",
+
+        correct:
+          false,
+
+        feedback:
+          "Setiap orang mempunyai pengalaman dan tahap keyakinan yang berbeza. Fokus kepada kemajuan diri sendiri."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Seorang rakan berkongsi bahawa dia sedang melalui hari yang sukar. Apakah respons yang lebih sesuai?",
+
+    options: [
+
+      {
+        text:
+          "Terus memberitahunya bahawa masalah itu kecil.",
+
+        correct:
+          false,
+
+        feedback:
+          "Perasaan seseorang mungkin berbeza daripada pengalaman kita. Mengurangkan kepentingan perasaannya boleh membuatkan dia rasa tidak didengari."
+      },
+
+      {
+        text:
+          "Dengar tanpa mengejek dan tanyakan sama ada dia perlukan sokongan.",
+
+        correct:
+          true,
+
+        feedback:
+          "Bagus. Mendengar dengan empati dan menghormati perasaan orang lain merupakan bentuk sokongan yang baik."
+      },
+
+      {
+        text:
+          "Kongsikan ceritanya kepada orang lain untuk mendapatkan perhatian.",
+
+        correct:
+          false,
+
+        feedback:
+          "Privasi rakan perlu dihormati. Jika terdapat kebimbangan tentang keselamatannya, dapatkan bantuan daripada orang dewasa yang dipercayai."
+      }
+
+    ]
+
+  }
+
+];
+
+
+const TOTAL =
+  situations.length;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let index = 0;
+
+let score = 0;
+
+let correctCount = 0;
+
+let answered = false;
+
+let resultSaved = false;
+
+
+/* =====================================================
+   LOAD QUESTION
+===================================================== */
+
+function loadQuestion() {
+
+  answered =
+    false;
+
+
+  const current =
+    situations[index];
+
+
+  document.getElementById(
+    "question"
+  ).textContent =
+    current.question;
+
+
+  document.getElementById(
+    "scenarioLabel"
+  ).textContent =
+    `Situasi ${index + 1}`;
+
+
+  document.getElementById(
+    "questionStat"
+  ).textContent =
+    `${index + 1}/${TOTAL}`;
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${
+      ((index + 1) / TOTAL) *
+      100
+    }%`;
+
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  feedback.className =
+    "feedback";
+
+
+  feedback.textContent =
+    "Pilih tindakan yang anda fikir paling sesuai.";
+
+
+  document.getElementById(
+    "nextButton"
+  ).classList.remove(
+    "show"
+  );
+
+
+  const options =
+    document.getElementById(
+      "options"
+    );
+
+
+  options.innerHTML =
+    "";
+
+
+  const letters =
+    ["A","B","C"];
+
+
+  current.options.forEach(
+    (option,optionIndex) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option-button";
+
+
+      button.innerHTML =
+        `
+          <span class="option-letter">
+            ${letters[optionIndex]}
+          </span>
+
+          <span>
+            ${option.text}
+          </span>
+        `;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          checkAnswer(
+            option,
+            button
+          )
+      );
+
+
+      options.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   CHECK ANSWER
+===================================================== */
+
+function checkAnswer(
+  option,
+  selectedButton
+) {
+
+  if(answered) {
+    return;
+  }
+
+
+  answered =
+    true;
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".option-button"
+    );
+
+
+  buttons.forEach(
+    button => {
+
+      button.disabled =
+        true;
+
+    }
+  );
+
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  if(option.correct) {
+
+    score += 10;
+
+    correctCount++;
+
+
+    selectedButton.classList.add(
+      "correct"
+    );
+
+
+    feedback.className =
+      "feedback success";
+
+
+    feedback.innerHTML =
+      `<strong>✓ Pilihan yang sesuai.</strong><br>${option.feedback}`;
+
+  }
+
+  else {
+
+    selectedButton.classList.add(
+      "incorrect"
+    );
+
+
+    feedback.className =
+      "feedback learning";
+
+
+    feedback.innerHTML =
+      `<strong>💡 Mari fikir semula.</strong><br>${option.feedback}`;
+
+
+    /*
+      Tunjukkan pilihan pembelajaran
+      yang disasarkan oleh situasi.
+    */
+
+    const correctIndex =
+      situations[index]
+        .options
+        .findIndex(
+          item =>
+            item.correct
+        );
+
+
+    if(
+      correctIndex >= 0 &&
+      buttons[correctIndex]
+    ) {
+
+      buttons[
+        correctIndex
+      ].classList.add(
+        "correct"
+      );
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "correctStat"
+  ).textContent =
+    correctCount;
+
+
+  document.getElementById(
+    "nextButton"
+  ).textContent =
+    index === TOTAL - 1
+      ? "Lihat Keputusan →"
+      : "Seterusnya →";
+
+
+  document.getElementById(
+    "nextButton"
+  ).classList.add(
+    "show"
+  );
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextQuestion() {
+
+  if(!answered) {
+    return;
+  }
+
+
+  index++;
+
+
+  if(index >= TOTAL) {
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  loadQuestion();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishGame() {
+
+  const percent =
+    Math.round(
+      (
+        correctCount /
+        TOTAL
+      ) *
+      100
+    );
+
+
+  document.getElementById(
+    "finalScore"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "finalCorrect"
+  ).textContent =
+    `${correctCount}/${TOTAL}`;
+
+
+  document.getElementById(
+    "finalPercent"
+  ).textContent =
+    `${percent}%`;
+
+
+  const message =
+    document.getElementById(
+      "resultMessage"
+    );
+
+
+  if(percent >= 80) {
+
+    message.textContent =
+      "Bagus! Anda dapat mengenal pasti banyak tindakan yang membantu dalam situasi emosi dan sosial.";
+
+  }
+
+  else if(percent >= 50) {
+
+    message.textContent =
+      "Baik. Teruskan berlatih melihat sesuatu situasi dari beberapa sudut sebelum memilih tindakan.";
+
+  }
+
+  else {
+
+    message.textContent =
+      "Aktiviti ini ialah ruang untuk belajar. Cuba lagi dan baca penerangan bagi setiap situasi.";
+
+  }
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.add(
+    "show"
+  );
+
+
+  await saveResult(
+    percent
+  );
+
+}
+
+
+/* =====================================================
+   FIRESTORE SAVE
+===================================================== */
+
+async function saveResult(
+  percent
+) {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan keputusan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Situasi Emosi",
+
+    permainan:
+      "Situasi Emosi",
+
+    jumlahSituasi:
+      TOTAL,
+
+    pilihanSesuai:
+      correctCount,
+
+    skor:
+      score,
+
+    peratus:
+      percent,
+
+    komen:
+      `${correctCount}/${TOTAL} pilihan sesuai`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Situasi Emosi result saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Keputusan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Situasi Emosi Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Keputusan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  index = 0;
+
+  score = 0;
+
+  correctCount = 0;
+
+  answered = false;
+
+  resultSaved = false;
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "correctStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  loadQuestion();
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
 </script>
 
+
 </body>
+
 </html>

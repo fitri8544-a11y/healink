@@ -1,202 +1,2641 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<title>HEALINK - Stress Challenge</title>
-<script src="https://cdn.tailwindcss.com"></script>
-</head>
 
-<body class="bg-gradient-to-br from-purple-600 to-blue-600 min-h-screen flex items-center justify-center text-white">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-<!-- HEADER -->
-<div class="fixed top-0 left-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
-  <button onclick="goBack()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
-  <div>😤 Stress Challenge</div>
-  <button onclick="closeGame()" class="bg-red-500 px-3 py-1 rounded">✕ Tutup</button>
-</div>
+<title>HEALINK 2.0 | Stress Challenge</title>
 
-<!-- BOX -->
-<div id="gameBox" class="mt-20 bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-2xl">
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
 
-  <!-- TOP -->
-  <div class="flex justify-between mb-4 text-sm">
-    <span id="noSoalan"></span>
-    <span>😤 Stress Level: <span id="stress">0</span></span>
-  </div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-  <!-- PROGRESS -->
-  <div class="w-full bg-white/20 rounded-full h-2 mb-6">
-    <div id="bar" class="bg-red-400 h-2 rounded-full transition-all"></div>
-  </div>
 
-  <!-- SOALAN -->
-  <h3 id="question" class="mb-6 font-semibold text-lg"></h3>
+<style>
 
-  <!-- JAWAPAN -->
-  <div id="answers" class="space-y-3"></div>
+/* =====================================================
+   ROOT
+===================================================== */
 
-</div>
+:root {
 
-<!-- RESULT -->
-<div id="resultBox" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --cyan: #22d3ee;
 
-  <div class="bg-white text-gray-800 p-8 rounded-xl text-center shadow-xl">
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
 
-    <h2 class="text-xl font-bold mb-3">🎯 Keputusan</h2>
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
 
-    <p id="finalText" class="mb-4"></p>
-
-    <button onclick="restart()" class="px-4 py-2 bg-purple-600 text-white rounded">
-      🔁 Main Lagi
-    </button>
-
-  </div>
-
-</div>
-
-<script>
-const soalan = [
-{
-q: "Anda mempunyai banyak kerja sekolah dan rasa tertekan.",
-answers: [
-{text:"Rehat sekejap dan susun jadual", stress:-2, msg:"Bagus! Anda mengurus stress dengan baik."},
-{text:"Abaikan semua kerja", stress:+2, msg:"Ini boleh menambah stress."},
-{text:"Marah semua orang", stress:+3, msg:"Tindakan ini tidak membantu."}
-]
-},
-{
-q: "Kawan anda mengejek anda di kelas.",
-answers: [
-{text:"Tenang dan abaikan", stress:-1, msg:"Tindakan matang."},
-{text:"Balas ejekan", stress:+2, msg:"Ini boleh jadi konflik."},
-{text:"Terus marah", stress:+3, msg:"Emosi tidak terkawal."}
-]
-},
-{
-q: "Anda gagal dalam ujian penting.",
-answers: [
-{text:"Belajar dari kesilapan", stress:-2, msg:"Sikap positif."},
-{text:"Putus asa", stress:+2, msg:"Jangan mudah putus asa."},
-{text:"Salahkan orang lain", stress:+1, msg:"Kurang bertanggungjawab."}
-]
-}
-];
-
-let index = 0;
-let stress = 0;
-
-function load(){
-  const q = soalan[index];
-
-  document.getElementById("question").innerText = q.q;
-  document.getElementById("noSoalan").innerText = `Situasi ${index+1}/${soalan.length}`;
-  document.getElementById("stress").innerText = stress;
-
-  let percent = (index/soalan.length)*100;
-  document.getElementById("bar").style.width = percent + "%";
-
-  const box = document.getElementById("answers");
-  box.innerHTML = "";
-
-  q.answers.forEach(ans=>{
-    const btn = document.createElement("button");
-
-    btn.innerText = ans.text;
-    btn.className = "w-full p-3 rounded-lg bg-white/10 hover:bg-white/20 transition";
-
-    btn.onclick = ()=>choose(btn, ans);
-
-    box.appendChild(btn);
-  });
 }
 
-function choose(btn, ans){
 
-  disable();
-
-  stress += ans.stress;
-  document.getElementById("stress").innerText = stress;
-
-  btn.classList.add(ans.stress < 0 ? "bg-green-400 text-black" : "bg-red-400 text-black");
-
-  setTimeout(()=>{
-    index++;
-
-    if(index < soalan.length){
-      load();
-    } else {
-      result();
-    }
-
-  },1000);
+* {
+  box-sizing: border-box;
 }
 
-function disable(){
-  document.querySelectorAll("#answers button").forEach(b=>b.disabled=true);
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
 }
 
-function result(){
 
-  let text;
+/* =====================================================
+   HEADER
+===================================================== */
 
-  if(stress <= 0){
-    text = "🧘 Anda mengawal stress dengan sangat baik!";
-  } else if(stress <= 3){
-    text = "🙂 Anda masih boleh memperbaiki kawalan stress.";
-  } else {
-    text = "⚠️ Tahap stress tinggi! Cuba teknik kawalan emosi.";
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding:
+    14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding:
+    10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
+}
+
+
+.header-button:hover {
+  background: rgba(255,255,255,.11);
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 920px);
+
+  margin:
+    0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 680px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin:
+    8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 740px;
+
+  margin: 0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+
+}
+
+
+.stat {
+
+  padding:
+    11px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 20px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width: 16.66%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .3s ease;
+
+}
+
+
+/* =====================================================
+   SITUATION
+===================================================== */
+
+.situation-card {
+
+  padding: 22px;
+
+  margin-bottom: 14px;
+
+  border:
+    1px solid rgba(167,139,250,.14);
+
+  border-radius: 19px;
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.situation-label {
+
+  margin-bottom: 9px;
+
+  color: #a5b4fc;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-transform: uppercase;
+
+}
+
+
+.situation-card h2 {
+
+  margin:
+    0 0 9px;
+
+  color: white;
+
+  font-size:
+    clamp(17px,3vw,21px);
+
+  line-height: 1.5;
+
+}
+
+
+.situation-context {
+
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  line-height: 1.65;
+
+}
+
+
+/* =====================================================
+   OPTIONS
+===================================================== */
+
+.answers {
+
+  display: grid;
+
+  gap: 9px;
+
+}
+
+
+.answer-button {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(167,139,250,.15);
+
+  border-radius: 14px;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(124,58,237,.07);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.5;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .18s ease;
+
+}
+
+
+.answer-button:hover:not(:disabled) {
+
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(34,211,238,.35);
+
+  background:
+    rgba(79,70,229,.16);
+
+}
+
+
+.answer-letter {
+
+  width: 30px;
+  height: 30px;
+
+  flex:
+    0 0 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: #c4b5fd;
+
+  background:
+    rgba(124,58,237,.18);
+
+  font-size: 10px;
+  font-weight: 800;
+
+}
+
+
+.answer-button.strong {
+
+  color: #dcfce7;
+
+  border-color:
+    rgba(34,197,94,.45);
+
+  background:
+    rgba(34,197,94,.13);
+
+}
+
+
+.answer-button.partial {
+
+  color: #fef3c7;
+
+  border-color:
+    rgba(245,158,11,.42);
+
+  background:
+    rgba(245,158,11,.11);
+
+}
+
+
+.answer-button.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.40);
+
+  background:
+    rgba(239,68,68,.10);
+
+}
+
+
+.answer-button:disabled {
+  cursor: default;
+}
+
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+.feedback {
+
+  min-height: 74px;
+
+  margin-top: 14px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.055);
+
+  border-radius: 14px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.7;
+
+}
+
+
+.feedback.strong {
+
+  color: #bbf7d0;
+
+  border-color:
+    rgba(34,197,94,.18);
+
+  background:
+    rgba(34,197,94,.055);
+
+}
+
+
+.feedback.partial {
+
+  color: #fde68a;
+
+  border-color:
+    rgba(245,158,11,.18);
+
+  background:
+    rgba(245,158,11,.055);
+
+}
+
+
+.feedback.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.17);
+
+  background:
+    rgba(239,68,68,.045);
+
+}
+
+
+.feedback-title {
+
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-weight: 800;
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+.next-area {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 12px;
+
+}
+
+
+.next-button {
+
+  display: none;
+
+  padding:
+    10px 17px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #4f46e5,
+      #0891b2
+    );
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.next-button.show {
+  display: block;
+}
+
+
+/* =====================================================
+   EDUCATION NOTE
+===================================================== */
+
+.education-note {
+
+  max-width: 740px;
+
+  margin:
+    13px auto 0;
+
+  padding:
+    11px 14px;
+
+  border:
+    1px solid rgba(34,211,238,.09);
+
+  border-radius: 13px;
+
+  color: #94a3b8;
+
+  background:
+    rgba(34,211,238,.025);
+
+  font-size: 9px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.82);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,500px);
+
+  padding:
+    34px 27px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-message {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+.result-tip {
+
+  margin-bottom: 17px;
+
+  padding:
+    12px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.12);
+
+  border-radius: 14px;
+
+  color: #bae6fd;
+
+  background:
+    rgba(34,211,238,.045);
+
+  font-size: 10px;
+
+  line-height: 1.65;
+
+  text-align: left;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
   }
 
-  document.getElementById("resultBox").classList.remove("hidden");
-  document.getElementById("finalText").innerText = text;
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,920px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .situation-card {
+    padding: 17px;
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
 }
 
-function restart(){
-  location.reload();
-}
+</style>
 
-function goBack(){
-  window.history.back();
-}
+</head>
 
-function closeGame(){
-  window.location.href = "menu.html";
-}
 
-load();
-</script>
+<body>
 
-<script>
-function goBack(){
-  window.history.back();
-}
 
-function closeGame(){
-  window.location.href = "../healink.html"; 
-}
-</script>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+<header class="game-header">
 
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
   </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      🌿
+    </div>
+
+    <span>
+      HEALINK 2.0 • Stress Challenge
+    </span>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
   </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="game-page">
+
+
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      🌿
+    </div>
+
+
+    <div class="hero-label">
+      Kenal • Urus • Bertindak
+    </div>
+
+
+    <h1>
+      Stress Challenge
+    </h1>
+
+
+    <p>
+      Hadapi beberapa situasi harian dan pilih strategi
+      yang boleh membantu anda mengurus tekanan dengan
+      lebih teratur.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="questionStat">
+          1/6
+        </strong>
+
+        <span>
+          Cabaran
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="scoreStat">
+          0
+        </strong>
+
+        <span>
+          Skor Strategi
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="strongStat">
+          0
+        </strong>
+
+        <span>
+          Strategi Kukuh
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <div class="situation-card">
+
+      <div
+        id="situationLabel"
+        class="situation-label"
+      >
+        Cabaran 1
+      </div>
+
+
+      <h2 id="question"></h2>
+
+
+      <p
+        id="context"
+        class="situation-context"
+      ></p>
+
+    </div>
+
+
+    <div
+      id="answers"
+      class="answers"
+    ></div>
+
+
+    <div
+      id="feedback"
+      class="feedback"
+    >
+      Pilih strategi yang anda fikir paling membantu
+      dalam situasi ini.
+    </div>
+
+
+    <div class="next-area">
+
+      <button
+        id="nextButton"
+        type="button"
+        class="next-button"
+        onclick="nextQuestion()"
+      >
+        Seterusnya →
+      </button>
+
+    </div>
+
+
+  </section>
+
+
+  <div class="education-note">
+
+    Skor dalam aktiviti ini ialah skor pembelajaran
+    berdasarkan pilihan strategi. Ia bukan ukuran atau
+    diagnosis tahap stres seseorang.
+
+  </div>
+
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🌱
+    </div>
+
+
+    <div class="result-label">
+      Cabaran Selesai
+    </div>
+
+
+    <h2>
+      Strategi Anda
+    </h2>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalScore">
+          0/60
+        </strong>
+
+        <span>
+          Skor Strategi
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalStrong">
+          0/6
+        </strong>
+
+        <span>
+          Strategi Kukuh
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalPercent">
+          0%
+        </strong>
+
+        <span>
+          Pencapaian
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="resultTip"
+      class="result-tip"
+    ></div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Cuba Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
 
 </div>
 
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER PROFILE
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user profile error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION CHECK
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   CHALLENGE DATA
+===================================================== */
+
+const challenges = [
+
+  {
+
+    question:
+      "Beberapa kerja sekolah perlu disiapkan dalam masa yang hampir sama.",
+
+    context:
+      "Anda mula rasa sukar menentukan tugasan mana yang perlu dibuat dahulu.",
+
+    answers: [
+
+      {
+        text:
+          "Senaraikan tugasan, lihat tarikh akhir dan mulakan satu demi satu.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Membahagikan beban kepada langkah yang lebih kecil boleh membantu tugasan terasa lebih teratur."
+      },
+
+      {
+        text:
+          "Cuba siapkan semuanya serentak tanpa membuat perancangan.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Anda masih cuba menyelesaikan tugasan, tetapi melakukan semuanya serentak boleh menyebabkan perhatian terbahagi. Menentukan keutamaan mungkin lebih membantu."
+      },
+
+      {
+        text:
+          "Abaikan semua tugasan sehingga saat akhir.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Menangguhkan semua tugasan mungkin memberi kelegaan sementara, tetapi beban boleh menjadi lebih besar apabila tarikh akhir semakin dekat."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda mempunyai peperiksaan esok tetapi fikiran terasa penuh dan sukar memberi tumpuan.",
+
+    context:
+      "Anda sudah belajar agak lama tanpa berhenti.",
+
+    answers: [
+
+      {
+        text:
+          "Terus belajar tanpa berhenti sehingga lewat malam.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Usaha belajar itu baik, tetapi badan dan perhatian juga memerlukan rehat. Belajar tanpa henti tidak semestinya menjadikan pembelajaran lebih berkesan."
+      },
+
+      {
+        text:
+          "Ambil rehat pendek, minum air dan sambung dengan sasaran yang jelas.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Rehat pendek dan sasaran yang kecil boleh membantu anda kembali kepada tugasan dengan lebih teratur."
+      },
+
+      {
+        text:
+          "Berhenti terus kerana menganggap semuanya sudah terlambat.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Walaupun masa terhad, satu langkah kecil masih boleh dilakukan. Fokus pada perkara penting yang masih boleh disiapkan."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Berlaku salah faham dengan seorang rakan dan anda masih berasa marah.",
+
+    context:
+      "Anda mahu menyelesaikan perkara itu tetapi emosi masih kuat.",
+
+    answers: [
+
+      {
+        text:
+          "Terus berjumpa dan bercakap ketika masih sangat marah.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Mahu menyelesaikan masalah ialah langkah yang baik, tetapi berbincang ketika emosi masih kuat boleh menyukarkan komunikasi."
+      },
+
+      {
+        text:
+          "Beri ruang seketika, tenangkan diri dan berbincang apabila lebih bersedia.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Memberi masa kepada diri sebelum berbincang boleh membantu anda menyampaikan perkara dengan lebih jelas."
+      },
+
+      {
+        text:
+          "Balas dengan kata-kata yang menyakitkan.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Membalas ketika marah boleh menambah konflik. Cuba beri ruang sebelum menentukan tindakan seterusnya."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Jadual minggu ini dipenuhi kelas, aktiviti dan tugasan.",
+
+    context:
+      "Anda mula rasa seperti tiada masa untuk berehat.",
+
+    answers: [
+
+      {
+        text:
+          "Semak semula jadual dan tentukan perkara yang benar-benar perlu dilakukan.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Menilai semula komitmen dan keutamaan boleh membantu mewujudkan ruang yang lebih realistik dalam jadual."
+      },
+
+      {
+        text:
+          "Terus menerima semua aktiviti kerana tidak mahu mengecewakan sesiapa.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Memenuhi semua permintaan tidak semestinya realistik. Menetapkan had dan keutamaan juga merupakan sebahagian daripada pengurusan diri."
+      },
+
+      {
+        text:
+          "Kurangkan satu aktiviti yang kurang penting tetapi tidak menyusun perkara lain.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Mengurangkan satu komitmen boleh membantu. Menyusun semula keseluruhan jadual mungkin memberi gambaran yang lebih jelas."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda melakukan kesilapan semasa pembentangan di hadapan kelas.",
+
+    context:
+      "Selepas itu anda terus teringat kesilapan tersebut.",
+
+    answers: [
+
+      {
+        text:
+          "Ingatkan diri bahawa kesilapan boleh berlaku dan lihat apa yang boleh diperbaiki.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Melihat kesilapan sebagai peluang pembelajaran boleh membantu anda bersedia dengan lebih baik pada masa akan datang."
+      },
+
+      {
+        text:
+          "Fikirkan kesilapan itu berulang kali sepanjang hari.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Memikirkan perkara yang sama berulang kali mungkin tidak menghasilkan penyelesaian. Cuba alihkan perhatian kepada perkara yang boleh dipelajari daripadanya."
+      },
+
+      {
+        text:
+          "Cuba lupakan terus tanpa memikirkan apa yang boleh dipelajari.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Memberi ruang kepada diri boleh membantu, tetapi melihat satu perkara yang boleh diperbaiki boleh menjadikan pengalaman itu lebih berguna."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda mula berasa terlalu terbeban dengan beberapa perkara yang berlaku serentak.",
+
+    context:
+      "Anda sudah cuba mengurusnya sendiri tetapi masih sukar menentukan langkah seterusnya.",
+
+    answers: [
+
+      {
+        text:
+          "Simpan semuanya sendiri kerana tidak mahu menyusahkan orang lain.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Tidak semua perkara perlu dihadapi seorang diri. Mendapatkan pandangan atau sokongan boleh membantu melihat pilihan yang ada."
+      },
+
+      {
+        text:
+          "Pilih seorang yang dipercayai dan berbincang tentang perkara yang sedang dihadapi.",
+
+        points:
+          10,
+
+        type:
+          "strong",
+
+        feedback:
+          "Berbual dengan orang yang dipercayai seperti ahli keluarga, guru atau kaunselor boleh membantu apabila sesuatu terasa sukar diurus sendiri."
+      },
+
+      {
+        text:
+          "Tunggu sahaja dan berharap semua perkara selesai dengan sendiri.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Memberi masa kadangkala membantu, tetapi apabila sesuatu terus mengganggu, mengambil satu tindakan kecil atau mendapatkan sokongan mungkin lebih berguna."
+      }
+
+    ]
+
+  }
+
+];
+
+
+const TOTAL =
+  challenges.length;
+
+
+const MAX_SCORE =
+  TOTAL * 10;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let index = 0;
+
+let score = 0;
+
+let strongCount = 0;
+
+let answered = false;
+
+let resultSaved = false;
+
+
+/* =====================================================
+   LOAD
+===================================================== */
+
+function loadQuestion() {
+
+  answered =
+    false;
+
+
+  const current =
+    challenges[index];
+
+
+  document.getElementById(
+    "questionStat"
+  ).textContent =
+    `${index + 1}/${TOTAL}`;
+
+
+  document.getElementById(
+    "situationLabel"
+  ).textContent =
+    `Cabaran ${index + 1}`;
+
+
+  document.getElementById(
+    "question"
+  ).textContent =
+    current.question;
+
+
+  document.getElementById(
+    "context"
+  ).textContent =
+    current.context;
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${
+      ((index + 1) / TOTAL) *
+      100
+    }%`;
+
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  feedback.className =
+    "feedback";
+
+
+  feedback.textContent =
+    "Pilih strategi yang anda fikir paling membantu dalam situasi ini.";
+
+
+  const nextButton =
+    document.getElementById(
+      "nextButton"
+    );
+
+
+  nextButton.classList.remove(
+    "show"
+  );
+
+
+  const answers =
+    document.getElementById(
+      "answers"
+    );
+
+
+  answers.innerHTML =
+    "";
+
+
+  const letters =
+    ["A","B","C"];
+
+
+  current.answers.forEach(
+    (answer,answerIndex) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "answer-button";
+
+
+      button.innerHTML =
+        `
+          <span class="answer-letter">
+            ${letters[answerIndex]}
+          </span>
+
+          <span>
+            ${answer.text}
+          </span>
+        `;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          chooseAnswer(
+            answer,
+            button
+          )
+      );
+
+
+      answers.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   CHOOSE
+===================================================== */
+
+function chooseAnswer(
+  answer,
+  selectedButton
+) {
+
+  if(answered) {
+    return;
+  }
+
+
+  answered =
+    true;
+
+
+  score +=
+    answer.points;
+
+
+  if(
+    answer.type ===
+    "strong"
+  ) {
+
+    strongCount++;
+
+  }
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".answer-button"
+    );
+
+
+  buttons.forEach(
+    button => {
+
+      button.disabled =
+        true;
+
+    }
+  );
+
+
+  selectedButton.classList.add(
+    answer.type
+  );
+
+
+  /*
+    Jika bukan strategi kukuh,
+    tunjukkan strategi pembelajaran
+    yang disasarkan.
+  */
+
+  if(
+    answer.type !==
+    "strong"
+  ) {
+
+    const strongIndex =
+      challenges[index]
+        .answers
+        .findIndex(
+          item =>
+            item.type ===
+            "strong"
+        );
+
+
+    if(
+      strongIndex >= 0 &&
+      buttons[strongIndex]
+    ) {
+
+      buttons[
+        strongIndex
+      ].classList.add(
+        "strong"
+      );
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "strongStat"
+  ).textContent =
+    strongCount;
+
+
+  const feedback =
+    document.getElementById(
+      "feedback"
+    );
+
+
+  feedback.className =
+    `feedback ${answer.type}`;
+
+
+  let title;
+
+
+  if(
+    answer.type ===
+    "strong"
+  ) {
+
+    title =
+      "✓ Strategi yang kukuh";
+
+  }
+
+  else if(
+    answer.type ===
+    "partial"
+  ) {
+
+    title =
+      "◐ Ada manfaat, tetapi boleh diperkukuh";
+
+  }
+
+  else {
+
+    title =
+      "💡 Pertimbangkan strategi lain";
+
+  }
+
+
+  feedback.innerHTML =
+    `
+      <span class="feedback-title">
+        ${title}
+      </span>
+
+      ${answer.feedback}
+    `;
+
+
+  const nextButton =
+    document.getElementById(
+      "nextButton"
+    );
+
+
+  nextButton.textContent =
+    index === TOTAL - 1
+      ? "Lihat Keputusan →"
+      : "Cabaran Seterusnya →";
+
+
+  nextButton.classList.add(
+    "show"
+  );
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextQuestion() {
+
+  if(!answered) {
+    return;
+  }
+
+
+  index++;
+
+
+  if(
+    index >= TOTAL
+  ) {
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  loadQuestion();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishGame() {
+
+  const percent =
+    Math.round(
+      (
+        score /
+        MAX_SCORE
+      ) *
+      100
+    );
+
+
+  document.getElementById(
+    "finalScore"
+  ).textContent =
+    `${score}/${MAX_SCORE}`;
+
+
+  document.getElementById(
+    "finalStrong"
+  ).textContent =
+    `${strongCount}/${TOTAL}`;
+
+
+  document.getElementById(
+    "finalPercent"
+  ).textContent =
+    `${percent}%`;
+
+
+  const message =
+    document.getElementById(
+      "resultMessage"
+    );
+
+
+  const tip =
+    document.getElementById(
+      "resultTip"
+    );
+
+
+  if(percent >= 80) {
+
+    message.textContent =
+      "Anda banyak mengenal pasti strategi yang boleh membantu apabila berhadapan tekanan harian.";
+
+
+    tip.textContent =
+      "🌿 Ingat: strategi yang sesuai boleh berbeza mengikut keadaan. Rehat, perancangan, komunikasi dan mendapatkan sokongan ialah beberapa pilihan yang boleh dipertimbangkan.";
+
+  }
+
+  else if(percent >= 50) {
+
+    message.textContent =
+      "Anda sudah mengenal pasti beberapa strategi yang membantu. Teruskan melihat kesan sesuatu tindakan sebelum memilih cara untuk bertindak.";
+
+
+    tip.textContent =
+      "💡 Cuba gunakan formula mudah: berhenti seketika → kenal pasti perkara yang boleh dikawal → pilih satu langkah kecil → dapatkan sokongan jika diperlukan.";
+
+  }
+
+  else {
+
+    message.textContent =
+      "Aktiviti ini ialah ruang pembelajaran. Cuba semula dan baca penerangan bagi setiap pilihan untuk mengenali lebih banyak strategi.";
+
+
+    tip.textContent =
+      "🌱 Tidak perlu menyelesaikan semuanya sekaligus. Apabila sesuatu terasa terlalu banyak, satu langkah kecil dan bantuan daripada orang yang dipercayai boleh menjadi permulaan.";
+
+  }
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.add(
+    "show"
+  );
+
+
+  await saveResult(
+    percent
+  );
+
+}
+
+
+/* =====================================================
+   FIRESTORE
+===================================================== */
+
+async function saveResult(
+  percent
+) {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan keputusan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Stress Challenge",
+
+    permainan:
+      "Stress Challenge",
+
+    jumlahSituasi:
+      TOTAL,
+
+    strategiKukuh:
+      strongCount,
+
+    skorStrategi:
+      score,
+
+    skorMaksimum:
+      MAX_SCORE,
+
+    peratus:
+      percent,
+
+    komen:
+      `${strongCount}/${TOTAL} strategi kukuh • skor ${score}/${MAX_SCORE}`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Stress Challenge saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Keputusan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Stress Challenge Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Keputusan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  index = 0;
+
+  score = 0;
+
+  strongCount = 0;
+
+  answered = false;
+
+  resultSaved = false;
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "strongStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  loadQuestion();
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
+</script>
+
+
 </body>
+
 </html>

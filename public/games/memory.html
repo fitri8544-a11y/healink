@@ -1,201 +1,2578 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HEALINK Memory Pro</title>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>
+  HEALINK 2.0 | Memory Emosi
+</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+
+<!-- =====================================================
+     FIREBASE
+===================================================== -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 
 <style>
-/* 3D CARD */
-.card {
-  perspective: 1000px;
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --bg: #0b0826;
+
+  --purple: #7c3aed;
+  --violet: #9333ea;
+  --indigo: #4f46e5;
+  --blue: #2563eb;
+  --cyan: #22d3ee;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
+
 }
-.inner {
-  position: relative;
-  width: 80px;
-  height: 80px;
-  transform-style: preserve-3d;
-  transition: transform 0.6s;
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+  box-sizing: border-box;
 }
-.flipped {
-  transform: rotateY(180deg);
+
+
+html {
+  min-height: 100%;
 }
-.front, .back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  border-radius: 12px;
+
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color:
+    var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.22),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.12),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   BACKGROUND GLOW
+===================================================== */
+
+body::before {
+
+  content: "";
+
+  position: fixed;
+
+  width: 500px;
+  height: 500px;
+
+  top: -260px;
+  right: -160px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(37,99,235,.18);
+
+  filter:
+    blur(90px);
+
+  pointer-events: none;
+
+}
+
+
+body::after {
+
+  content: "";
+
+  position: fixed;
+
+  width: 450px;
+  height: 450px;
+
+  bottom: -240px;
+  left: -170px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(124,58,237,.18);
+
+  filter:
+    blur(90px);
+
+  pointer-events: none;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.memory-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding:
+    14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.75);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
   display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
   align-items: center;
   justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  box-shadow:
+    0 0 25px
+    rgba(124,58,237,.28);
+
 }
-.front {
-  background: white;
-  color: black;
-  font-size: 28px;
-}
-.back {
-  background: #9333ea;
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding:
+    10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
   color: white;
-  transform: rotateY(180deg);
-  font-size: 32px;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
 }
+
+
+.header-button:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.memory-page {
+
+  position: relative;
+
+  z-index: 2;
+
+  width:
+    min(100% - 32px, 1050px);
+
+  margin:
+    0 auto;
+
+  padding:
+    38px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.memory-hero {
+
+  text-align: center;
+
+  margin-bottom: 25px;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  font-size: 30px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  box-shadow:
+    0 0 30px
+    rgba(124,58,237,.16);
+
+}
+
+
+.hero-label {
+
+  color:
+    #67e8f9;
+
+  font-size: 11px;
+
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.memory-hero h1 {
+
+  margin:
+    8px 0;
+
+  font-size:
+    clamp(27px,4vw,39px);
+
+  line-height: 1.15;
+
+}
+
+
+.memory-hero p {
+
+  max-width: 590px;
+
+  margin:
+    0 auto;
+
+  color:
+    var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+/* =====================================================
+   USER
+===================================================== */
+
+.user-pill {
+
+  width: fit-content;
+
+  max-width: 100%;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color:
+    #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   GAME PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 820px;
+
+  margin:
+    0 auto;
+
+  padding:
+    22px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.9),
+      rgba(22,28,75,.76)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.05),
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+  backdrop-filter:
+    blur(18px);
+
+}
+
+
+/* =====================================================
+   LEVEL
+===================================================== */
+
+.level-label {
+
+  margin-bottom: 10px;
+
+  color:
+    var(--muted);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: .15em;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+}
+
+
+.level-buttons {
+
+  display: flex;
+
+  justify-content: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.level-button {
+
+  padding:
+    9px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.11);
+
+  border-radius: 999px;
+
+  color:
+    #cbd5e1;
+
+  background:
+    rgba(255,255,255,.04);
+
+  font-family: inherit;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
+}
+
+
+.level-button:hover {
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.level-button.active {
+
+  color: white;
+
+  border-color:
+    rgba(34,211,238,.38);
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #4f46e5,
+      #0891b2
+    );
+
+  box-shadow:
+    0 8px 25px
+    rgba(79,70,229,.24);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.game-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 10px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.stat-card {
+
+  padding:
+    12px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 15px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat-value {
+
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+}
+
+
+.stat-label {
+
+  color:
+    var(--muted);
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: .08em;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 23px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width: 0%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .35s ease;
+
+}
+
+
+/* =====================================================
+   MEMORY GRID
+===================================================== */
+
+.memory-grid {
+
+  display: grid;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin:
+    0 auto;
+
+}
+
+
+/* =====================================================
+   MEMORY CARD
+===================================================== */
+
+.memory-card {
+
+  perspective:
+    1000px;
+
+  cursor: pointer;
+
+  user-select: none;
+
+}
+
+
+.memory-inner {
+
+  position: relative;
+
+  width: 82px;
+  height: 82px;
+
+  transform-style:
+    preserve-3d;
+
+  transition:
+    transform .5s cubic-bezier(
+      .2,.75,.25,1
+    );
+
+}
+
+
+.memory-inner.flipped,
+.memory-inner.matched {
+
+  transform:
+    rotateY(180deg);
+
+}
+
+
+.memory-front,
+.memory-back {
+
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 17px;
+
+  backface-visibility:
+    hidden;
+
+  -webkit-backface-visibility:
+    hidden;
+
+}
+
+
+.memory-front {
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  color:
+    #c4b5fd;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(124,58,237,.19),
+      rgba(37,99,235,.12)
+    );
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.07);
+
+  font-size: 25px;
+
+  font-weight: 800;
+
+}
+
+
+.memory-front::after {
+  content: "?";
+}
+
+
+.memory-back {
+
+  border:
+    1px solid rgba(34,211,238,.28);
+
+  background:
+    linear-gradient(
+      135deg,
+      #5b21b6,
+      #4338ca,
+      #0369a1
+    );
+
+  transform:
+    rotateY(180deg);
+
+  box-shadow:
+    0 8px 25px
+    rgba(79,70,229,.22);
+
+  font-size: 32px;
+
+}
+
+
+.memory-inner.matched .memory-back {
+
+  border-color:
+    rgba(34,197,94,.6);
+
+  box-shadow:
+    0 0 22px
+    rgba(34,197,94,.18);
+
+}
+
+
+/* =====================================================
+   HINT
+===================================================== */
+
+.game-hint {
+
+  margin:
+    21px 0 0;
+
+  color:
+    #94a3b8;
+
+  font-size: 10px;
+
+  line-height: 1.6;
+
+  text-align: center;
+
+}
+
+
+/* =====================================================
+   RESULT MODAL
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.76);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  position: relative;
+
+  width:
+    min(100%,480px);
+
+  padding:
+    34px 28px;
+
+  overflow: hidden;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-card::before {
+
+  content: "";
+
+  position: absolute;
+
+  width: 200px;
+  height: 200px;
+
+  top: -120px;
+  left: -60px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(147,51,234,.2);
+
+  filter:
+    blur(40px);
+
+}
+
+
+.result-icon {
+
+  position: relative;
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 15px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color:
+    #67e8f9;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  position: relative;
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-card > p {
+
+  position: relative;
+
+  margin:
+    0;
+
+  color:
+    #cbd5e1;
+
+  font-size: 12px;
+
+}
+
+
+/* =====================================================
+   RESULT STATS
+===================================================== */
+
+.result-stats {
+
+  position: relative;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color:
+    #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+/* =====================================================
+   RESULT BUTTONS
+===================================================== */
+
+.result-actions {
+
+  position: relative;
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding:
+    12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+/* =====================================================
+   SAVE STATUS
+===================================================== */
+
+.save-status {
+
+  position: relative;
+
+  min-height: 17px;
+
+  margin-top: 13px;
+
+  color:
+    #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:650px) {
+
+  .memory-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding:
+      10px;
+
+  }
+
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+
+    font-size: 10px;
+
+  }
+
+
+  .header-button {
+
+    padding:
+      8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .memory-page {
+
+    width:
+      min(100% - 18px,1050px);
+
+    padding-top: 28px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 10px;
+
+    border-radius: 20px;
+
+  }
+
+
+  .memory-grid {
+
+    gap: 7px;
+
+  }
+
+
+  .memory-inner {
+
+    width: 65px;
+    height: 65px;
+
+  }
+
+
+  .memory-back {
+
+    font-size: 25px;
+
+  }
+
+
+  .game-stats {
+
+    gap: 6px;
+
+  }
+
+
+  .stat-card {
+
+    padding:
+      9px 4px;
+
+  }
+
+
+  .result-card {
+
+    padding:
+      28px 18px;
+
+  }
+
+}
+
+
+@media(max-width:390px) {
+
+  .memory-inner {
+
+    width: 57px;
+    height: 57px;
+
+  }
+
+
+  .memory-grid {
+
+    gap: 5px;
+
+  }
+
+
+  .memory-back {
+
+    font-size: 22px;
+
+  }
+
+}
+
 </style>
+
 </head>
 
-<body class="bg-gradient-to-br from-blue-600 to-purple-600 min-h-screen flex flex-col items-center justify-center text-white">
 
-<!-- HEADER -->
-<div class="fixed top-0 w-full flex justify-between px-4 py-3 bg-white/10 backdrop-blur z-50">
-  <button onclick="history.back()" class="bg-white/20 px-3 py-1 rounded">← Kembali</button>
-  <div>🧠 Memory Pro</div>
-  <button onclick="startGame()" class="bg-red-500 px-3 py-1 rounded">⟳ Restart</button>
-</div>
+<body>
 
-<div class="mt-20 text-center">
 
-<h1 class="text-2xl font-bold mb-2">🎴 Memory Emosi</h1>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-<!-- LEVEL -->
-<div class="mb-4">
-  <button onclick="setLevel(4)" class="bg-green-400 px-3 py-1 rounded">Mudah</button>
-  <button onclick="setLevel(6)" class="bg-yellow-400 px-3 py-1 rounded">Sederhana</button>
-  <button onclick="setLevel(8)" class="bg-red-400 px-3 py-1 rounded">Sukar</button>
-</div>
+<header class="memory-header">
 
-<!-- SCORE -->
-<div class="mb-4">
-  ⭐ <span id="score">0</span> | ⏱️ <span id="time">0</span>s
-</div>
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
+  </button>
 
-<!-- GRID -->
-<div id="grid" class="grid gap-4"></div>
 
-</div>
+  <div class="header-title">
 
-<!-- WIN -->
-<div id="winBox" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center">
-  <div class="bg-white text-black p-8 rounded-xl text-center">
-    <h2 class="text-xl font-bold text-purple-600">🎉 Tahniah!</h2>
-    <p>Anda berjaya!</p>
-    <button onclick="startGame()" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded">
-      Main Lagi
-    </button>
+    <div class="header-logo">
+      🧩
+    </div>
+
+    <span>
+      HEALINK 2.0 • Memory Emosi
+    </span>
+
   </div>
+
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="startGame()"
+  >
+    ↻ Restart
+  </button>
+
+</header>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="memory-page">
+
+
+  <!-- HERO -->
+
+  <section class="memory-hero">
+
+    <div class="hero-icon">
+      🧩
+    </div>
+
+    <div class="hero-label">
+      Permainan • Fokus • Ingatan
+    </div>
+
+    <h1>
+      Memory Emosi
+    </h1>
+
+    <p>
+      Cari dan padankan pasangan emoji yang sama.
+      Uji daya ingatan, fokus dan perhatian anda.
+    </p>
+
+
+    <div
+      id="memoryUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME PANEL
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="level-label">
+      Pilih Tahap Cabaran
+    </div>
+
+
+    <div class="level-buttons">
+
+      <button
+        id="level4"
+        type="button"
+        class="level-button active"
+        onclick="setLevel(4)"
+      >
+        🌱 Mudah
+      </button>
+
+
+      <button
+        id="level6"
+        type="button"
+        class="level-button"
+        onclick="setLevel(6)"
+      >
+        ⭐ Sederhana
+      </button>
+
+
+      <button
+        id="level8"
+        type="button"
+        class="level-button"
+        onclick="setLevel(8)"
+      >
+        🔥 Sukar
+      </button>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="game-stats">
+
+      <div class="stat-card">
+
+        <span
+          id="score"
+          class="stat-value"
+        >
+          0
+        </span>
+
+        <span class="stat-label">
+          Pasangan
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span
+          id="attempts"
+          class="stat-value"
+        >
+          0
+        </span>
+
+        <span class="stat-label">
+          Percubaan
+        </span>
+
+      </div>
+
+
+      <div class="stat-card">
+
+        <span class="stat-value">
+
+          <span id="time">
+            0
+          </span>s
+
+        </span>
+
+        <span class="stat-label">
+          Masa
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- PROGRESS -->
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <!-- GRID -->
+
+    <div
+      id="grid"
+      class="memory-grid"
+    ></div>
+
+
+    <p class="game-hint">
+      💡 Klik dua kad untuk mencari pasangan emoji yang sama.
+    </p>
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="winBox"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🏆
+    </div>
+
+    <div class="result-label">
+      Cabaran Selesai
+    </div>
+
+    <h2>
+      Tahniah!
+    </h2>
+
+    <p>
+      Anda berjaya memadankan semua pasangan.
+    </p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="resultPairs">
+          0
+        </strong>
+
+        <span>
+          Pasangan
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="resultAttempts">
+          0
+        </strong>
+
+        <span>
+          Percubaan
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="resultTime">
+          0s
+        </strong>
+
+        <span>
+          Masa
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="startGame()"
+      >
+        ↻ Main Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="memorySaveStatus"
+      class="save-status"
+    ></div>
+
+  </div>
+
 </div>
+
 
 <script>
-let emojisBase = ["😄","😢","😡","😎","😱","😴","😇","🤯"];
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+/* =====================================================
+   FIREBASE INIT
+===================================================== */
+
+if(
+  !firebase.apps.length
+) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   HEALINK USER
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION CHECK
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadMemoryUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const element =
+    document.getElementById(
+      "memoryUser"
+    );
+
+
+  if(element) {
+
+    element.textContent =
+      jenis
+        ? `👤 ${nama} • ${jenis}`
+        : `👤 ${nama}`;
+
+  }
+
+}
+
+
+/* =====================================================
+   GAME DATA
+===================================================== */
+
+const emojisBase = [
+  "😄",
+  "😢",
+  "😡",
+  "😎",
+  "😱",
+  "😴",
+  "😇",
+  "🤯"
+];
+
+
 let cards = [];
+
 let first = null;
 let second = null;
+
 let lock = false;
+
 let score = 0;
+
 let pairs = 4;
 
-// SOUND
-const flipSound = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-const matchSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
-const winSound = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+let attempts = 0;
 
-// LEVEL
-function setLevel(p){
-  pairs = p;
-  startGame();
+let time = 0;
+
+let timer = null;
+
+let gameStarted = false;
+
+let resultSaved = false;
+
+
+/* =====================================================
+   AUDIO
+===================================================== */
+
+const flipSound =
+  new Audio(
+    "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"
+  );
+
+
+const matchSound =
+  new Audio(
+    "https://actions.google.com/sounds/v1/cartoon/pop.ogg"
+  );
+
+
+const winSound =
+  new Audio(
+    "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
+  );
+
+
+/* =====================================================
+   LEVEL NAME
+===================================================== */
+
+function getLevelName() {
+
+  if(pairs === 4) {
+    return "Mudah";
+  }
+
+  if(pairs === 6) {
+    return "Sederhana";
+  }
+
+  return "Sukar";
+
 }
 
-function startGame(){
+
+/* =====================================================
+   LEVEL
+===================================================== */
+
+function setLevel(
+  selectedPairs
+) {
+
+  pairs =
+    selectedPairs;
+
+
+  document
+    .querySelectorAll(
+      ".level-button"
+    )
+    .forEach(
+      button => {
+
+        button.classList.remove(
+          "active"
+        );
+
+      }
+    );
+
+
+  const activeButton =
+    document.getElementById(
+      `level${pairs}`
+    );
+
+
+  if(activeButton) {
+
+    activeButton.classList.add(
+      "active"
+    );
+
+  }
+
+
+  startGame();
+
+}
+
+
+/* =====================================================
+   START / RESET GAME
+===================================================== */
+
+function startGame() {
+
+  if(timer) {
+
+    clearInterval(
+      timer
+    );
+
+    timer = null;
+
+  }
+
 
   score = 0;
-  document.getElementById("score").innerText = score;
-  document.getElementById("winBox").classList.add("hidden");
 
-  const selected = emojisBase.slice(0,pairs);
-  cards = [...selected, ...selected].sort(()=>0.5-Math.random());
+  attempts = 0;
 
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
-  grid.style.gridTemplateColumns = `repeat(${Math.sqrt(cards.length)}, 1fr)`;
-
-  cards.forEach(icon=>{
-    const card = document.createElement("div");
-    card.className = "card";
-
-    const inner = document.createElement("div");
-    inner.className = "inner";
-
-    const front = document.createElement("div");
-    front.className = "front";
-    front.innerText = "?";
-
-    const back = document.createElement("div");
-    back.className = "back";
-    back.innerText = icon;
-
-    inner.appendChild(front);
-    inner.appendChild(back);
-    card.appendChild(inner);
-
-    card.onclick = ()=>flip(inner);
-
-    grid.appendChild(card);
-  });
+  time = 0;
 
   first = null;
+
   second = null;
+
+  lock = false;
+
+  gameStarted = false;
+
+  resultSaved = false;
+
+
+  document.getElementById(
+    "score"
+  ).textContent = "0";
+
+
+  document.getElementById(
+    "attempts"
+  ).textContent = "0";
+
+
+  document.getElementById(
+    "time"
+  ).textContent = "0";
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width = "0%";
+
+
+  document.getElementById(
+    "winBox"
+  ).classList.remove(
+    "show"
+  );
+
+
+  document.getElementById(
+    "memorySaveStatus"
+  ).textContent = "";
+
+
+  const selected =
+    emojisBase.slice(
+      0,
+      pairs
+    );
+
+
+  cards =
+    [
+      ...selected,
+      ...selected
+    ];
+
+
+  shuffleCards(
+    cards
+  );
+
+
+  renderCards();
+
 }
 
-// FLIP
-function flip(card){
 
-  if(lock || card.classList.contains("flipped")) return;
+/* =====================================================
+   SHUFFLE
+===================================================== */
 
-  flipSound.play();
-  card.classList.add("flipped");
+function shuffleCards(
+  array
+) {
 
-  if(!first){
-    first = card;
-  } else {
-    second = card;
-    lock = true;
-    setTimeout(check, 700);
+  for(
+    let i =
+      array.length - 1;
+
+    i > 0;
+
+    i--
+  ) {
+
+    const j =
+      Math.floor(
+        Math.random() *
+        (i + 1)
+      );
+
+
+    [
+      array[i],
+      array[j]
+    ] =
+    [
+      array[j],
+      array[i]
+    ];
+
   }
+
 }
 
-// CHECK
-function check(){
-  if(first.children[1].innerText === second.children[1].innerText){
-    matchSound.play();
-    score++;
-    document.getElementById("score").innerText = score;
 
-    if(score === cards.length/2){
-      winSound.play();
-      document.getElementById("winBox").classList.remove("hidden");
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderCards() {
+
+  const grid =
+    document.getElementById(
+      "grid"
+    );
+
+
+  grid.innerHTML = "";
+
+
+  /*
+    4 pasangan = 8 kad  -> 4 kolum
+    6 pasangan = 12 kad -> 4 kolum
+    8 pasangan = 16 kad -> 4 kolum
+  */
+
+  grid.style.gridTemplateColumns =
+    "repeat(4, max-content)";
+
+
+  cards.forEach(
+    icon => {
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "memory-card";
+
+
+      const inner =
+        document.createElement(
+          "div"
+        );
+
+
+      inner.className =
+        "memory-inner";
+
+
+      inner.dataset.icon =
+        icon;
+
+
+      const front =
+        document.createElement(
+          "div"
+        );
+
+
+      front.className =
+        "memory-front";
+
+
+      const back =
+        document.createElement(
+          "div"
+        );
+
+
+      back.className =
+        "memory-back";
+
+
+      back.textContent =
+        icon;
+
+
+      inner.appendChild(
+        front
+      );
+
+
+      inner.appendChild(
+        back
+      );
+
+
+      card.appendChild(
+        inner
+      );
+
+
+      card.addEventListener(
+        "click",
+        () => flipCard(inner)
+      );
+
+
+      grid.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   TIMER START
+===================================================== */
+
+function startTimer() {
+
+  if(
+    gameStarted
+  ) {
+    return;
+  }
+
+
+  gameStarted = true;
+
+
+  timer =
+    setInterval(
+      () => {
+
+        time++;
+
+
+        document.getElementById(
+          "time"
+        ).textContent =
+          time;
+
+      },
+      1000
+    );
+
+}
+
+
+/* =====================================================
+   FLIP
+===================================================== */
+
+function flipCard(
+  card
+) {
+
+  if(
+    lock ||
+    card.classList.contains(
+      "flipped"
+    ) ||
+    card.classList.contains(
+      "matched"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  startTimer();
+
+
+  flipSound
+    .play()
+    .catch(
+      () => {}
+    );
+
+
+  card.classList.add(
+    "flipped"
+  );
+
+
+  if(
+    !first
+  ) {
+
+    first =
+      card;
+
+    return;
+
+  }
+
+
+  second =
+    card;
+
+
+  attempts++;
+
+
+  document.getElementById(
+    "attempts"
+  ).textContent =
+    attempts;
+
+
+  lock = true;
+
+
+  setTimeout(
+    checkMatch,
+    650
+  );
+
+}
+
+
+/* =====================================================
+   CHECK MATCH
+===================================================== */
+
+function checkMatch() {
+
+  if(
+    !first ||
+    !second
+  ) {
+
+    lock = false;
+
+    return;
+
+  }
+
+
+  const isMatch =
+    first.dataset.icon ===
+    second.dataset.icon;
+
+
+  if(
+    isMatch
+  ) {
+
+    matchSound
+      .play()
+      .catch(
+        () => {}
+      );
+
+
+    first.classList.add(
+      "matched"
+    );
+
+
+    second.classList.add(
+      "matched"
+    );
+
+
+    score++;
+
+
+    document.getElementById(
+      "score"
+    ).textContent =
+      score;
+
+
+    updateProgress();
+
+
+    if(
+      score === pairs
+    ) {
+
+      finishGame();
+
     }
 
-  } else {
-    first.classList.remove("flipped");
-    second.classList.remove("flipped");
   }
 
+  else {
+
+    first.classList.remove(
+      "flipped"
+    );
+
+
+    second.classList.remove(
+      "flipped"
+    );
+
+  }
+
+
   first = null;
+
   second = null;
+
   lock = false;
+
 }
 
-// TIMER
-let time = 0;
-setInterval(()=>{
-  time++;
-  document.getElementById("time").innerText = time;
-},1000);
 
-// START
-startGame();
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+function updateProgress() {
+
+  const percentage =
+    Math.round(
+      (score / pairs) *
+      100
+    );
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${percentage}%`;
+
+}
+
+
+/* =====================================================
+   FINISH GAME
+===================================================== */
+
+async function finishGame() {
+
+  if(timer) {
+
+    clearInterval(
+      timer
+    );
+
+    timer = null;
+
+  }
+
+
+  gameStarted = false;
+
+
+  winSound
+    .play()
+    .catch(
+      () => {}
+    );
+
+
+  document.getElementById(
+    "resultPairs"
+  ).textContent =
+    `${score}/${pairs}`;
+
+
+  document.getElementById(
+    "resultAttempts"
+  ).textContent =
+    attempts;
+
+
+  document.getElementById(
+    "resultTime"
+  ).textContent =
+    `${time}s`;
+
+
+  document.getElementById(
+    "winBox"
+  ).classList.add(
+    "show"
+  );
+
+
+  await saveMemoryResult();
+
+}
+
+
+/* =====================================================
+   SAVE FIRESTORE
+===================================================== */
+
+async function saveMemoryResult() {
+
+  if(
+    resultSaved
+  ) {
+
+    console.log(
+      "Keputusan Memory sudah direkodkan."
+    );
+
+    return;
+
+  }
+
+
+  resultSaved = true;
+
+
+  const status =
+    document.getElementById(
+      "memorySaveStatus"
+    );
+
+
+  if(status) {
+
+    status.textContent =
+      "Menyimpan keputusan...";
+
+  }
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const level =
+    getLevelName();
+
+
+  const dataAktiviti = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas,
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Memory Emosi",
+
+    permainan:
+      "Memory Card",
+
+    tahapPermainan:
+      level,
+
+    pasangan:
+      pairs,
+
+    percubaan:
+      attempts,
+
+    masaSaat:
+      time,
+
+    komen:
+      `${pairs} pasangan selesai dalam ${attempts} percubaan dan ${time} saat`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        dataAktiviti
+      );
+
+
+    console.log(
+      "Memory result saved:",
+      dataAktiviti
+    );
+
+
+    if(status) {
+
+      status.textContent =
+        "✓ Keputusan berjaya direkodkan.";
+
+    }
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Memory Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    if(status) {
+
+      status.textContent =
+        "Keputusan belum dapat direkodkan.";
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadMemoryUser();
+
+  startGame();
+
+}
+
 </script>
 
+
 </body>
+
 </html>

@@ -1,87 +1,2547 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
+
 <head>
-<script src="https://cdn.tailwindcss.com"></script>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
+
+<title>HEALINK 2.0 | Decision Making</title>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<style>
+
+/* =====================================================
+   ROOT
+===================================================== */
+
+:root {
+
+  --purple: #7c3aed;
+  --indigo: #4f46e5;
+  --cyan: #22d3ee;
+
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --red: #ef4444;
+
+  --text: #f8fafc;
+  --secondary: #cbd5e1;
+  --muted: #94a3b8;
+
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  font-family:
+    "Plus Jakarta Sans",
+    sans-serif;
+
+  color: var(--text);
+
+  background:
+
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(124,58,237,.23),
+      transparent 28%
+    ),
+
+    radial-gradient(
+      circle at 92% 92%,
+      rgba(34,211,238,.13),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      135deg,
+      #0b0826 0%,
+      #15103d 42%,
+      #161a50 70%,
+      #102a4a 100%
+    );
+
+  overflow-x: hidden;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.game-header {
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr auto 1fr;
+
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 14px 25px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.08);
+
+  background:
+    rgba(9,7,35,.76);
+
+  backdrop-filter:
+    blur(20px);
+
+}
+
+
+.header-title {
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-weight: 800;
+
+}
+
+
+.header-logo {
+
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+}
+
+
+.header-button {
+
+  width: fit-content;
+
+  padding: 10px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    rgba(255,255,255,.06);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s ease;
+
+}
+
+
+.header-button:hover {
+
+  background:
+    rgba(255,255,255,.11);
+
+}
+
+
+.restart-button {
+  justify-self: end;
+}
+
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.game-page {
+
+  width:
+    min(100% - 30px, 920px);
+
+  margin: 0 auto;
+
+  padding:
+    34px 0 70px;
+
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.game-hero {
+
+  max-width: 680px;
+
+  margin:
+    0 auto 22px;
+
+  text-align: center;
+
+}
+
+
+.hero-icon {
+
+  width: 65px;
+  height: 65px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 13px;
+
+  border:
+    1px solid rgba(167,139,250,.25);
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(124,58,237,.32),
+      rgba(34,211,238,.15)
+    );
+
+  font-size: 31px;
+
+}
+
+
+.hero-label {
+
+  color: #67e8f9;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .18em;
+
+  text-transform: uppercase;
+
+}
+
+
+.game-hero h1 {
+
+  margin:
+    8px 0;
+
+  font-size:
+    clamp(28px,4vw,40px);
+
+}
+
+
+.game-hero p {
+
+  margin: 0;
+
+  color: var(--secondary);
+
+  font-size: 13px;
+
+  line-height: 1.7;
+
+}
+
+
+.user-pill {
+
+  width: fit-content;
+
+  margin:
+    14px auto 0;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid rgba(34,211,238,.15);
+
+  border-radius: 999px;
+
+  color: #a5f3fc;
+
+  background:
+    rgba(34,211,238,.06);
+
+  font-size: 11px;
+  font-weight: 700;
+
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
+
+.game-panel {
+
+  max-width: 740px;
+
+  margin: 0 auto;
+
+  padding: 23px;
+
+  border:
+    1px solid rgba(167,139,250,.22);
+
+  border-radius: 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(31,25,70,.91),
+      rgba(22,28,75,.77)
+    );
+
+  box-shadow:
+    0 22px 55px
+    rgba(4,2,20,.3);
+
+}
+
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+
+}
+
+
+.stat {
+
+  padding: 11px;
+
+  border:
+    1px solid rgba(255,255,255,.07);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.035);
+
+  text-align: center;
+
+}
+
+
+.stat strong {
+
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 17px;
+
+}
+
+
+.stat span {
+
+  color: var(--muted);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+}
+
+
+/* =====================================================
+   PROGRESS
+===================================================== */
+
+.progress-track {
+
+  height: 6px;
+
+  margin-bottom: 20px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background:
+    rgba(255,255,255,.08);
+
+}
+
+
+.progress-bar {
+
+  width: 16.66%;
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #22d3ee
+    );
+
+  transition:
+    width .3s ease;
+
+}
+
+
+/* =====================================================
+   DECISION CARD
+===================================================== */
+
+.decision-card {
+
+  padding: 22px;
+
+  margin-bottom: 14px;
+
+  border:
+    1px solid rgba(167,139,250,.14);
+
+  border-radius: 19px;
+
+  background:
+    rgba(255,255,255,.025);
+
+}
+
+
+.decision-label {
+
+  margin-bottom: 9px;
+
+  color: #a5b4fc;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .13em;
+
+  text-transform: uppercase;
+
+}
+
+
+.decision-card h2 {
+
+  margin:
+    0 0 9px;
+
+  color: white;
+
+  font-size:
+    clamp(17px,3vw,21px);
+
+  line-height: 1.5;
+
+}
+
+
+.decision-context {
+
+  margin: 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  line-height: 1.65;
+
+}
+
+
+/* =====================================================
+   OPTIONS
+===================================================== */
+
+.options {
+
+  display: grid;
+
+  gap: 9px;
+
+}
+
+
+.option-button {
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(167,139,250,.15);
+
+  border-radius: 14px;
+
+  color: #e2e8f0;
+
+  background:
+    rgba(124,58,237,.07);
+
+  font-family: inherit;
+
+  font-size: 12px;
+  font-weight: 600;
+
+  line-height: 1.5;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: .18s ease;
+
+}
+
+
+.option-button:hover:not(:disabled) {
+
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(34,211,238,.35);
+
+  background:
+    rgba(79,70,229,.16);
+
+}
+
+
+.option-letter {
+
+  width: 30px;
+  height: 30px;
+
+  flex:
+    0 0 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 9px;
+
+  color: #c4b5fd;
+
+  background:
+    rgba(124,58,237,.18);
+
+  font-size: 10px;
+  font-weight: 800;
+
+}
+
+
+.option-button.best {
+
+  color: #dcfce7;
+
+  border-color:
+    rgba(34,197,94,.45);
+
+  background:
+    rgba(34,197,94,.13);
+
+}
+
+
+.option-button.partial {
+
+  color: #fef3c7;
+
+  border-color:
+    rgba(245,158,11,.42);
+
+  background:
+    rgba(245,158,11,.11);
+
+}
+
+
+.option-button.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.4);
+
+  background:
+    rgba(239,68,68,.10);
+
+}
+
+
+.option-button:disabled {
+  cursor: default;
+}
+
+
+/* =====================================================
+   CONSEQUENCE
+===================================================== */
+
+.consequence {
+
+  min-height: 72px;
+
+  margin-top: 14px;
+
+  padding:
+    13px 14px;
+
+  border:
+    1px solid rgba(255,255,255,.055);
+
+  border-radius: 14px;
+
+  color: #cbd5e1;
+
+  background:
+    rgba(255,255,255,.025);
+
+  font-size: 11px;
+
+  line-height: 1.7;
+
+}
+
+
+.consequence.best {
+
+  color: #bbf7d0;
+
+  border-color:
+    rgba(34,197,94,.18);
+
+  background:
+    rgba(34,197,94,.055);
+
+}
+
+
+.consequence.partial {
+
+  color: #fde68a;
+
+  border-color:
+    rgba(245,158,11,.18);
+
+  background:
+    rgba(245,158,11,.055);
+
+}
+
+
+.consequence.weak {
+
+  color: #fecaca;
+
+  border-color:
+    rgba(239,68,68,.17);
+
+  background:
+    rgba(239,68,68,.045);
+
+}
+
+
+.consequence-title {
+
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-weight: 800;
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+.next-area {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 12px;
+
+}
+
+
+.next-button {
+
+  display: none;
+
+  padding:
+    10px 17px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      90deg,
+      #7c3aed,
+      #4f46e5,
+      #0891b2
+    );
+
+  font-family: inherit;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.next-button.show {
+  display: block;
+}
+
+
+/* =====================================================
+   RESULT
+===================================================== */
+
+.result-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(3,2,18,.8);
+
+  backdrop-filter:
+    blur(13px);
+
+}
+
+
+.result-overlay.show {
+  display: flex;
+}
+
+
+.result-card {
+
+  width:
+    min(100%,500px);
+
+  padding:
+    34px 27px;
+
+  border:
+    1px solid rgba(167,139,250,.28);
+
+  border-radius: 26px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #21164e,
+      #172052
+    );
+
+  box-shadow:
+    0 30px 80px
+    rgba(0,0,0,.45);
+
+  text-align: center;
+
+}
+
+
+.result-icon {
+
+  width: 70px;
+  height: 70px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  margin:
+    0 auto 14px;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #7c3aed,
+      #2563eb
+    );
+
+  font-size: 34px;
+
+}
+
+
+.result-label {
+
+  color: #67e8f9;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: .16em;
+
+  text-transform: uppercase;
+
+}
+
+
+.result-card h2 {
+
+  margin:
+    8px 0 7px;
+
+  font-size: 28px;
+
+}
+
+
+.result-message {
+
+  margin: 0;
+
+  color: #cbd5e1;
+
+  font-size: 12px;
+
+  line-height: 1.65;
+
+}
+
+
+.result-stats {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap: 8px;
+
+  margin:
+    22px 0;
+
+}
+
+
+.result-stat {
+
+  padding:
+    12px 7px;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255,255,255,.04);
+
+}
+
+
+.result-stat strong {
+
+  display: block;
+
+  font-size: 18px;
+
+}
+
+
+.result-stat span {
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+}
+
+
+.result-actions {
+
+  display: flex;
+
+  gap: 9px;
+
+}
+
+
+.result-button {
+
+  flex: 1;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 13px;
+
+  color: white;
+
+  font-family: inherit;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+}
+
+
+.result-button.primary {
+
+  background:
+    linear-gradient(
+      90deg,
+      #9333ea,
+      #6366f1,
+      #06b6d4
+    );
+
+}
+
+
+.result-button.secondary {
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(255,255,255,.06);
+
+}
+
+
+.save-status {
+
+  min-height: 16px;
+
+  margin-top: 13px;
+
+  color: #86efac;
+
+  font-size: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:600px) {
+
+  .game-header {
+
+    grid-template-columns:
+      auto 1fr auto;
+
+    gap: 7px;
+
+    padding: 10px;
+
+  }
+
+
+  .header-logo {
+    display: none;
+  }
+
+
+  .header-title {
+    font-size: 10px;
+  }
+
+
+  .header-button {
+
+    padding: 8px;
+
+    font-size: 9px;
+
+  }
+
+
+  .game-page {
+
+    width:
+      min(100% - 16px,920px);
+
+    padding-top: 27px;
+
+  }
+
+
+  .game-panel {
+
+    padding:
+      15px 10px;
+
+  }
+
+
+  .decision-card {
+    padding: 17px;
+  }
+
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+}
+
+</style>
+
 </head>
-<body class="bg-indigo-600 flex items-center justify-center min-h-screen text-white">
 
-<div class="bg-white text-gray-800 p-8 rounded-xl text-center max-w-xl">
 
-<h1 class="text-xl font-bold mb-4">⚖️ Decision Making</h1>
+<body>
 
-<p class="mb-4">Anda stress dengan kerja sekolah</p>
 
-<button onclick="choose(1)" class="block w-full mb-2 bg-green-200 p-2 rounded">Buat sedikit demi sedikit</button>
-<button onclick="choose(0)" class="block w-full mb-2 bg-red-200 p-2 rounded">Abaikan semua</button>
-<button onclick="choose(0)" class="block w-full bg-yellow-200 p-2 rounded">Main game sahaja</button>
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-<p id="result" class="mt-4"></p>
+<header class="game-header">
 
-</div>
-
-<script>
-function choose(val){
-if(val){
-document.getElementById("result").innerText="✅ Pilihan bijak!";
-}else{
-document.getElementById("result").innerText="❌ Cuba lagi";
-}
-}
-</script>
-
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
-
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
+  <button
+    type="button"
+    class="header-button"
+    onclick="goBack()"
+  >
+    ← Permainan
   </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+
+  <div class="header-title">
+
+    <div class="header-logo">
+      ⚖️
+    </div>
+
+    <span>
+      HEALINK 2.0 • Decision Making
+    </span>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
+
+  <button
+    type="button"
+    class="header-button restart-button"
+    onclick="restartGame()"
+  >
+    ↻ Restart
   </button>
 
-</div>
+</header>
 
-<script>
-function goBack(){
-  window.history.back();
-}
 
-function closeGame(){
-  window.location.href = "../healink.html"; 
-}
-</script>
+<!-- =====================================================
+     MAIN
+===================================================== -->
 
-<!-- ================= HEADER GAME ================= -->
-<div class="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-3 bg-white/10 backdrop-blur text-white z-50">
+<main class="game-page">
 
-  <!-- BACK -->
-  <button onclick="goBack()" 
-    class="bg-white/20 px-3 py-1 rounded hover:bg-white/30 transition">
-    ← Kembali
-  </button>
 
-  <!-- TITLE -->
-  <div class="font-semibold text-sm md:text-base">
-    HEALINK Game
+  <section class="game-hero">
+
+    <div class="hero-icon">
+      ⚖️
+    </div>
+
+
+    <div class="hero-label">
+      Pertimbang • Pilih • Pelajari
+    </div>
+
+
+    <h1>
+      Decision Making
+    </h1>
+
+
+    <p>
+      Setiap keputusan mempunyai kemungkinan kesan.
+      Pertimbangkan pilihan yang ada sebelum membuat
+      keputusan.
+    </p>
+
+
+    <div
+      id="gameUser"
+      class="user-pill"
+    >
+      👤 HEALINK User
+    </div>
+
+  </section>
+
+
+  <!-- =================================================
+       GAME PANEL
+  ================================================== -->
+
+  <section class="game-panel">
+
+
+    <div class="stats">
+
+      <div class="stat">
+
+        <strong id="decisionStat">
+          1/6
+        </strong>
+
+        <span>
+          Keputusan
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="scoreStat">
+          0
+        </strong>
+
+        <span>
+          Skor
+        </span>
+
+      </div>
+
+
+      <div class="stat">
+
+        <strong id="bestStat">
+          0
+        </strong>
+
+        <span>
+          Pilihan Kukuh
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="progress-track">
+
+      <div
+        id="progressBar"
+        class="progress-bar"
+      ></div>
+
+    </div>
+
+
+    <div class="decision-card">
+
+      <div
+        id="decisionLabel"
+        class="decision-label"
+      >
+        Keputusan 1
+      </div>
+
+
+      <h2 id="question"></h2>
+
+
+      <p
+        id="context"
+        class="decision-context"
+      ></p>
+
+    </div>
+
+
+    <div
+      id="options"
+      class="options"
+    ></div>
+
+
+    <div
+      id="consequence"
+      class="consequence"
+    >
+      Pertimbangkan kemungkinan kesan bagi setiap
+      pilihan sebelum membuat keputusan.
+    </div>
+
+
+    <div class="next-area">
+
+      <button
+        id="nextButton"
+        type="button"
+        class="next-button"
+        onclick="nextDecision()"
+      >
+        Seterusnya →
+      </button>
+
+    </div>
+
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="resultModal"
+  class="result-overlay"
+>
+
+  <div class="result-card">
+
+    <div class="result-icon">
+      🧭
+    </div>
+
+
+    <div class="result-label">
+      Aktiviti Selesai
+    </div>
+
+
+    <h2>
+      Keputusan Anda
+    </h2>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div class="result-stats">
+
+      <div class="result-stat">
+
+        <strong id="finalScore">
+          0/60
+        </strong>
+
+        <span>
+          Skor
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalBest">
+          0/6
+        </strong>
+
+        <span>
+          Pilihan Kukuh
+        </span>
+
+      </div>
+
+
+      <div class="result-stat">
+
+        <strong id="finalPercent">
+          0%
+        </strong>
+
+        <span>
+          Pencapaian
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="result-actions">
+
+      <button
+        type="button"
+        class="result-button secondary"
+        onclick="goBack()"
+      >
+        ← Menu
+      </button>
+
+
+      <button
+        type="button"
+        class="result-button primary"
+        onclick="restartGame()"
+      >
+        ↻ Main Lagi
+      </button>
+
+    </div>
+
+
+    <div
+      id="saveStatus"
+      class="save-status"
+    ></div>
+
   </div>
 
-  <!-- CLOSE -->
-  <button onclick="closeGame()" 
-    class="bg-red-500 px-3 py-1 rounded hover:bg-red-600 transition">
-    ✕ Tutup
-  </button>
-
 </div>
+
+
+<script>
+
+/* =====================================================
+   FIREBASE
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+    "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain:
+    "bimbingankaunselingskkk.firebaseapp.com",
+
+  projectId:
+    "bimbingankaunselingskkk"
+
+};
+
+
+if(!firebase.apps.length) {
+
+  firebase.initializeApp(
+    firebaseConfig
+  );
+
+}
+
+
+const db =
+  firebase.firestore();
+
+
+/* =====================================================
+   USER PROFILE
+===================================================== */
+
+let healinkUser = {};
+
+
+try {
+
+  healinkUser =
+    JSON.parse(
+      sessionStorage.getItem(
+        "healinkUser"
+      )
+    ) || {};
+
+}
+catch(error) {
+
+  console.error(
+    "HEALINK user profile error:",
+    error
+  );
+
+}
+
+
+/* =====================================================
+   SESSION
+===================================================== */
+
+function checkHealSession() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    );
+
+
+  if(!nama) {
+
+    window.location.href =
+      "../register.html";
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   USER DISPLAY
+===================================================== */
+
+function loadUser() {
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  document.getElementById(
+    "gameUser"
+  ).textContent =
+    jenis
+      ? `👤 ${nama} • ${jenis}`
+      : `👤 ${nama}`;
+
+}
+
+
+/* =====================================================
+   DECISION DATA
+===================================================== */
+
+const decisions = [
+
+  {
+
+    question:
+      "Kerja sekolah semakin banyak dan anda mula berasa terbeban.",
+
+    context:
+      "Beberapa tugasan perlu disiapkan dalam minggu yang sama.",
+
+    options: [
+
+      {
+        text:
+          "Senaraikan tugasan, tentukan keutamaan dan siapkan sedikit demi sedikit.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Membahagikan tugasan kepada langkah yang lebih kecil boleh menjadikan beban kerja lebih teratur dan mudah diurus."
+      },
+
+      {
+        text:
+          "Siapkan hanya tugasan yang paling mudah dahulu tanpa melihat tarikh akhir.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Memulakan sesuatu tugasan ialah satu langkah, tetapi melihat tarikh akhir dan keutamaan boleh membantu perancangan menjadi lebih berkesan."
+      },
+
+      {
+        text:
+          "Abaikan semua tugasan kerana terlalu banyak untuk difikirkan.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Mengelakkan semua tugasan mungkin memberi kelegaan sementara tetapi boleh menyebabkan beban bertambah. Cuba mulakan dengan satu langkah kecil."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Rakan mengajak anda keluar tetapi anda mempunyai ujian penting pada keesokan hari.",
+
+    context:
+      "Anda mahu bersama rakan, tetapi anda juga belum selesai membuat persediaan.",
+
+    options: [
+
+      {
+        text:
+          "Keluar sepanjang malam dan fikir tentang ujian kemudian.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Pilihan ini mungkin menyeronokkan buat sementara waktu tetapi boleh mengurangkan masa persediaan dan rehat sebelum ujian."
+      },
+
+      {
+        text:
+          "Buat persediaan dahulu dan bincang masa lain yang sesuai untuk bersama rakan.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Ini mempertimbangkan tanggungjawab semasa tanpa mengabaikan hubungan dengan rakan."
+      },
+
+      {
+        text:
+          "Tolak ajakan tanpa memberikan sebarang penjelasan.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Mengutamakan ujian boleh difahami, tetapi komunikasi yang baik boleh membantu rakan memahami keputusan anda."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda menerima mesej yang membuatkan anda marah dan mahu membalas dengan segera.",
+
+    context:
+      "Anda belum pasti sama ada anda memahami maksud mesej tersebut dengan betul.",
+
+    options: [
+
+      {
+        text:
+          "Balas dengan mesej yang lebih keras supaya orang itu faham.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Membalas ketika emosi sedang kuat boleh meningkatkan salah faham dan konflik."
+      },
+
+      {
+        text:
+          "Tunggu sebentar, tenangkan diri dan baca semula mesej sebelum membalas.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Memberi masa kepada diri boleh membantu anda menilai keadaan dengan lebih jelas sebelum bertindak."
+      },
+
+      {
+        text:
+          "Tidak balas langsung walaupun perkara itu perlu diselesaikan.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Memberi ruang sementara boleh membantu, tetapi perkara penting mungkin masih perlu dibincangkan apabila keadaan lebih tenang."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda melihat rakan menggunakan telefon semasa ujian dan dia meminta anda merahsiakannya.",
+
+    context:
+      "Anda bimbang persahabatan akan terjejas jika anda tidak mengikut permintaannya.",
+
+    options: [
+
+      {
+        text:
+          "Setuju merahsiakannya kerana dia ialah kawan rapat.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Persahabatan penting, tetapi keputusan juga perlu mempertimbangkan peraturan, kejujuran dan kesan kepada orang lain."
+      },
+
+      {
+        text:
+          "Fikirkan peraturan dan dapatkan panduan daripada guru yang dipercayai jika perlu.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Apabila berhadapan dilema, mendapatkan panduan daripada orang dewasa yang bertanggungjawab boleh membantu membuat keputusan yang lebih berasas."
+      },
+
+      {
+        text:
+          "Terus sebarkan perkara itu kepada semua rakan.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Menyebarkan perkara kepada orang lain boleh menambah masalah. Gunakan saluran yang sesuai jika sesuatu isu perlu dilaporkan."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Anda ditawarkan menyertai satu aktiviti sekolah tetapi jadual anda sudah agak padat.",
+
+    context:
+      "Aktiviti itu menarik, tetapi ia memerlukan komitmen masa setiap minggu.",
+
+    options: [
+
+      {
+        text:
+          "Terus terima kerana takut terlepas peluang.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Mencuba peluang baharu boleh menjadi perkara positif, tetapi komitmen sedia ada juga perlu dipertimbangkan."
+      },
+
+      {
+        text:
+          "Semak jadual, komitmen dan kemampuan diri sebelum memberikan jawapan.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Keputusan yang baik biasanya mengambil kira masa, tanggungjawab dan kemampuan sebelum membuat komitmen."
+      },
+
+      {
+        text:
+          "Terima semua aktiviti walaupun tahu masa tidak mencukupi.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Terlalu banyak komitmen boleh menyebabkan tugas menjadi sukar diurus. Memilih keutamaan juga merupakan satu kemahiran."
+      }
+
+    ]
+
+  },
+
+
+  {
+
+    question:
+      "Rakan meminta anda berkongsi kata laluan akaun supaya dia boleh membantu menyiapkan sesuatu.",
+
+    context:
+      "Dia ialah rakan yang anda percayai dan berkata hanya akan menggunakannya sekali.",
+
+    options: [
+
+      {
+        text:
+          "Berikan kata laluan kerana dia rakan yang dipercayai.",
+
+        points:
+          0,
+
+        type:
+          "weak",
+
+        feedback:
+          "Kata laluan ialah maklumat peribadi. Kepercayaan kepada seseorang tidak menghapuskan risiko keselamatan akaun."
+      },
+
+      {
+        text:
+          "Jangan kongsi kata laluan dan cari cara lain untuk bekerjasama.",
+
+        points:
+          10,
+
+        type:
+          "best",
+
+        feedback:
+          "Bagus. Anda masih boleh bekerjasama tanpa memberikan akses kepada akaun peribadi."
+      },
+
+      {
+        text:
+          "Berikan kata laluan dan tukar semula selepas selesai.",
+
+        points:
+          5,
+
+        type:
+          "partial",
+
+        feedback:
+          "Menukar kata laluan kemudian mengurangkan sebahagian risiko, tetapi pilihan yang lebih selamat ialah tidak berkongsi kata laluan dari awal."
+      }
+
+    ]
+
+  }
+
+];
+
+
+const TOTAL =
+  decisions.length;
+
+
+const MAX_SCORE =
+  TOTAL * 10;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let index = 0;
+
+let score = 0;
+
+let bestCount = 0;
+
+let answered = false;
+
+let resultSaved = false;
+
+
+/* =====================================================
+   LOAD DECISION
+===================================================== */
+
+function loadDecision() {
+
+  answered =
+    false;
+
+
+  const current =
+    decisions[index];
+
+
+  document.getElementById(
+    "decisionStat"
+  ).textContent =
+    `${index + 1}/${TOTAL}`;
+
+
+  document.getElementById(
+    "decisionLabel"
+  ).textContent =
+    `Keputusan ${index + 1}`;
+
+
+  document.getElementById(
+    "question"
+  ).textContent =
+    current.question;
+
+
+  document.getElementById(
+    "context"
+  ).textContent =
+    current.context;
+
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    `${
+      ((index + 1) / TOTAL) *
+      100
+    }%`;
+
+
+  const consequence =
+    document.getElementById(
+      "consequence"
+    );
+
+
+  consequence.className =
+    "consequence";
+
+
+  consequence.innerHTML =
+    "Pertimbangkan kemungkinan kesan bagi setiap pilihan sebelum membuat keputusan.";
+
+
+  const nextButton =
+    document.getElementById(
+      "nextButton"
+    );
+
+
+  nextButton.classList.remove(
+    "show"
+  );
+
+
+  const options =
+    document.getElementById(
+      "options"
+    );
+
+
+  options.innerHTML =
+    "";
+
+
+  const letters =
+    ["A","B","C"];
+
+
+  current.options.forEach(
+    (option,optionIndex) => {
+
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "option-button";
+
+
+      button.innerHTML =
+        `
+          <span class="option-letter">
+            ${letters[optionIndex]}
+          </span>
+
+          <span>
+            ${option.text}
+          </span>
+        `;
+
+
+      button.addEventListener(
+        "click",
+        () =>
+          chooseOption(
+            option,
+            button
+          )
+      );
+
+
+      options.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   CHOOSE
+===================================================== */
+
+function chooseOption(
+  option,
+  selectedButton
+) {
+
+  if(answered) {
+    return;
+  }
+
+
+  answered =
+    true;
+
+
+  score +=
+    option.points;
+
+
+  if(
+    option.type ===
+    "best"
+  ) {
+
+    bestCount++;
+
+  }
+
+
+  const buttons =
+    document.querySelectorAll(
+      ".option-button"
+    );
+
+
+  buttons.forEach(
+    button => {
+
+      button.disabled =
+        true;
+
+    }
+  );
+
+
+  selectedButton.classList.add(
+    option.type
+  );
+
+
+  /*
+    Tunjukkan juga pilihan paling kukuh
+    jika pengguna memilih pilihan lain.
+  */
+
+  if(
+    option.type !==
+    "best"
+  ) {
+
+    const bestIndex =
+      decisions[index]
+        .options
+        .findIndex(
+          item =>
+            item.type ===
+            "best"
+        );
+
+
+    if(
+      bestIndex >= 0 &&
+      buttons[bestIndex]
+    ) {
+
+      buttons[
+        bestIndex
+      ].classList.add(
+        "best"
+      );
+
+    }
+
+  }
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    score;
+
+
+  document.getElementById(
+    "bestStat"
+  ).textContent =
+    bestCount;
+
+
+  const consequence =
+    document.getElementById(
+      "consequence"
+    );
+
+
+  consequence.className =
+    `consequence ${option.type}`;
+
+
+  let title =
+    "Pertimbangkan lagi";
+
+
+  if(
+    option.type ===
+    "best"
+  ) {
+
+    title =
+      "✓ Pertimbangan yang kukuh";
+
+  }
+
+  else if(
+    option.type ===
+    "partial"
+  ) {
+
+    title =
+      "◐ Ada perkara yang baik, tetapi...";
+
+  }
+
+  else {
+
+    title =
+      "💡 Lihat kemungkinan kesannya";
+
+  }
+
+
+  consequence.innerHTML =
+    `
+      <span class="consequence-title">
+        ${title}
+      </span>
+
+      ${option.feedback}
+    `;
+
+
+  const nextButton =
+    document.getElementById(
+      "nextButton"
+    );
+
+
+  nextButton.textContent =
+    index === TOTAL - 1
+      ? "Lihat Keputusan →"
+      : "Keputusan Seterusnya →";
+
+
+  nextButton.classList.add(
+    "show"
+  );
+
+}
+
+
+/* =====================================================
+   NEXT
+===================================================== */
+
+function nextDecision() {
+
+  if(!answered) {
+    return;
+  }
+
+
+  index++;
+
+
+  if(
+    index >= TOTAL
+  ) {
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  loadDecision();
+
+}
+
+
+/* =====================================================
+   FINISH
+===================================================== */
+
+async function finishGame() {
+
+  const percent =
+    Math.round(
+      (
+        score /
+        MAX_SCORE
+      ) *
+      100
+    );
+
+
+  document.getElementById(
+    "finalScore"
+  ).textContent =
+    `${score}/${MAX_SCORE}`;
+
+
+  document.getElementById(
+    "finalBest"
+  ).textContent =
+    `${bestCount}/${TOTAL}`;
+
+
+  document.getElementById(
+    "finalPercent"
+  ).textContent =
+    `${percent}%`;
+
+
+  const message =
+    document.getElementById(
+      "resultMessage"
+    );
+
+
+  if(percent >= 80) {
+
+    message.textContent =
+      "Anda banyak mempertimbangkan kesan, tanggungjawab dan pilihan yang tersedia sebelum membuat keputusan.";
+
+  }
+
+  else if(percent >= 50) {
+
+    message.textContent =
+      "Anda sudah menunjukkan beberapa pertimbangan yang baik. Cuba beri lebih perhatian kepada kesan jangka pendek dan jangka panjang sesuatu keputusan.";
+
+  }
+
+  else {
+
+    message.textContent =
+      "Membuat keputusan ialah kemahiran yang boleh dipelajari. Cuba lagi dan gunakan penerangan setiap situasi untuk melihat pilihan dari sudut yang berbeza.";
+
+  }
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.add(
+    "show"
+  );
+
+
+  await saveResult(
+    percent
+  );
+
+}
+
+
+/* =====================================================
+   SAVE FIRESTORE
+===================================================== */
+
+async function saveResult(
+  percent
+) {
+
+  if(resultSaved) {
+    return;
+  }
+
+
+  resultSaved =
+    true;
+
+
+  const status =
+    document.getElementById(
+      "saveStatus"
+    );
+
+
+  status.textContent =
+    "Menyimpan keputusan...";
+
+
+  const nama =
+    healinkUser.nama ||
+    sessionStorage.getItem(
+      "nama"
+    ) ||
+    "Pengguna";
+
+
+  const jenis =
+    healinkUser.jenis ||
+    sessionStorage.getItem(
+      "jenis"
+    ) ||
+    "";
+
+
+  const kelas =
+    healinkUser.kelas ||
+    sessionStorage.getItem(
+      "kelas"
+    ) ||
+    "";
+
+
+  const organisasi =
+    healinkUser.organisasi ||
+    sessionStorage.getItem(
+      "organisasi"
+    ) ||
+    "";
+
+
+  const activityData = {
+
+    nama:
+      nama,
+
+    jenis:
+      jenis,
+
+    kelas:
+      kelas || "-",
+
+    organisasi:
+      organisasi,
+
+    module:
+      "Permainan Minda Sihat",
+
+    aktiviti:
+      "Decision Making",
+
+    permainan:
+      "Decision Making",
+
+    jumlahSituasi:
+      TOTAL,
+
+    pilihanKukuh:
+      bestCount,
+
+    skor:
+      score,
+
+    skorMaksimum:
+      MAX_SCORE,
+
+    peratus:
+      percent,
+
+    komen:
+      `${bestCount}/${TOTAL} pilihan kukuh • skor ${score}/${MAX_SCORE}`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore
+        .FieldValue
+        .serverTimestamp()
+
+  };
+
+
+  try {
+
+    await db
+      .collection(
+        "aktivitiPelajar"
+      )
+      .add(
+        activityData
+      );
+
+
+    console.log(
+      "Decision Making result saved:",
+      activityData
+    );
+
+
+    status.textContent =
+      "✓ Keputusan berjaya direkodkan.";
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Decision Making Firestore error:",
+      error
+    );
+
+
+    resultSaved =
+      false;
+
+
+    status.textContent =
+      "Keputusan belum dapat direkodkan.";
+
+  }
+
+}
+
+
+/* =====================================================
+   RESTART
+===================================================== */
+
+function restartGame() {
+
+  index = 0;
+
+  score = 0;
+
+  bestCount = 0;
+
+  answered = false;
+
+  resultSaved = false;
+
+
+  document.getElementById(
+    "scoreStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "bestStat"
+  ).textContent =
+    "0";
+
+
+  document.getElementById(
+    "saveStatus"
+  ).textContent =
+    "";
+
+
+  document.getElementById(
+    "resultModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  loadDecision();
+
+}
+
+
+/* =====================================================
+   BACK
+===================================================== */
+
+function goBack() {
+
+  window.location.href =
+    "menu.html";
+
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+if(
+  checkHealSession()
+) {
+
+  loadUser();
+
+  restartGame();
+
+}
+
+</script>
+
 
 </body>
+
 </html>

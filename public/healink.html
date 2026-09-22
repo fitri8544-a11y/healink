@@ -594,7 +594,7 @@ body::after {
 <!-- ================= KAD TAMBAHAN ================= -->
 
   <!-- KAWAL -->
-  <div onclick="openKawal(); trackActivity('Kawal')" 
+  <div onclick="openKawal()"
      class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
             hover:scale-105 transition cursor-pointer text-center">
 
@@ -612,7 +612,7 @@ body::after {
   </div>
 
   <!-- MINDA SIHAT -->
-  <div onclick="openMinda(); trackActivity('Minda')" 
+  <div onclick="openMinda()"
      class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg 
             hover:scale-105 transition cursor-pointer text-center">
 
@@ -931,6 +931,34 @@ setInterval(animateSlogan, 8000);
       placeholder="Nota ringkas (optional)..."
       class="w-full p-3 border rounded-xl text-gray-700"></textarea>
 
+    <!-- ================= CADANGAN BERDASARKAN EMOSI ================= -->
+    <div id="moodSuggestion"
+        class="hidden mt-5 p-4 rounded-2xl
+                bg-gradient-to-br from-purple-50 to-blue-50
+                border border-purple-200 text-left">
+
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xl">✨</span>
+
+        <h3 class="font-bold text-purple-700">
+          Cadangan Untuk Anda
+        </h3>
+      </div>
+
+      <p id="moodSuggestionText"
+        class="text-sm text-gray-600 mb-4">
+      </p>
+
+      <div id="moodSuggestionActions"
+          class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      </div>
+
+      <p class="text-[11px] text-gray-400 mt-3">
+        Cadangan ini untuk aktiviti kesejahteraan umum dan bukan penilaian kesihatan.
+      </p>
+
+    </div>
+
     <!-- BUTTON -->
     <button onclick="saveMood()" 
       class="w-full mt-5 bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-xl">
@@ -1170,38 +1198,285 @@ setInterval(animateSlogan, 8000);
   </div>
 </div>
 
-<!-- ================= KAWAL MODAL ================= -->
-<div id="kawalModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999]">
+<!-- =====================================================
+     ⚖️ KAWAL & TIDAK BOLEH KAWAL
+===================================================== -->
 
-  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-lg text-center relative shadow-xl">
+<div id="kawalModal"
+  class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm
+         flex items-center justify-center z-[9999] p-4">
 
-    <!-- CLOSE BUTTON -->
-    <button onclick="closeKawal()" 
-      class="absolute top-3 right-3 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow hover:scale-110 transition">
+  <div
+    class="bg-white p-6 rounded-3xl w-[95%] max-w-lg
+           text-center relative shadow-2xl">
+
+
+    <!-- ================= CLOSE ================= -->
+
+    <button
+      onclick="closeKawal()"
+      class="absolute top-3 right-3
+             bg-red-500 text-white
+             w-9 h-9 rounded-full
+             flex items-center justify-center
+             shadow hover:scale-110 transition">
+
       ✕
+
     </button>
 
-    <h2 class="font-bold text-lg text-gray-800 mb-4">
-      ⚖️ Kawal vs Tidak Boleh Kawal
-    </h2>
 
-    <div class="grid grid-cols-2 gap-4 text-sm">
+    <!-- ================= HEADER ================= -->
 
-      <div class="bg-green-100 text-green-900 font-semibold p-4 rounded-xl shadow">
-        ✔ Sikap saya<br>
-        ✔ Usaha saya<br>
-        ✔ Cara saya berfikir
+    <div class="mb-5">
+
+      <div class="text-4xl mb-2">
+        ⚖️
       </div>
 
-      <div class="bg-red-100 text-red-900 font-semibold p-4 rounded-xl shadow">
-        ❌ Cuaca<br>
-        ❌ Perasaan orang lain<br>
-        ❌ Masa lalu
+      <h2 class="font-bold text-xl text-gray-800">
+        Kawal & Tidak Boleh Kawal
+      </h2>
+
+      <p class="text-sm text-gray-500 mt-2">
+        Kenali perkara yang berada dalam kawalan anda
+      </p>
+
+    </div>
+
+
+    <!-- ================= PROGRESS ================= -->
+
+    <div
+      id="kawalProgressBox"
+      class="mb-5">
+
+      <div
+        class="flex justify-between
+               text-xs text-gray-500 mb-2">
+
+        <span>
+          🎯 Cabaran
+        </span>
+
+        <span id="kawalProgress">
+          1 / 8
+        </span>
+
+      </div>
+
+
+      <div
+        class="w-full h-2
+               bg-gray-200 rounded-full
+               overflow-hidden">
+
+        <div
+          id="kawalProgressBar"
+          class="h-full
+                 bg-gradient-to-r
+                 from-purple-600 to-blue-500
+                 transition-all duration-500"
+          style="width:12.5%">
+        </div>
+
       </div>
 
     </div>
 
+
+    <!-- ================= QUESTION ================= -->
+
+    <div
+      id="kawalQuestionBox"
+      class="bg-gradient-to-br
+             from-purple-50 to-blue-50
+             border border-purple-200
+             rounded-2xl p-6 mb-5">
+
+      <p
+        class="text-xs font-bold
+               text-purple-600 uppercase mb-3">
+
+        Situasi
+
+      </p>
+
+
+      <div
+        id="kawalQuestionIcon"
+        class="text-4xl mb-3">
+
+        🎯
+
+      </div>
+
+
+      <p
+        id="kawalQuestion"
+        class="text-lg font-bold
+               text-gray-800">
+
+        Tekan Mula untuk memulakan cabaran
+
+      </p>
+
+    </div>
+
+
+    <!-- ================= ANSWER BUTTON ================= -->
+
+    <div
+      id="kawalAnswerButtons"
+      class="hidden grid grid-cols-1
+             sm:grid-cols-2 gap-3">
+
+
+      <button
+        onclick="answerKawal(true)"
+        class="p-4 rounded-xl
+               bg-green-100 text-green-800
+               border border-green-200
+               font-semibold
+               hover:bg-green-200
+               hover:scale-[1.02]
+               transition">
+
+        ✅ Boleh Saya Kawal
+
+      </button>
+
+
+      <button
+        onclick="answerKawal(false)"
+        class="p-4 rounded-xl
+               bg-red-100 text-red-800
+               border border-red-200
+               font-semibold
+               hover:bg-red-200
+               hover:scale-[1.02]
+               transition">
+
+        ❌ Tidak Boleh Saya Kawal
+
+      </button>
+
+
+    </div>
+
+
+    <!-- ================= FEEDBACK ================= -->
+
+    <div
+      id="kawalFeedback"
+      class="hidden mt-4 p-4
+             rounded-xl text-sm
+             font-medium">
+
+    </div>
+
+
+    <!-- ================= START BUTTON ================= -->
+
+    <button
+      id="kawalStartBtn"
+      onclick="startKawalGame()"
+      class="w-full mt-4 py-3
+             rounded-xl
+             bg-gradient-to-r
+             from-purple-600 to-blue-500
+             text-white font-semibold
+             shadow
+             hover:scale-[1.02]
+             transition">
+
+      ▶️ Mula Cabaran
+
+    </button>
+
+
+    <!-- ================= RESULT ================= -->
+
+    <div
+      id="kawalResult"
+      class="hidden mt-5">
+
+      <div
+        class="bg-gradient-to-br
+               from-green-50 to-blue-50
+               border border-green-200
+               rounded-2xl p-5">
+
+        <div class="text-4xl mb-2">
+          🎉
+        </div>
+
+        <h3
+          class="font-bold text-lg
+                 text-gray-800">
+
+          Cabaran Selesai!
+
+        </h3>
+
+
+        <p
+          class="text-sm text-gray-500 mt-1">
+
+          Skor anda
+
+        </p>
+
+
+        <div
+          id="kawalScore"
+          class="text-3xl font-bold
+                 text-purple-700 mt-2">
+
+          0 / 8
+
+        </div>
+
+
+        <p
+          id="kawalResultMessage"
+          class="text-sm text-gray-600 mt-3">
+        </p>
+
+
+        <button
+          onclick="startKawalGame()"
+          class="w-full mt-4 py-3
+                 rounded-xl
+                 bg-purple-100
+                 text-purple-700
+                 font-semibold
+                 hover:bg-purple-200
+                 transition">
+
+          🔄 Cuba Lagi
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ================= INFO ================= -->
+
+    <p
+      class="text-[11px]
+             text-gray-400 mt-5">
+
+      💡 Fokus kepada perkara yang boleh anda kawal
+      dapat membantu anda membuat tindakan yang lebih positif.
+
+    </p>
+
+
   </div>
+
 </div>
 
 
@@ -1354,20 +1629,132 @@ hover:scale-[1.01] transition duration-300">
 
     <div class="grid grid-cols-2 gap-3 text-sm font-semibold">
 
-      <div class="bg-green-100 text-green-900 p-3 rounded-lg shadow">
-        😊 Positif
+      <!-- POSITIF -->
+      <button onclick="showMindaActivity('positif')"
+        class="bg-green-100 text-green-900 p-4 rounded-xl shadow
+              hover:scale-105 hover:bg-green-200 transition text-center">
+        <div class="text-2xl mb-1">😊</div>
+        Positif
+      </button>
+
+      <!-- KOMUNIKASI -->
+      <button onclick="showMindaActivity('komunikasi')"
+        class="bg-blue-100 text-blue-900 p-4 rounded-xl shadow
+              hover:scale-105 hover:bg-blue-200 transition text-center">
+        <div class="text-2xl mb-1">💬</div>
+        Komunikasi Baik
+      </button>
+
+      <!-- YAKIN DIRI -->
+      <button onclick="showMindaActivity('yakin')"
+        class="bg-purple-100 text-purple-900 p-4 rounded-xl shadow
+              hover:scale-105 hover:bg-purple-200 transition text-center">
+        <div class="text-2xl mb-1">💪</div>
+        Yakin Diri
+      </button>
+
+      <!-- EMPATI -->
+      <button onclick="showMindaActivity('empati')"
+        class="bg-pink-100 text-pink-900 p-4 rounded-xl shadow
+              hover:scale-105 hover:bg-pink-200 transition text-center">
+        <div class="text-2xl mb-1">❤️</div>
+        Empati
+      </button>
+
+    </div>
+
+
+    <!-- ================= AKTIVITI MINDA ================= -->
+    <div id="mindaActivity"
+        class="hidden mt-5 p-4 rounded-2xl
+                bg-gradient-to-br from-purple-50 to-blue-50
+                border border-purple-200 text-left">
+
+      <div class="flex items-center gap-2 mb-2">
+
+        <span id="mindaActivityIcon"
+              class="text-2xl">
+          ✨
+        </span>
+
+        <h3 id="mindaActivityTitle"
+            class="font-bold text-purple-700">
+        </h3>
+
       </div>
 
-      <div class="bg-blue-100 text-blue-900 p-3 rounded-lg shadow">
-        💬 Komunikasi baik
+      <p id="mindaActivityDescription"
+        class="text-sm text-gray-600 mb-3">
+      </p>
+
+      <div class="bg-white rounded-xl p-3 border border-purple-100">
+
+        <p class="text-xs font-bold text-purple-600 uppercase mb-1">
+          🎯 Cabaran Kecil
+        </p>
+
+        <p id="mindaActivityChallenge"
+          class="text-sm text-gray-700">
+        </p>
+
       </div>
 
-      <div class="bg-purple-100 text-purple-900 p-3 rounded-lg shadow">
-        💪 Yakin diri
+
+      <!-- ================= JAWAPAN CABARAN ================= -->
+      <div class="mt-4">
+
+        <label for="mindaAnswer"
+          class="block text-xs font-bold text-gray-500 uppercase mb-2">
+          ✍️ Jawapan / Refleksi Anda
+        </label>
+
+        <textarea
+          id="mindaAnswer"
+          rows="3"
+          maxlength="300"
+          placeholder="Tulis jawapan ringkas anda di sini..."
+          class="w-full p-3 rounded-xl border border-purple-200
+                text-gray-700 text-sm
+                focus:outline-none focus:ring-2 focus:ring-purple-400
+                resize-none"></textarea>
+
+        <div class="flex justify-between items-center mt-1">
+
+          <span class="text-[11px] text-gray-400">
+            Maksimum 300 aksara
+          </span>
+
+          <span id="mindaCharCount"
+            class="text-[11px] text-gray-400">
+            0 / 300
+          </span>
+
+        </div>
+
       </div>
 
-      <div class="bg-pink-100 text-pink-900 p-3 rounded-lg shadow">
-        ❤️ Empati
+
+      <!-- ================= BUTTON SELESAI ================= -->
+      <button
+        onclick="completeMindaActivity()"
+        class="w-full mt-4 py-3 rounded-xl
+              bg-gradient-to-r from-purple-600 to-blue-500
+              text-white font-semibold shadow
+              hover:scale-[1.02] transition">
+
+        ✅ Selesai Cabaran
+
+      </button>
+
+
+      <!-- ================= SUCCESS MESSAGE ================= -->
+      <div id="mindaSuccess"
+        class="hidden mt-3 p-3 rounded-xl
+              bg-green-50 border border-green-200
+              text-green-700 text-sm text-center font-medium">
+
+        🎉 Syabas! Anda telah menyelesaikan cabaran ini.
+
       </div>
 
     </div>
@@ -1567,11 +1954,186 @@ function openTracker(){
 /* PILIH EMOSI */
 function selectMood(el, mood){
 
+  // ================================
+  // RESET PILIHAN EMOJI
+  // ================================
   document.querySelectorAll("#trackerModal .emoji-card")
     .forEach(e => e.classList.remove("emoji-selected"));
 
+  // Highlight emoji dipilih
   el.classList.add("emoji-selected");
+
+  // Simpan mood
   selectedMood = mood;
+
+
+  // ================================
+  // CADANGAN BERDASARKAN EMOSI
+  // ================================
+  const suggestionBox =
+    document.getElementById("moodSuggestion");
+
+  const suggestionText =
+    document.getElementById("moodSuggestionText");
+
+  const suggestionActions =
+    document.getElementById("moodSuggestionActions");
+
+
+  // Safety check
+  if(
+    !suggestionBox ||
+    !suggestionText ||
+    !suggestionActions
+  ){
+    return;
+  }
+
+
+  let text = "";
+  let actions = "";
+
+
+  // 😊 GEMBIRA
+  if(mood === "😊"){
+
+    text =
+      "Seronok melihat anda berada dalam keadaan yang positif. Teruskan momentum dengan aktiviti yang membantu anda mengenali kekuatan diri.";
+
+    actions = `
+      <button onclick="closeTracker(); openMinda();"
+        class="p-3 rounded-xl bg-green-100 text-green-700
+               font-semibold hover:bg-green-200 transition">
+        🌈 Ciri Minda Sejahtera
+      </button>
+
+      <button onclick="closeTracker(); openCoping();"
+        class="p-3 rounded-xl bg-purple-100 text-purple-700
+               font-semibold hover:bg-purple-200 transition">
+        🧠 Coping Skills
+      </button>
+    `;
+  }
+
+
+  // 😌 TENANG
+  else if(mood === "😌"){
+
+    text =
+      "Anda kelihatan tenang hari ini. Gunakan keadaan ini untuk berehat, melakukan refleksi atau meneroka aktiviti positif.";
+
+    actions = `
+      <button onclick="closeTracker(); openIntervensi();"
+        class="p-3 rounded-xl bg-teal-100 text-teal-700
+               font-semibold hover:bg-teal-200 transition">
+        🧘 Latihan Relaksasi
+      </button>
+
+      <button onclick="closeTracker(); openMinda();"
+        class="p-3 rounded-xl bg-green-100 text-green-700
+               font-semibold hover:bg-green-200 transition">
+        🌈 Minda Sejahtera
+      </button>
+    `;
+  }
+
+
+  // 😴 LETIH
+  else if(mood === "😴"){
+
+    text =
+      "Jika anda berasa letih, beri ruang kepada diri untuk berehat seketika. Aktiviti ringkas mungkin membantu anda kembali fokus.";
+
+    actions = `
+      <button onclick="closeTracker(); openIntervensi();"
+        class="p-3 rounded-xl bg-blue-100 text-blue-700
+               font-semibold hover:bg-blue-200 transition">
+        🌬️ Latihan Pernafasan
+      </button>
+
+      <button onclick="closeTracker(); openCoping();"
+        class="p-3 rounded-xl bg-purple-100 text-purple-700
+               font-semibold hover:bg-purple-200 transition">
+        🧠 Coping Skills
+      </button>
+    `;
+  }
+
+
+  // 😰 CEMAS / RISAU
+  else if(mood === "😰"){
+
+    text =
+      "Jika anda sedang berasa risau atau tidak selesa, cuba beri perhatian kepada pernafasan dan lakukan aktiviti menenangkan diri.";
+
+    actions = `
+      <button onclick="closeTracker(); openIntervensi();"
+        class="p-3 rounded-xl bg-cyan-100 text-cyan-700
+               font-semibold hover:bg-cyan-200 transition">
+        🌬️ Tenangkan Pernafasan
+      </button>
+
+      <button onclick="closeTracker(); openCoping();"
+        class="p-3 rounded-xl bg-purple-100 text-purple-700
+               font-semibold hover:bg-purple-200 transition">
+        💜 Coping Skills
+      </button>
+    `;
+  }
+
+
+  // 😢 SEDIH
+  else if(mood === "😢"){
+
+    text =
+      "Tidak mengapa untuk mengambil masa memahami perasaan anda. Anda boleh mencuba aktiviti menenangkan diri atau meluahkan apa yang sedang dirasakan.";
+
+    actions = `
+      <button onclick="closeTracker(); openHealTalk();"
+        class="p-3 rounded-xl bg-pink-100 text-pink-700
+               font-semibold hover:bg-pink-200 transition">
+        💬 HEAL Talk
+      </button>
+
+      <button onclick="closeTracker(); openCoping();"
+        class="p-3 rounded-xl bg-purple-100 text-purple-700
+               font-semibold hover:bg-purple-200 transition">
+        💜 Coping Skills
+      </button>
+    `;
+  }
+
+
+  // 😡 MARAH
+  else if(mood === "😡"){
+
+    text =
+      "Jika emosi terasa kuat sekarang, beri diri anda sedikit ruang sebelum bertindak. Cuba aktiviti yang membantu menenangkan tubuh dan fikiran.";
+
+    actions = `
+      <button onclick="closeTracker(); openIntervensi();"
+        class="p-3 rounded-xl bg-red-100 text-red-700
+               font-semibold hover:bg-red-200 transition">
+        🌬️ Tenangkan Diri
+      </button>
+
+      <button onclick="closeTracker(); openCoping();"
+        class="p-3 rounded-xl bg-orange-100 text-orange-700
+               font-semibold hover:bg-orange-200 transition">
+        🧠 Coping Skills
+      </button>
+    `;
+  }
+
+
+  // ================================
+  // PAPARKAN CADANGAN
+  // ================================
+  suggestionText.textContent = text;
+  suggestionActions.innerHTML = actions;
+
+  suggestionBox.classList.remove("hidden");
+
 }
 
 /* ================= SIMPAN DATA ================= */
@@ -1619,6 +2181,23 @@ function saveMood(){
     document.querySelectorAll("#trackerModal .emoji-card").forEach(e => {
       e.classList.remove("emoji-selected");
     });
+
+    // ================= RESET CADANGAN =================
+    const suggestionBox = document.getElementById("moodSuggestion");
+    const suggestionText = document.getElementById("moodSuggestionText");
+    const suggestionActions = document.getElementById("moodSuggestionActions");
+
+    if(suggestionBox){
+      suggestionBox.classList.add("hidden");
+    }
+
+    if(suggestionText){
+      suggestionText.textContent = "";
+    }
+
+    if(suggestionActions){
+      suggestionActions.innerHTML = "";
+    }
 
     // ✅ SUCCESS
     alert("✅ Emosi berjaya disimpan");
@@ -2101,16 +2680,35 @@ function analyzeEmotion(){
 
 <script>
 
-/* ================= OPEN ================= */
+/* =====================================================
+   OPEN MODAL
+===================================================== */
+
 function openKawal(){
+
   closeAllModals();
-  document.getElementById("kawalModal").classList.remove("hidden");
+
+  const modal = document.getElementById("kawalModal");
+
+  if(modal){
+    modal.classList.remove("hidden");
+  }
+
 }
 
+
 function openNota(){
+
   closeAllModals();
-  document.getElementById("notaModal").classList.remove("hidden");
+
+  const modal = document.getElementById("notaModal");
+
+  if(modal){
+    modal.classList.remove("hidden");
+  }
+
 }
+
 
 function openMinda(){
 
@@ -2128,16 +2726,407 @@ function openMinda(){
 
 }
 
-/* ================= CLOSE ================= */
+
+/* =====================================================
+   CLOSE MODAL
+===================================================== */
+
 function closeKawal(e){
+
   if(e && e.target !== e.currentTarget) return;
-  document.getElementById("kawalModal").classList.add("hidden");
+
+  const modal = document.getElementById("kawalModal");
+
+  if(modal){
+    modal.classList.add("hidden");
+  }
+
 }
 
-function closeNota(e){
-  if(e && e.target !== e.currentTarget) return;
-  document.getElementById("notaModal").classList.add("hidden");
+
+
+
+/* =====================================================
+   ⚖️ KAWAL & TIDAK BOLEH KAWAL
+   INTERACTIVE CHALLENGE
+===================================================== */
+
+const kawalQuestions = [
+  { icon: "📚", text: "Usaha saya ketika belajar", answer: true },
+  { icon: "🌧️", text: "Cuaca hari ini", answer: false },
+  { icon: "🧠", text: "Cara saya berfikir tentang sesuatu situasi", answer: true },
+  { icon: "👥", text: "Apa yang orang lain fikir tentang saya", answer: false },
+  { icon: "💬", text: "Cara saya bercakap dengan orang lain", answer: true },
+  { icon: "⏳", text: "Perkara yang telah berlaku pada masa lalu", answer: false },
+  { icon: "🎯", text: "Tindakan yang saya pilih hari ini", answer: true },
+  { icon: "❤️", text: "Perasaan dan tindakan orang lain", answer: false }
+];
+
+let kawalIndex = 0;
+let kawalScore = 0;
+let kawalAnswered = false;
+let kawalResultSaved = false;
+
+function startKawalGame(){
+  kawalIndex = 0;
+  kawalScore = 0;
+  kawalAnswered = false;
+  kawalResultSaved = false;
+
+  const startBtn = document.getElementById("kawalStartBtn");
+  const answerButtons = document.getElementById("kawalAnswerButtons");
+  const result = document.getElementById("kawalResult");
+  const questionBox = document.getElementById("kawalQuestionBox");
+  const progressBox = document.getElementById("kawalProgressBox");
+  const feedback = document.getElementById("kawalFeedback");
+  const saveStatus = document.getElementById("kawalSaveStatus");
+
+  if(saveStatus){
+    saveStatus.remove();
+  }
+
+  if(startBtn) startBtn.classList.add("hidden");
+  if(answerButtons) answerButtons.classList.remove("hidden");
+  if(result) result.classList.add("hidden");
+  if(questionBox) questionBox.classList.remove("hidden");
+  if(progressBox) progressBox.classList.remove("hidden");
+  if(feedback) feedback.classList.add("hidden");
+
+  showKawalQuestion();
 }
+
+function showKawalQuestion(){
+  const data = kawalQuestions[kawalIndex];
+  if(!data){
+    finishKawalGame();
+    return;
+  }
+
+  kawalAnswered = false;
+
+  const question = document.getElementById("kawalQuestion");
+  const icon = document.getElementById("kawalQuestionIcon");
+  const progress = document.getElementById("kawalProgress");
+  const progressBar = document.getElementById("kawalProgressBar");
+  const feedback = document.getElementById("kawalFeedback");
+
+  if(question) question.textContent = data.text;
+  if(icon) icon.textContent = data.icon;
+  if(progress) progress.textContent = `${kawalIndex + 1} / ${kawalQuestions.length}`;
+
+  if(progressBar){
+    const percent = ((kawalIndex + 1) / kawalQuestions.length) * 100;
+    progressBar.style.width = `${percent}%`;
+  }
+
+  if(feedback){
+    feedback.classList.add("hidden");
+    feedback.classList.remove(
+      "bg-green-50", "border", "border-green-200", "text-green-700",
+      "bg-red-50", "border-red-200", "text-red-700"
+    );
+  }
+}
+
+function answerKawal(userAnswer){
+  if(kawalAnswered) return;
+
+  const data = kawalQuestions[kawalIndex];
+  if(!data) return;
+
+  kawalAnswered = true;
+
+  const feedback = document.getElementById("kawalFeedback");
+  const correct = userAnswer === data.answer;
+
+  if(correct){
+    kawalScore++;
+    if(feedback){
+      feedback.innerHTML = "✅ Betul! Anda berjaya mengenal pasti perkara ini.";
+      feedback.classList.add("bg-green-50", "border", "border-green-200", "text-green-700");
+    }
+  } else if(feedback){
+    feedback.innerHTML = data.answer
+      ? "💡 Perkara ini sebenarnya berada dalam kawalan anda."
+      : "💡 Perkara ini tidak berada sepenuhnya dalam kawalan anda.";
+    feedback.classList.add("bg-red-50", "border", "border-red-200", "text-red-700");
+  }
+
+  if(feedback) feedback.classList.remove("hidden");
+
+  setTimeout(() => {
+    kawalIndex++;
+    if(kawalIndex < kawalQuestions.length) showKawalQuestion();
+    else finishKawalGame();
+  }, 1200);
+}
+
+/* =====================================================
+   FINISH KAWAL GAME
+   + SIMPAN KE FIRESTORE
+===================================================== */
+
+async function finishKawalGame(){
+
+  /* ================= ELEMENT ================= */
+
+  const answerButtons =
+    document.getElementById("kawalAnswerButtons");
+
+  const questionBox =
+    document.getElementById("kawalQuestionBox");
+
+  const progressBox =
+    document.getElementById("kawalProgressBox");
+
+  const feedback =
+    document.getElementById("kawalFeedback");
+
+  const result =
+    document.getElementById("kawalResult");
+
+  const score =
+    document.getElementById("kawalScore");
+
+  const message =
+    document.getElementById("kawalResultMessage");
+
+
+  /* ================= PAPAR KEPUTUSAN ================= */
+
+  if(answerButtons){
+    answerButtons.classList.add("hidden");
+  }
+
+  if(questionBox){
+    questionBox.classList.add("hidden");
+  }
+
+  if(progressBox){
+    progressBox.classList.add("hidden");
+  }
+
+  if(feedback){
+    feedback.classList.add("hidden");
+  }
+
+  if(result){
+    result.classList.remove("hidden");
+  }
+
+
+  /* ================= SKOR ================= */
+
+  if(score){
+
+    score.textContent =
+      `${kawalScore} / ${kawalQuestions.length}`;
+
+  }
+
+
+  /* ================= MESEJ ================= */
+
+  if(message){
+
+    if(kawalScore === kawalQuestions.length){
+
+      message.textContent =
+        "Cemerlang! Anda dapat membezakan perkara yang boleh dan tidak boleh dikawal.";
+
+    }
+
+    else if(kawalScore >= 6){
+
+      message.textContent =
+        "Bagus! Anda sudah memahami kebanyakan perkara yang berada dalam kawalan diri.";
+
+    }
+
+    else{
+
+      message.textContent =
+        "Teruskan berlatih mengenal pasti perkara yang boleh anda kawal dan fokus kepada tindakan diri sendiri.";
+
+    }
+
+  }
+
+
+  /* =====================================================
+     DATA PENGGUNA
+  ===================================================== */
+
+  const nama =
+    sessionStorage.getItem("nama") || "Tanpa Nama";
+
+  const kelas =
+    sessionStorage.getItem("kelas") || "-";
+
+  const organisasi =
+    sessionStorage.getItem("organisasi") || "-";
+
+  const jenis =
+    sessionStorage.getItem("jenis") || "-";
+
+
+  /* =====================================================
+     DATA AKTIVITI
+  ===================================================== */
+
+  const dataAktiviti = {
+
+    nama: nama,
+
+    kelas: kelas,
+
+    organisasi: organisasi,
+
+    jenis: jenis,
+
+    module:
+      "Kawal & Tidak Boleh Kawal",
+
+    aktiviti:
+      "Cabaran Kawalan Diri",
+
+    skor:
+      kawalScore,
+
+    jumlahSoalan:
+      kawalQuestions.length,
+
+    komen:
+      `${kawalScore}/${kawalQuestions.length} jawapan betul`,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+  };
+
+
+  /* ================= ELAK DUPLICATE SAVE ================= */
+
+  if(kawalResultSaved){
+    console.log(
+      "Keputusan Kawal sudah direkodkan untuk pusingan ini."
+    );
+    return;
+  }
+
+  kawalResultSaved = true;
+
+
+  /* =====================================================
+     SIMPAN FIRESTORE
+  ===================================================== */
+
+  try{
+
+    await firebase
+      .firestore()
+      .collection("aktivitiPelajar")
+      .add(dataAktiviti);
+
+
+    console.log(
+      "Keputusan Kawal berjaya disimpan:",
+      dataAktiviti
+    );
+
+
+    /* ================= STATUS SIMPAN ================= */
+
+    if(message){
+
+      const status =
+        document.createElement("div");
+
+      status.id =
+        "kawalSaveStatus";
+
+      status.className =
+        "mt-3 text-xs font-semibold text-green-600";
+
+      status.innerHTML =
+        "☁️ Keputusan berjaya direkodkan.";
+
+      const oldStatus =
+        document.getElementById("kawalSaveStatus");
+
+      if(oldStatus){
+        oldStatus.remove();
+      }
+
+      message.insertAdjacentElement(
+        "afterend",
+        status
+      );
+
+    }
+
+  }
+
+  catch(error){
+
+  /* ================= BENARKAN CUBA SIMPAN SEMULA ================= */
+
+  kawalResultSaved = false;
+
+  console.error(
+    "Gagal menyimpan keputusan Kawal:",
+    error
+  );
+
+
+    if(message){
+
+      const status =
+        document.createElement("div");
+
+      status.id =
+        "kawalSaveStatus";
+
+      status.className =
+        "mt-3 text-xs font-semibold text-red-600";
+
+      status.innerHTML =
+        "⚠️ Keputusan belum berjaya direkodkan.";
+
+      const oldStatus =
+        document.getElementById("kawalSaveStatus");
+
+      if(oldStatus){
+        oldStatus.remove();
+      }
+
+      message.insertAdjacentElement(
+        "afterend",
+        status
+      );
+
+    }
+
+  }
+
+}
+
+
+function closeNota(e){
+
+  if(e && e.target !== e.currentTarget) return;
+
+  const modal = document.getElementById("notaModal");
+
+  if(modal){
+    modal.classList.add("hidden");
+  }
+
+}
+
 
 function closeMinda(){
 
@@ -2149,6 +3138,526 @@ function closeMinda(){
   modal.style.display = "none";
 
 }
+
+
+/* =====================================================
+   🌈 CIRI MINDA SEJAHTERA
+   AKTIVITI INTERAKTIF
+===================================================== */
+
+/* ================================
+   AKTIVITI YANG SEDANG DIPILIH
+================================ */
+
+let selectedMindaType = "";
+let selectedMindaTitle = "";
+
+
+function showMindaActivity(type){
+
+  const box =
+    document.getElementById("mindaActivity");
+
+  const icon =
+    document.getElementById("mindaActivityIcon");
+
+  const title =
+    document.getElementById("mindaActivityTitle");
+
+  const description =
+    document.getElementById("mindaActivityDescription");
+
+  const challenge =
+    document.getElementById("mindaActivityChallenge");
+
+
+  /* ================= SAFETY CHECK ================= */
+
+  if(
+    !box ||
+    !icon ||
+    !title ||
+    !description ||
+    !challenge
+  ){
+
+    console.error(
+      "Elemen aktiviti Minda Sejahtera tidak dijumpai"
+    );
+
+    return;
+  }
+
+
+  /* ================= DATA AKTIVITI ================= */
+
+  const activities = {
+
+    positif: {
+
+      icon: "😊",
+
+      title:
+        "Pemikiran Positif",
+
+      description:
+        "Pemikiran positif membantu kita melihat kekuatan, peluang dan perkara baik dalam kehidupan seharian.",
+
+      challenge:
+        "Fikirkan 3 perkara baik yang berlaku kepada anda hari ini."
+
+    },
+
+
+    komunikasi: {
+
+      icon: "💬",
+
+      title:
+        "Komunikasi Baik",
+
+      description:
+        "Komunikasi yang baik membantu kita menyampaikan perasaan dan pendapat dengan jelas serta menghormati orang lain.",
+
+      challenge:
+        "Berikan satu ucapan yang baik atau penghargaan kepada seseorang hari ini."
+
+    },
+
+
+    yakin: {
+
+      icon: "💪",
+
+      title:
+        "Yakin Diri",
+
+      description:
+        "Yakin diri bermaksud mempercayai kebolehan diri sambil terus belajar dan berusaha memperbaiki diri.",
+
+      challenge:
+        "Nyatakan satu perkara yang anda berjaya lakukan atau usahakan hari ini."
+
+    },
+
+
+    empati: {
+
+      icon: "❤️",
+
+      title:
+        "Empati",
+
+      description:
+        "Empati membantu kita memahami perasaan dan keadaan orang lain serta bertindak dengan prihatin.",
+
+      challenge:
+        "Fikirkan seseorang yang mungkin memerlukan sokongan. Apakah satu perkara baik yang boleh anda lakukan?"
+
+    }
+
+  };
+
+
+  /* ================= PILIH AKTIVITI ================= */
+
+  const data = activities[type];
+
+  if(!data){
+    console.error(
+      "Jenis aktiviti Minda Sejahtera tidak dikenali:",
+      type
+    );
+
+    return;
+  }
+
+
+  /* ================================
+   SIMPAN AKTIVITI YANG DIPILIH
+================================ */
+
+selectedMindaType = type;
+selectedMindaTitle = data.title;
+
+
+  /* ================= PAPAR AKTIVITI ================= */
+
+  icon.textContent =
+    data.icon;
+
+  title.textContent =
+    data.title;
+
+  description.textContent =
+    data.description;
+
+  challenge.textContent =
+    data.challenge;
+
+
+  box.classList.remove("hidden");
+
+
+  /* =================================================
+     RESET JAWAPAN APABILA PILIH CABARAN BARU
+  ================================================= */
+
+  const answer =
+    document.getElementById("mindaAnswer");
+
+  const success =
+    document.getElementById("mindaSuccess");
+
+  const count =
+    document.getElementById("mindaCharCount");
+
+
+  if(answer){
+
+    answer.value = "";
+    answer.disabled = false;
+
+    answer.classList.remove(
+      "border-red-400",
+      "ring-2",
+      "ring-red-200"
+    );
+
+  }
+
+
+  if(success){
+    success.classList.add("hidden");
+  }
+
+
+  if(count){
+    count.textContent = "0 / 300";
+  }
+
+  /* ================= RESET BUTTON ================= */
+
+  const completeButton =
+    document.querySelector(
+      'button[onclick="completeMindaActivity()"]'
+    );
+
+  if(completeButton){
+
+    completeButton.disabled = false;
+
+    completeButton.innerHTML =
+      "✅ Selesai Cabaran";
+
+    completeButton.classList.remove(
+      "opacity-70",
+      "cursor-not-allowed"
+    );
+
+  }
+
+
+  /* ================= RESET MESEJ ================= */
+
+  if(success){
+
+    success.classList.remove(
+      "bg-red-50",
+      "border-red-200",
+      "text-red-700"
+    );
+
+    success.classList.add(
+      "bg-green-50",
+      "border-green-200",
+      "text-green-700"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   🌈 SELESAI CABARAN MINDA SEJAHTERA
+   + SIMPAN KE FIRESTORE
+===================================================== */
+
+async function completeMindaActivity(){
+
+  const answer =
+    document.getElementById("mindaAnswer");
+
+  const success =
+    document.getElementById("mindaSuccess");
+
+  const button =
+    document.querySelector(
+      'button[onclick="completeMindaActivity()"]'
+    );
+
+
+  /* ================= SAFETY CHECK ================= */
+
+  if(!answer || !success){
+
+    console.error(
+      "Elemen Minda Sejahtera tidak dijumpai"
+    );
+
+    return;
+  }
+
+
+  const value =
+    answer.value.trim();
+
+
+  /* ================= SEMAK AKTIVITI ================= */
+
+  if(!selectedMindaType || !selectedMindaTitle){
+
+    console.error(
+      "Tiada aktiviti Minda Sejahtera dipilih"
+    );
+
+    return;
+  }
+
+
+  /* ================= SEMAK JAWAPAN ================= */
+
+  if(value === ""){
+
+    answer.focus();
+
+    answer.classList.add(
+      "border-red-400",
+      "ring-2",
+      "ring-red-200"
+    );
+
+    return;
+  }
+
+
+  /* ================= BUANG ERROR ================= */
+
+  answer.classList.remove(
+    "border-red-400",
+    "ring-2",
+    "ring-red-200"
+  );
+
+
+  /* ================= ELAK DOUBLE CLICK ================= */
+
+  if(button){
+
+    button.disabled = true;
+
+    button.innerHTML =
+      "⏳ Menyimpan...";
+
+    button.classList.add(
+      "opacity-70",
+      "cursor-not-allowed"
+    );
+
+  }
+
+
+  /* ================= DATA PENGGUNA ================= */
+
+  const nama =
+    sessionStorage.getItem("nama") || "Tanpa Nama";
+
+  const kelas =
+    sessionStorage.getItem("kelas") || "-";
+
+  const organisasi =
+    sessionStorage.getItem("organisasi") || "-";
+
+  const jenis =
+    sessionStorage.getItem("jenis") || "-";
+
+
+  /* ================= DATA AKTIVITI ================= */
+
+  const dataAktiviti = {
+
+    nama: nama,
+
+    kelas: kelas,
+
+    organisasi: organisasi,
+
+    jenis: jenis,
+
+    module:
+      "Ciri Minda Sejahtera",
+
+    aktiviti:
+      selectedMindaTitle,
+
+    jenisAktiviti:
+      selectedMindaType,
+
+    komen:
+      value,
+
+    perluPerhatian:
+      false,
+
+    masa:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+  };
+
+
+  try{
+
+    /* ================= SIMPAN FIRESTORE ================= */
+
+    await firebase
+      .firestore()
+      .collection("aktivitiPelajar")
+      .add(dataAktiviti);
+
+
+    console.log(
+      "Minda Sejahtera berjaya disimpan:",
+      dataAktiviti
+    );
+
+
+    /* ================= PAPAR BERJAYA ================= */
+
+    success.classList.remove(
+      "hidden",
+      "bg-red-50",
+      "border-red-200",
+      "text-red-700"
+    );
+
+    success.classList.add(
+      "bg-green-50",
+      "border-green-200",
+      "text-green-700"
+    );
+
+    success.innerHTML = `
+      🎉 Syabas! Cabaran
+      <strong>${selectedMindaTitle}</strong>
+      telah berjaya diselesaikan dan direkodkan.
+    `;
+
+
+    /* ================= KUNCI JAWAPAN ================= */
+
+    answer.disabled = true;
+
+
+    /* ================= BUTTON SELESAI ================= */
+
+    if(button){
+
+      button.innerHTML =
+        "✅ Cabaran Selesai";
+
+    }
+
+  }
+  catch(error){
+
+    console.error(
+      "Gagal menyimpan Minda Sejahtera:",
+      error
+    );
+
+
+    /* ================= PAPAR ERROR ================= */
+
+    success.classList.remove(
+      "hidden",
+      "bg-green-50",
+      "border-green-200",
+      "text-green-700"
+    );
+
+    success.classList.add(
+      "bg-red-50",
+      "border-red-200",
+      "text-red-700"
+    );
+
+    success.innerHTML =
+      "⚠️ Aktiviti belum berjaya disimpan. Sila cuba sekali lagi.";
+
+
+    /* ================= AKTIFKAN BUTTON ================= */
+
+    if(button){
+
+      button.disabled = false;
+
+      button.innerHTML =
+        "🔄 Cuba Simpan Semula";
+
+      button.classList.remove(
+        "opacity-70",
+        "cursor-not-allowed"
+      );
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   🌈 KIRA AKSARA JAWAPAN
+===================================================== */
+
+const mindaAnswer =
+  document.getElementById("mindaAnswer");
+
+
+if(mindaAnswer){
+
+  mindaAnswer.addEventListener(
+    "input",
+    function(){
+
+      const count =
+        document.getElementById("mindaCharCount");
+
+
+      /* ================= KIRA AKSARA ================= */
+
+      if(count){
+
+        count.textContent =
+          this.value.length + " / 300";
+
+      }
+
+
+      /* ================= BUANG ERROR ================= */
+
+      this.classList.remove(
+        "border-red-400",
+        "ring-2",
+        "ring-red-200"
+      );
+
+    }
+  );
+
+}
+
 </script>
 
 <!-- 🔥 STEP 1: LOAD FIREBASE DULU -->
