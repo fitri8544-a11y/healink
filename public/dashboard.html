@@ -3459,49 +3459,37 @@ function loadSidebar(){
   db.collection("aktivitiPelajar")
   .onSnapshot(snapshot => {
 
-    const sekolahCount = {};
-    const kelasCount = {};
-    const organisasiCount = {};
+    // Set digunakan supaya badge sidebar mengira PENGGUNA UNIK,
+    // bukan jumlah rekod aktiviti.
+    const sekolahUsers = {};
+    const kelasUsers = {};
+    const organisasiUsers = {};
+    const semuaUsers = new Set();
+
+    // Bersihkan cache supaya rekod yang telah dipadam tidak kekal.
+    Object.keys(sidebarActivityRecords).forEach(key => delete sidebarActivityRecords[key]);
 
     snapshot.forEach(doc => {
 
-  const d = doc.data();
+      const d = doc.data();
 
-  // Simpan rekod penuh supaya item sidebar boleh dibuka sebagai senarai aktiviti.
-  sidebarActivityRecords[doc.id] = d;
-  // Kongsi dengan modal butiran Aktiviti Pengguna sedia ada.
-  liveActivityRecords[doc.id] = d;
+      sidebarActivityRecords[doc.id] = d;
+      liveActivityRecords[doc.id] = d;
 
-  const orgRaw =
-  normalizeSekolah(
-    d.organisasi
-  );
+      const orgRaw = normalizeSekolah(d.organisasi);
+      const kelas = (d.kelas || "-").toUpperCase().trim();
 
-  const kelas =
-    (d.kelas || "-")
-      .toUpperCase()
-      .trim();
+      // ==========================================
+      // 🔐 FILTER SCHOOL ADMIN
+      // ==========================================
+      if(
+        window.currentAdmin &&
+        window.currentAdmin.role === "schooladmin"
+      ){
+        const sekolahAdmin = normalizeSekolah(window.currentAdmin.sekolah);
+        if(orgRaw !== sekolahAdmin) return;
+      }
 
-  // ==========================================
-  // 🔐 FILTER SCHOOL ADMIN
-  // ==========================================
-  if (
-    window.currentAdmin &&
-    window.currentAdmin.role === "schooladmin"
-  ) {
-
-    const sekolahAdmin =
-      normalizeSekolah(
-        window.currentAdmin.sekolah
-      );
-
-    // Abaikan semua sekolah lain
-    if (orgRaw !== sekolahAdmin) {
-      return;
-    }
-  }
-
-      // ================= CLASSIFY =================
       let kategori = "LAIN";
 
       if(
@@ -3519,51 +3507,54 @@ function loadSidebar(){
         kategori = "ORGANISASI";
       }
 
-      // ================= COUNT =================
+      const userKey = sidebarUserKey(d);
+      semuaUsers.add(userKey);
+
       if(kategori === "SEKOLAH"){
-        sekolahCount[orgRaw] = (sekolahCount[orgRaw] || 0) + 1;
+        if(!sekolahUsers[orgRaw]) sekolahUsers[orgRaw] = new Set();
+        sekolahUsers[orgRaw].add(userKey);
       }
 
       if(kategori === "ORGANISASI"){
-        organisasiCount[orgRaw] = (organisasiCount[orgRaw] || 0) + 1;
+        if(!organisasiUsers[orgRaw]) organisasiUsers[orgRaw] = new Set();
+        organisasiUsers[orgRaw].add(userKey);
       }
 
       if(kategori === "LAIN"){
-        organisasiCount["LAIN-LAIN"] = (organisasiCount["LAIN-LAIN"] || 0) + 1;
+        if(!organisasiUsers["LAIN-LAIN"]){
+          organisasiUsers["LAIN-LAIN"] = new Set();
+        }
+        organisasiUsers["LAIN-LAIN"].add(userKey);
       }
 
-      // kelas semua
-      kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
+      if(!kelasUsers[kelas]) kelasUsers[kelas] = new Set();
+      kelasUsers[kelas].add(userKey);
     });
 
     // ================= SEKOLAH =================
     let htmlSekolah = "";
 
-// ==========================================
-// 👑 "SEMUA" HANYA UNTUK SUPERADMIN
-// ==========================================
-if (
-  window.currentAdmin &&
-  window.currentAdmin.role === "superadmin"
-) {
+    if(
+      window.currentAdmin &&
+      window.currentAdmin.role === "superadmin"
+    ){
+      htmlSekolah = `
+        <div onclick="openSidebarActivityGroup('SEMUA', 'SEMUA')"
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>Semua</span>
+          <span class="badge" title="Jumlah pengguna unik">${semuaUsers.size}</span>
+        </div>
+      `;
+    }
 
-  htmlSekolah = `
-    <div onclick="openSidebarActivityGroup('SEMUA', 'SEMUA')" 
-         class="sidebar-item flex justify-between cursor-pointer">
-      <span>Semua</span>
-      <span class="badge">${snapshot.size}</span>
-    </div>
-  `;
-}
-
-    Object.keys(sekolahCount)
-    .sort((a,b) => sekolahCount[b] - sekolahCount[a])
+    Object.keys(sekolahUsers)
+    .sort((a,b) => sekolahUsers[b].size - sekolahUsers[a].size)
     .forEach(s => {
       htmlSekolah += `
-        <div onclick="openSidebarActivityGroup('SEKOLAH', decodeURIComponent('${encodeURIComponent(s)}'))" 
+        <div onclick="openSidebarActivityGroup('SEKOLAH', decodeURIComponent('${encodeURIComponent(s)}'))"
              class="sidebar-item flex justify-between cursor-pointer">
           <span>${s}</span>
-          <span class="badge">${sekolahCount[s]}</span>
+          <span class="badge" title="Jumlah pengguna unik">${sekolahUsers[s].size}</span>
         </div>
       `;
     });
@@ -3573,14 +3564,14 @@ if (
     // ================= KELAS =================
     let htmlKelas = "";
 
-    Object.keys(kelasCount)
-    .sort((a,b) => kelasCount[b] - kelasCount[a])
+    Object.keys(kelasUsers)
+    .sort((a,b) => kelasUsers[b].size - kelasUsers[a].size)
     .forEach(k => {
       htmlKelas += `
-        <div onclick="openSidebarActivityGroup('KELAS', decodeURIComponent('${encodeURIComponent(k)}'))" 
+        <div onclick="openSidebarActivityGroup('KELAS', decodeURIComponent('${encodeURIComponent(k)}'))"
              class="sidebar-item flex justify-between cursor-pointer">
           <span>${k}</span>
-          <span class="badge">${kelasCount[k]}</span>
+          <span class="badge" title="Jumlah pengguna unik">${kelasUsers[k].size}</span>
         </div>
       `;
     });
@@ -3590,14 +3581,14 @@ if (
     // ================= ORGANISASI =================
     let htmlOrg = "";
 
-    Object.keys(organisasiCount)
-    .sort((a,b) => organisasiCount[b] - organisasiCount[a])
+    Object.keys(organisasiUsers)
+    .sort((a,b) => organisasiUsers[b].size - organisasiUsers[a].size)
     .forEach(o => {
       htmlOrg += `
         <div onclick="openSidebarActivityGroup('ORGANISASI', decodeURIComponent('${encodeURIComponent(o)}'))"
              class="sidebar-item flex justify-between cursor-pointer">
           <span>${o}</span>
-          <span class="badge">${organisasiCount[o]}</span>
+          <span class="badge" title="Jumlah pengguna unik">${organisasiUsers[o].size}</span>
         </div>
       `;
     });
@@ -3611,129 +3602,172 @@ if (
 // =====================================================
 // 🗂️ BUTIRAN SIDEBAR — SEKOLAH / KELAS / ORGANISASI
 // =====================================================
-function openSidebarActivityGroup(type, value){
+function sidebarUserKey(d){
+  return [
+    (d.nama || "Pengguna").toString().trim().toUpperCase(),
+    (d.jenis || "-").toString().trim().toUpperCase(),
+    (d.kelas || "-").toString().trim().toUpperCase(),
+    (d.organisasi || "-").toString().trim().toUpperCase()
+  ].join("||");
+}
 
+function sidebarRecordMatches(type, value, d){
+  const targetType = (type || "").toUpperCase();
+  const targetValue = (value || "").toString().trim();
+  const org = normalizeSekolah(d.organisasi);
+  const kelas = (d.kelas || "-").toString().toUpperCase().trim();
+
+  if(window.currentAdmin && window.currentAdmin.role === "schooladmin"){
+    if(org !== normalizeSekolah(window.currentAdmin.sekolah)) return false;
+  }
+
+  if(targetType === "SEMUA") return true;
+  if(targetType === "SEKOLAH") return org === normalizeSekolah(targetValue);
+  if(targetType === "KELAS") return kelas === targetValue.toUpperCase();
+
+  if(targetType === "ORGANISASI"){
+    if(targetValue === "LAIN-LAIN"){
+      const isSekolah = org.includes("SK") || org.includes("SMK") ||
+                         org.includes("SJKC") || org.includes("SJKT");
+      const isOrganisasi = org.includes("PPD") || org.includes("JPN");
+      return !isSekolah && !isOrganisasi;
+    }
+    return org === normalizeSekolah(targetValue);
+  }
+  return false;
+}
+
+function openSidebarActivityGroup(type, value){
   const modal = document.getElementById("sidebarActivityModal");
   const title = document.getElementById("sidebarActivityTitle");
   const subtitle = document.getElementById("sidebarActivitySubtitle");
   const content = document.getElementById("sidebarActivityContent");
-
   if(!modal || !title || !subtitle || !content) return;
 
+  const records = Object.entries(sidebarActivityRecords)
+    .filter(([docId,d]) => sidebarRecordMatches(type,value,d))
+    .map(([docId,data]) => ({docId,data}))
+    .sort((a,b) => getSidebarActivityMillis(b.data.masa) -
+                   getSidebarActivityMillis(a.data.masa));
+
+  const userMap = new Map();
+
+  records.forEach(item => {
+    const key = sidebarUserKey(item.data);
+    if(!userMap.has(key)){
+      userMap.set(key,{
+        nama: item.data.nama || "Pengguna",
+        jenis: item.data.jenis || "-",
+        kelas: item.data.kelas || "-",
+        organisasi: item.data.organisasi || "-",
+        records: []
+      });
+    }
+    userMap.get(key).records.push(item);
+  });
+
+  const users = Array.from(userMap.values());
+  window.sidebarUniqueUserGroups = {};
+
+  users.forEach((user,index) => {
+    window.sidebarUniqueUserGroups["user_"+index] = user;
+  });
+
   const targetType = (type || "").toUpperCase();
-  const targetValue = (value || "").toString().trim();
-  const records = [];
-
-  Object.entries(sidebarActivityRecords).forEach(([docId, d]) => {
-
-    const org = normalizeSekolah(d.organisasi);
-    const kelas = (d.kelas || "-").toString().toUpperCase().trim();
-
-    // Keselamatan paparan untuk schooladmin.
-    if(
-      window.currentAdmin &&
-      window.currentAdmin.role === "schooladmin"
-    ){
-      const sekolahAdmin = normalizeSekolah(window.currentAdmin.sekolah);
-      if(org !== sekolahAdmin) return;
-    }
-
-    let match = false;
-
-    if(targetType === "SEMUA"){
-      match = true;
-    }
-    else if(targetType === "SEKOLAH"){
-      match = org === normalizeSekolah(targetValue);
-    }
-    else if(targetType === "KELAS"){
-      match = kelas === targetValue.toUpperCase();
-    }
-    else if(targetType === "ORGANISASI"){
-      if(targetValue === "LAIN-LAIN"){
-        const isSekolah =
-          org.includes("SK") ||
-          org.includes("SMK") ||
-          org.includes("SJKC") ||
-          org.includes("SJKT");
-
-        const isOrganisasi =
-          org.includes("PPD") ||
-          org.includes("JPN");
-
-        match = !isSekolah && !isOrganisasi;
-      } else {
-        match = org === normalizeSekolah(targetValue);
-      }
-    }
-
-    if(match){
-      records.push({ docId, data: d });
-    }
-  });
-
-  records.sort((a, b) => {
-    const aTime = getSidebarActivityMillis(a.data.masa);
-    const bTime = getSidebarActivityMillis(b.data.masa);
-    return bTime - aTime;
-  });
-
-  const label =
-    targetType === "SEMUA"
-      ? "Semua Aktiviti"
-      : `${formatSidebarGroupType(targetType)} — ${targetValue}`;
+  const label = targetType === "SEMUA"
+    ? "Semua Pengguna"
+    : `${formatSidebarGroupType(targetType)} — ${value}`;
 
   title.textContent = label;
-  subtitle.textContent = `${records.length} rekod aktiviti`;
+  subtitle.textContent =
+    `${users.length} pengguna • ${records.length} rekod aktiviti`;
 
-  if(records.length === 0){
+  if(!users.length){
     content.innerHTML = `
       <div class="rounded-2xl border border-white/10 bg-white/[0.03]
                   p-8 text-center text-sm text-white/50">
-        Tiada rekod aktiviti dijumpai.
-      </div>
-    `;
+        Tiada pengguna dijumpai.
+      </div>`;
   } else {
-    content.innerHTML = records.map(({docId, data}) => {
-      const nama = escapeLiveActivityHTML(data.nama || "Pengguna");
-      const jenis = escapeLiveActivityHTML(data.jenis || "-");
-      const kelas = escapeLiveActivityHTML(data.kelas || "-");
-      const organisasi = escapeLiveActivityHTML(data.organisasi || "-");
-      const modul = escapeLiveActivityHTML(data.module || "Aktiviti HEALINK");
-      const masa = escapeLiveActivityHTML(formatLiveActivityValue(data.masa));
-
-      return `
-        <button type="button"
-                onclick="openSidebarRecordDetail('${docId}')"
-                class="w-full text-left rounded-2xl border border-white/10
-                       bg-white/[0.035] hover:bg-white/[0.075]
-                       hover:border-cyan-300/20 transition p-4">
-          <div class="flex items-start justify-between gap-4">
-            <div class="min-w-0">
-              <div class="font-extrabold text-white truncate">${nama}</div>
-              <div class="text-xs text-white/45 mt-1">
-                ${jenis} • ${kelas}
-              </div>
-              <div class="text-xs text-white/35 mt-1 truncate">
-                ${organisasi}
-              </div>
+    content.innerHTML = users.map((user,index) => `
+      <button type="button"
+              onclick="openSidebarUserActivities('user_${index}')"
+              class="w-full text-left rounded-2xl border border-white/10
+                     bg-white/[0.035] hover:bg-white/[0.075]
+                     hover:border-cyan-300/20 transition p-4">
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <div class="font-extrabold text-white truncate">
+              ${escapeLiveActivityHTML(user.nama)}
             </div>
-            <div class="text-right shrink-0">
-              <div class="text-xs font-bold text-cyan-300 max-w-[180px] truncate">
-                ${modul}
-              </div>
-              <div class="text-[10px] text-white/35 mt-1">
-                ${masa}
-              </div>
+            <div class="text-xs text-white/45 mt-1">
+              ${escapeLiveActivityHTML(user.jenis)}
+              ${user.kelas && user.kelas !== "-" ? " • "+escapeLiveActivityHTML(user.kelas) : ""}
+            </div>
+            <div class="text-xs text-white/35 mt-1 truncate">
+              ${escapeLiveActivityHTML(user.organisasi)}
             </div>
           </div>
-        </button>
-      `;
-    }).join("");
+          <div class="shrink-0 flex items-center gap-3">
+            <div class="rounded-xl border border-cyan-300/20
+                        bg-cyan-400/10 px-3 py-2 text-center">
+              <div class="text-lg leading-none font-extrabold text-cyan-300">
+                ${user.records.length}
+              </div>
+              <div class="text-[9px] uppercase tracking-wide text-white/45 mt-1">
+                Aktiviti
+              </div>
+            </div>
+            <span class="text-white/35 text-xl">›</span>
+          </div>
+        </div>
+      </button>
+    `).join("");
   }
 
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
+}
+
+function openSidebarUserActivities(userKey){
+  const user = window.sidebarUniqueUserGroups?.[userKey];
+  const modal = document.getElementById("sidebarUserActivitiesModal");
+  const title = document.getElementById("sidebarUserActivitiesTitle");
+  const subtitle = document.getElementById("sidebarUserActivitiesSubtitle");
+  const content = document.getElementById("sidebarUserActivitiesContent");
+  if(!user || !modal || !title || !subtitle || !content) return;
+
+  title.textContent = user.nama;
+  subtitle.textContent =
+    `${user.jenis} • ${user.organisasi} • ${user.records.length} aktiviti`;
+
+  content.innerHTML = user.records.map(({docId,data}) => `
+    <button type="button"
+            onclick="openSidebarRecordDetail('${docId}')"
+            class="w-full text-left rounded-2xl border border-white/10
+                   bg-white/[0.035] hover:bg-white/[0.075]
+                   hover:border-cyan-300/20 transition p-4">
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0">
+          <div class="font-bold text-white truncate">
+            ${escapeLiveActivityHTML(data.module || "Aktiviti HEALINK")}
+          </div>
+          <div class="text-xs text-white/40 mt-1">
+            ${escapeLiveActivityHTML(formatLiveActivityValue(data.masa))}
+          </div>
+        </div>
+        <span class="text-white/35 text-xl shrink-0">›</span>
+      </div>
+    </button>
+  `).join("");
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSidebarUserActivities(){
+  const modal = document.getElementById("sidebarUserActivitiesModal");
+  if(modal) modal.classList.add("hidden");
 }
 
 function closeSidebarActivityGroup(){
@@ -3743,7 +3777,7 @@ function closeSidebarActivityGroup(){
 }
 
 function openSidebarRecordDetail(docId){
-  // Tutup senarai dan gunakan modal Aktiviti Pengguna sedia ada.
+  closeSidebarUserActivities();
   closeSidebarActivityGroup();
   openLiveActivityDetail(docId);
 }
@@ -4373,6 +4407,41 @@ z-[9999] flex items-center justify-center p-4">
 </div>
 
 
+
+<!-- =====================================================
+     👤 MODAL SENARAI AKTIVITI PENGGUNA
+===================================================== -->
+<div id="sidebarUserActivitiesModal"
+     class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm p-4
+            flex items-center justify-center"
+     onclick="if(event.target === this) closeSidebarUserActivities()">
+  <div class="w-full max-w-2xl max-h-[88vh] overflow-hidden
+              rounded-3xl border border-violet-300/15
+              bg-[#0b0e2a]/95 shadow-2xl">
+    <div class="flex items-center justify-between gap-4 px-5 md:px-6 py-4
+                border-b border-white/10">
+      <div class="min-w-0">
+        <div class="text-[10px] uppercase tracking-[0.14em]
+                    text-cyan-300 font-extrabold">Aktiviti Pengguna</div>
+        <div id="sidebarUserActivitiesTitle"
+             class="text-lg font-extrabold text-white mt-1 truncate">Pengguna</div>
+        <div id="sidebarUserActivitiesSubtitle"
+             class="text-[10px] text-white/40 mt-1">Senarai aktiviti</div>
+      </div>
+      <button type="button" onclick="closeSidebarUserActivities()"
+              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
+                     hover:bg-white/10 transition text-white/70 shrink-0">✕</button>
+    </div>
+    <div id="sidebarUserActivitiesContent"
+         class="p-5 md:p-6 overflow-y-auto max-h-[70vh] space-y-3"></div>
+    <div class="px-5 md:px-6 py-4 border-t border-white/10">
+      <button type="button" onclick="closeSidebarUserActivities()"
+              class="w-full py-3 rounded-xl font-bold text-sm
+                     bg-gradient-to-r from-violet-600 to-cyan-500
+                     hover:opacity-90 transition">Kembali</button>
+    </div>
+  </div>
+</div>
 
 <!-- =====================================================
      🗂️ MODAL SENARAI AKTIVITI SIDEBAR
