@@ -2,82 +2,458 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
-<title></title>
-<link rel="icon" type="image/png" href="assets/admin.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HEALINK 2.0 | Login Admin</title>
+
+<link rel="icon" type="image/png" sizes="192x192" href="assets/healink-icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/healink-icon-512.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080a20">
+
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- 🔥 FIREBASE (WAJIB ATAS) -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:#fff;
+  background:
+    radial-gradient(circle at 15% 15%,rgba(124,58,237,.24),transparent 30%),
+    radial-gradient(circle at 85% 85%,rgba(6,182,212,.14),transparent 30%),
+    linear-gradient(135deg,#050716,#0c0c2b 50%,#080b22);
+}
+
+.login-shell{
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px 16px;
+}
+
+.login-card{
+  width:min(100%,440px);
+  padding:30px;
+  border-radius:28px;
+  border:1px solid rgba(151,129,255,.22);
+  background:linear-gradient(145deg,rgba(31,29,78,.88),rgba(12,15,42,.94));
+  box-shadow:0 30px 80px rgba(0,0,0,.46),0 0 60px rgba(124,58,237,.08);
+  backdrop-filter:blur(22px);
+  position:relative;
+  overflow:hidden;
+}
+
+.login-card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#8b5cf6,#22d3ee,transparent);
+}
+
+.login-brand{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.login-logo{
+  width:78px;
+  height:78px;
+  display:block;
+  margin:0 auto 13px;
+  border-radius:20px;
+  box-shadow:0 0 30px rgba(99,102,241,.35);
+}
+
+.login-eyebrow{
+  color:#55d9f5;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  margin-bottom:7px;
+}
+
+.login-brand h1{
+  margin:0;
+  font-size:31px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.035em;
+}
+
+.login-brand h1 span{
+  background:linear-gradient(90deg,#c084fc,#818cf8,#22d3ee);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.login-brand p{
+  margin:9px 0 0;
+  color:#b9b8d2;
+  font-size:12px;
+}
+
+.admin-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-top:14px;
+  padding:7px 12px;
+  border-radius:999px;
+  color:#ddd6fe;
+  background:rgba(139,92,246,.10);
+  border:1px solid rgba(167,139,250,.22);
+  font-size:10px;
+  font-weight:800;
+}
+
+.login-label{
+  display:block;
+  margin:0 0 7px;
+  color:#d8d7e7;
+  font-size:11px;
+  font-weight:800;
+}
+
+.login-input{
+  width:100%;
+  padding:14px 15px;
+  margin-bottom:14px;
+  border-radius:15px;
+  color:#f8fafc;
+  background:rgba(5,8,28,.56);
+  border:1px solid rgba(148,163,184,.16);
+  font-size:13px;
+  transition:.22s ease;
+}
+
+.login-input::placeholder{color:#777a98}
+
+.login-input:focus{
+  outline:none;
+  border-color:rgba(103,232,249,.55);
+  box-shadow:0 0 0 3px rgba(34,211,238,.07),0 0 24px rgba(124,58,237,.10);
+  background:rgba(7,10,34,.78);
+}
+
+.login-button{
+  width:100%;
+  margin-top:3px;
+  padding:14px 16px;
+  border:0;
+  border-radius:15px;
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(90deg,#9333ea,#6366f1 50%,#06b6d4);
+  box-shadow:0 13px 32px rgba(99,102,241,.20);
+  transition:.25s ease;
+}
+
+.login-button:hover:not(:disabled){
+  transform:translateY(-2px);
+  box-shadow:0 17px 36px rgba(99,102,241,.30);
+}
+
+.login-button:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
+
+.error-message{
+  min-height:18px;
+  margin:10px 0 0;
+  color:#fda4af;
+  font-size:11px;
+  line-height:1.45;
+  text-align:center;
+}
+
+.back-button{
+  width:100%;
+  margin-top:4px;
+  padding:11px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:#aaaac1;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.22s ease;
+}
+
+.back-button:hover{
+  color:#fff;
+  background:rgba(255,255,255,.06);
+  border-color:rgba(167,139,250,.25);
+}
+
+.divider{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:18px 0 13px;
+}
+
+.divider::before,.divider::after{
+  content:"";
+  height:1px;
+  flex:1;
+  background:rgba(255,255,255,.08);
+}
+
+.divider span{
+  color:#6f718e;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.17em;
+}
+
+.footer{
+  margin-top:21px;
+  padding-top:15px;
+  border-top:1px solid rgba(255,255,255,.06);
+  text-align:center;
+  color:#666985;
+  font-size:9px;
+  line-height:1.65;
+}
+
+@media(max-width:480px){
+  .login-shell{padding:16px 11px}
+  .login-card{padding:24px 18px;border-radius:23px}
+  .login-logo{width:72px;height:72px;border-radius:18px}
+  .login-brand h1{font-size:29px}
+}
+</style>
 </head>
 
-<body class="bg-gradient-to-br from-[#1e1b4b] via-purple-700 to-blue-600 min-h-screen flex items-center justify-center text-white">
+<body>
 
-<!-- CARD -->
-<div class="bg-white/10 backdrop-blur-lg p-8 rounded-2xl shadow-xl w-[90%] max-w-md">
+<main class="login-shell">
+<section class="login-card">
 
-  <h2 class="text-2xl font-bold text-center mb-6 drop-shadow-lg">
-    🔐 Admin
-  </h2>
+  <header class="login-brand">
 
-  <!-- EMAIL -->
-  <input id="email" type="email" placeholder="Email Guru"
-    class="w-full p-3 mb-4 rounded-lg bg-white text-black placeholder-gray-500 
-           focus:outline-none focus:ring-2 focus:ring-purple-400">
+    <img
+      src="assets/healink-icon-192.png"
+      alt="Logo HEALINK 2.0"
+      class="login-logo"
+    >
 
-  <!-- PASSWORD -->
-  <input id="password" type="password" placeholder="Password"
-    class="w-full p-3 mb-6 rounded-lg bg-white text-black placeholder-gray-500 
-           focus:outline-none focus:ring-2 focus:ring-purple-400">
+    <div class="login-eyebrow">
+      Digital Wellbeing Platform
+    </div>
 
-  <!-- BUTTON -->
-  <button onclick="login()" id="loginBtn"
-    class="w-full bg-gradient-to-r from-purple-500 to-blue-500 p-3 rounded-lg font-semibold 
-           hover:scale-105 hover:shadow-lg transition duration-300">
-    Login
+    <h1>
+      HEALINK <span>2.0</span>
+    </h1>
+
+    <p>
+      Ekosistem Kesejahteraan Minda
+    </p>
+
+    <div class="admin-pill">
+      🔐 Portal Pentadbir
+    </div>
+
+  </header>
+
+
+  <form id="loginForm">
+
+    <label for="email" class="login-label">
+      Email Admin
+    </label>
+
+    <input
+      id="email"
+      type="email"
+      placeholder="Masukkan email"
+      autocomplete="username"
+      class="login-input"
+      required
+    >
+
+
+    <label for="password" class="login-label">
+      Kata Laluan
+    </label>
+
+    <input
+      id="password"
+      type="password"
+      placeholder="Masukkan kata laluan"
+      autocomplete="current-password"
+      class="login-input"
+      required
+    >
+
+
+    <button
+      type="submit"
+      id="loginBtn"
+      class="login-button"
+    >
+      🔐 Login Admin
+    </button>
+
+  </form>
+
+
+  <p id="errorMsg" class="error-message"></p>
+
+
+  <div class="divider">
+    <span>HEALINK 2.0</span>
+  </div>
+
+
+  <button
+    type="button"
+    onclick="kembaliDaftar()"
+    class="back-button"
+  >
+    ← Kembali ke Daftar Pengunjung
   </button>
 
-  <!-- ERROR -->
-  <p id="errorMsg" class="text-red-300 text-sm mt-3 text-center"></p>
 
-  <!-- FOOTER -->
-  <p class="text-xs text-white/60 mt-6 text-center">
-    © 2026 HEALINK System
-  </p>
+  <footer class="footer">
+    © 2026 HEALINK 2.0 • Ekosistem Kesejahteraan Minda
+    <br>
+    Minda Sihat • Potensi Hebat
+  </footer>
 
-</div>
+</section>
+</main>
 
-<!-- 🔥 SCRIPT -->
+
 <script>
 
-// CONFIG (guna config cikgu)
+// =====================================================
+// FIREBASE CONFIG
+// =====================================================
+
 const firebaseConfig = {
   apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
   authDomain: "bimbingankaunselingskkk.firebaseapp.com",
   projectId: "bimbingankaunselingskkk"
 };
 
+
+// =====================================================
 // INIT FIREBASE
+// =====================================================
+
 firebase.initializeApp(firebaseConfig);
 
-// LOGIN FUNCTION
+
+// =====================================================
+// LOGIN
+// =====================================================
+
 function login(){
 
-  const btn = document.getElementById("loginBtn");
-  const email = document.getElementById("email").value;
-  const pass  = document.getElementById("password").value;
+  const btn =
+    document.getElementById("loginBtn");
 
-  btn.innerText = "Loading...";
+  const email =
+    document.getElementById("email").value.trim();
 
-  firebase.auth().signInWithEmailAndPassword(email, pass)
+  const pass =
+    document.getElementById("password").value;
+
+  const errorMsg =
+    document.getElementById("errorMsg");
+
+
+  errorMsg.innerText = "";
+
+
+  if(!email || !pass){
+
+    errorMsg.innerText =
+      "Sila masukkan email dan kata laluan.";
+
+    return;
+
+  }
+
+
+  btn.disabled = true;
+  btn.innerText = "⏳ Sedang Log Masuk...";
+
+
+  firebase.auth()
+  .signInWithEmailAndPassword(
+    email,
+    pass
+  )
   .then(() => {
-    window.location.href = "dashboard.html";
+
+    window.location.href =
+      "dashboard.html";
+
   })
   .catch(err => {
-    document.getElementById("errorMsg").innerText = err.message;
-    btn.innerText = "Login";
+
+    console.error(
+      "HEALINK Admin Login:",
+      err
+    );
+
+    errorMsg.innerText =
+      "Log masuk tidak berjaya. Sila semak email dan kata laluan.";
+
+    btn.disabled = false;
+    btn.innerText =
+      "🔐 Login Admin";
+
   });
+
+}
+
+
+// =====================================================
+// FORM SUBMIT / ENTER KEY
+// =====================================================
+
+document
+.getElementById("loginForm")
+.addEventListener(
+  "submit",
+  function(event){
+
+    event.preventDefault();
+
+    login();
+
+  }
+);
+
+
+// =====================================================
+// BACK TO REGISTER
+// =====================================================
+
+function kembaliDaftar(){
+
+  window.location.href =
+    "register.html";
 
 }
 
