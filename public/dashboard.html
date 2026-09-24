@@ -2711,25 +2711,30 @@ let currentKelas = "all";
 
 function normalizeSekolah(nama){
 
-  const value = (nama || "")
+  let value = (nama || "")
     .toUpperCase()
     .trim()
     .replace(/\s+/g, " ");
 
-  const aliases = {
+  // Nama penuh sekolah → singkatan standard
+  value = value
+    .replace(/^SEKOLAH MENENGAH KEBANGSAAN\s+/, "SMK ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(CINA\)\s+/, "SJKC ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+CINA\s+/, "SJKC ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(TAMIL\)\s+/, "SJKT ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+TAMIL\s+/, "SJKT ")
+    .replace(/^SEKOLAH KEBANGSAAN\s+/, "SK ")
+    .replace(/\s+/g, " ")
+    .trim();
 
-    // ================= SK KUALA KETIL =================
+  const aliases = {
     "SKKK": "SK KUALA KETIL",
     "SK KUALA KETIL": "SK KUALA KETIL",
-
-    // ================= SK KUALA PEGANG =================
     "SKKP": "SK KUALA PEGANG",
     "SK KUALA PEGANG": "SK KUALA PEGANG"
-
   };
 
   return aliases[value] || value;
-
 }
 
 
@@ -3502,7 +3507,8 @@ function loadSidebar(){
       }
       else if(
         orgRaw.includes("PPD") ||
-        orgRaw.includes("JPN")
+        orgRaw.includes("JPN") ||
+        orgRaw.includes("PKG")
       ){
         kategori = "ORGANISASI";
       }
@@ -3607,7 +3613,7 @@ function sidebarUserKey(d){
     (d.nama || "Pengguna").toString().trim().toUpperCase(),
     (d.jenis || "-").toString().trim().toUpperCase(),
     (d.kelas || "-").toString().trim().toUpperCase(),
-    (d.organisasi || "-").toString().trim().toUpperCase()
+    normalizeSekolah(d.organisasi || "-")
   ].join("||");
 }
 
@@ -3629,7 +3635,7 @@ function sidebarRecordMatches(type, value, d){
     if(targetValue === "LAIN-LAIN"){
       const isSekolah = org.includes("SK") || org.includes("SMK") ||
                          org.includes("SJKC") || org.includes("SJKT");
-      const isOrganisasi = org.includes("PPD") || org.includes("JPN");
+      const isOrganisasi = org.includes("PPD") || org.includes("JPN") || org.includes("PKG");
       return !isSekolah && !isOrganisasi;
     }
     return org === normalizeSekolah(targetValue);
@@ -3659,7 +3665,7 @@ function openSidebarActivityGroup(type, value){
         nama: item.data.nama || "Pengguna",
         jenis: item.data.jenis || "-",
         kelas: item.data.kelas || "-",
-        organisasi: item.data.organisasi || "-",
+        organisasi: normalizeSekolah(item.data.organisasi || "-"),
         records: []
       });
     }
