@@ -7,8 +7,6 @@
 
 "use strict";
 
-const admin = require("firebase-admin");
-
 const {
   Timestamp,
   FieldValue
@@ -23,10 +21,10 @@ const {
 const DRY_RUN = process.env.HEALINK_DRY_RUN !== "false";
 
 // Had maksimum aktiviti bagi setiap pelaksanaan.
-const MAX_ACTIVITIES = 1;
+const MAX_ACTIVITIES = 50;
 
-// Tempoh semakan aktiviti dalam minit.
-const LOOKBACK_MINUTES = 30;
+// Tempoh semakan aktiviti: 24 jam
+const LOOKBACK_MINUTES = 1440;
 
 // ==========================================
 // FIREBASE INITIALIZATION
@@ -36,7 +34,7 @@ function initializeFirebase() {
 
   if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     throw new Error(
-      "GOOGLE_APPLICATION_CREDENTIALIALS belum dikonfigurasi."
+      "GOOGLE_APPLICATION_CREDENTIALS belum dikonfigurasi."
     );
   }
 
@@ -60,7 +58,6 @@ function initializeFirebase() {
     db: getFirestore(app),
     messaging: getMessaging(app)
   };
-
 }
 
 // ==========================================
@@ -103,13 +100,10 @@ function canReceiveNotification(adminData, activityData) {
 
   // School Admin hanya sekolah sendiri
   if (role === "schooladmin") {
-
     return Boolean(activitySchool) &&
       adminSchool === activitySchool;
-
   }
 
-  // Peranan lain tidak dibenarkan
   return false;
 }
 
@@ -123,14 +117,13 @@ async function getRecentActivities(db) {
 
   const now = Date.now();
 
-  const thirtyMinutesAgo =
-    Timestamp.fromMillis(
-      now - (30 * 60 * 1000)
-    );
+  const lookbackStart = Timestamp.fromMillis(
+    now - (LOOKBACK_MINUTES * 60 * 1000)
+  );
 
   const snapshot = await db
     .collection("aktivitiPelajar")
-    .where("masa", ">=", thirtyMinutesAgo)
+    .where("masa", ">=", lookbackStart)
     .orderBy("masa", "asc")
     .get();
 
@@ -140,7 +133,6 @@ async function getRecentActivities(db) {
 
     const data = doc.data();
 
-    // Abaikan rekod tanpa organisasi
     if (!normalizeSchoolName(data.organisasi)) {
       return;
     }
@@ -171,7 +163,6 @@ async function getAuthorizedAdminTokens(db, activityData) {
 
   const tokens = new Set();
 
-  // Ambil senarai langganan FCM
   const subscriptions = await db
     .collection("push_subscriptions")
     .get();
@@ -189,7 +180,6 @@ async function getAuthorizedAdminTokens(db, activityData) {
       continue;
     }
 
-    // Semak akaun pentadbir yang sebenar
     const adminDoc = await db
       .collection("adminUsers")
       .doc(data.uid)
@@ -201,28 +191,20 @@ async function getAuthorizedAdminTokens(db, activityData) {
 
     const adminData = adminDoc.data();
 
-// ==========================================
-// SEMAK STATUS AKAUN PENTADBIR
-// ==========================================
+    // Sekat akaun pentadbir yang dinyahaktifkan
+    if (
+      adminData.disabled === true ||
+      adminData.active === false ||
+      adminData.status === "inactive"
+    ) {
+      continue;
+    }
 
-// Sekat akaun yang dinyahaktifkan secara jelas
-if (
-  adminData.disabled === true ||
-  adminData.active === false ||
-  adminData.status === "inactive"
-) {
-  continue;
-}
+    // Semak peranan dan sekolah
+    if (!canReceiveNotification(adminData, activityData)) {
+      continue;
+    }
 
-// ==========================================
-// SEMAK PERANAN DAN SEKOLAH
-// ==========================================
-
-if (!canReceiveNotification(adminData, activityData)) {
-  continue;
-}
-
-    // Elakkan token sama dimasukkan berulang kali
     tokens.add(data.token);
   }
 
@@ -245,6 +227,7 @@ async function sendAdminNotification(
 
   if (!Array.isArray(tokens) || tokens.length === 0) {
     console.log("Tiada token pentadbir yang layak.");
+
     return {
       successCount: 0,
       failureCount: 0
@@ -261,7 +244,6 @@ async function sendAdminNotification(
   let successCount = 0;
   let failureCount = 0;
 
-  // FCM menyokong maksimum 500 token setiap kelompok
   for (let i = 0; i < tokens.length; i += 500) {
 
     const batch = tokens.slice(i, i + 500);
@@ -269,8 +251,6 @@ async function sendAdminNotification(
     const response = await messaging.sendEachForMulticast({
       tokens: batch,
 
-      // Data-only message: Service Worker akan
-      // memaparkan notifikasi ketika Dashboard ditutup.
       data: {
         title,
         body,
@@ -333,24 +313,22 @@ async function claimNotification(db, activityId) {
     }
 
     const data = snapshot.data();
-
     const attempts = Number(data.attempts || 0);
 
-    // Had percubaan
+    // Had maksimum percubaan
     if (attempts >= MAX_ATTEMPTS) {
       return false;
     }
 
-    // Rekod berjaya atau tiada penerima
+    // Jangan hantar semula notifikasi yang sudah berjaya
     if (
       data.status === "sent" ||
-      data.status === "partial" ||
-      data.status === "no_recipients"
+      data.status === "partial"
     ) {
       return false;
     }
 
-    // Rekod sedang diproses
+    // Semak rekod yang sedang diproses
     if (data.status === "processing") {
 
       const updatedAt = data.updatedAt?.toMillis?.() || 0;
@@ -363,6 +341,7 @@ async function claimNotification(db, activityId) {
     // Benarkan percubaan semula
     if (
       data.status === "failed" ||
+      data.status === "no_recipients" ||
       data.status === "processing"
     ) {
 
@@ -430,49 +409,90 @@ async function main() {
   const { db, messaging } = initializeFirebase();
 
   console.log("Firebase Admin SDK berjaya dimulakan.");
+
   console.log(
-    DRY_RUN ? "MOD UJIAN: AKTIF" : "MOD PENGHANTARAN: AKTIF"
+    DRY_RUN
+      ? "MOD UJIAN: AKTIF"
+      : "MOD PENGHANTARAN: AKTIF"
   );
 
   const activities = await getRecentActivities(db);
 
-  // Hanya rekod yang memerlukan perhatian pentadbir
+  // Utamakan rekod tertua yang belum diproses.
+  // Had 50 dikenakan selepas semakan notification_logs.
+
   const selectedActivities = activities
     .filter(activity => activity.perluPerhatian === true)
-    .slice(0, MAX_ACTIVITIES);
+    .sort((a, b) => {
+      return a.masa.toMillis() - b.masa.toMillis();
+    });
 
   console.log(
     `Aktiviti memerlukan perhatian: ${selectedActivities.length}`
   );
 
+  let processedCount = 0;
+  let skippedCount = 0;
+
   for (const activity of selectedActivities) {
 
-    const tokens = await getAuthorizedAdminTokens(
-      db,
-      activity
-    );
+    if (processedCount >= MAX_ACTIVITIES) {
+      console.log(
+        "Had pemprosesan dicapai. Baki rekod disemak pada pelaksanaan seterusnya."
+      );
+      break;
+    }
 
-    console.log(
-      `Aktiviti ${activity.id} | Penerima layak: ${tokens.length}`
-    );
-
+    // DRY RUN tidak menghantar FCM
+    // dan tidak mengubah notification_logs.
     if (DRY_RUN) {
-      console.log("DRY RUN: Notifikasi tidak dihantar.");
+
+      const log = await db
+        .collection("notification_logs")
+        .doc(activity.id)
+        .get();
+
+      const status = log.exists
+        ? log.data().status
+        : "belum diproses";
+
+      console.log(
+        `DRY RUN | Aktiviti ${activity.id} | Status: ${status}`
+      );
+
+      processedCount++;
       continue;
     }
 
-    // Elakkan penghantaran berulang
+    // Semak dan tuntut rekod secara atomik
     const claimed = await claimNotification(
       db,
       activity.id
     );
 
     if (!claimed) {
-      console.log("Rekod telah diproses. Langkau.");
+
+      skippedCount++;
+
+      console.log(
+        `Aktiviti ${activity.id}: telah diproses / masih dikunci / had percubaan.`
+      );
+
       continue;
     }
 
+    processedCount++;
+
     try {
+
+      const tokens = await getAuthorizedAdminTokens(
+        db,
+        activity
+      );
+
+      console.log(
+        `Aktiviti ${activity.id} | Penerima layak: ${tokens.length}`
+      );
 
       if (tokens.length === 0) {
 
@@ -493,9 +513,16 @@ async function main() {
 
       let status = "failed";
 
-      if (result.failureCount === 0 && result.successCount > 0) {
+      if (
+        result.successCount > 0 &&
+        result.failureCount === 0
+      ) {
         status = "sent";
+
       } else if (result.successCount > 0) {
+
+        // Elakkan penghantaran semula kepada
+        // penerima yang telah berjaya.
         status = "partial";
       }
 
@@ -509,7 +536,7 @@ async function main() {
     } catch (error) {
 
       console.error(
-        `Gagal menghantar aktiviti ${activity.id}:`,
+        `Gagal memproses aktiviti ${activity.id}:`,
         error.message
       );
 
@@ -518,9 +545,16 @@ async function main() {
         activity.id,
         "failed"
       );
-
     }
   }
+
+  console.log(
+    `Jumlah diproses dalam pelaksanaan ini: ${processedCount}`
+  );
+
+  console.log(
+    `Jumlah dilangkau kerana status log: ${skippedCount}`
+  );
 
   console.log("==================================");
   console.log("PROSES NOTIFIKASI SELESAI");
@@ -532,6 +566,7 @@ async function main() {
 // ==========================================
 
 if (require.main === module) {
+
   main().catch((error) => {
 
     console.error(
@@ -540,6 +575,5 @@ if (require.main === module) {
     );
 
     process.exitCode = 1;
-
   });
 }

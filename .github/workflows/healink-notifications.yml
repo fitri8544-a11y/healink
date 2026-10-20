@@ -7,6 +7,16 @@
 name: HEALINK 2.0 Notifications
 
 on:
+
+  # ==========================================
+  # AUTOMATIC SCHEDULE - EVERY 15 MINUTES
+  # ==========================================
+  schedule:
+    - cron: "*/15 * * * *"
+
+  # ==========================================
+  # MANUAL WORKFLOW
+  # ==========================================
   workflow_dispatch:
     inputs:
       send_notification:

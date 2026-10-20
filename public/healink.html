@@ -2215,62 +2215,6 @@ function saveMood(){
 
 }
 
-  // ================= LOCAL STORAGE =================
-  const data = JSON.parse(localStorage.getItem("emotionData")) || [];
-
-  data.push({
-    mood: selectedMood,
-    note: note,
-    time: new Date().toLocaleTimeString()
-  });
-
-  localStorage.setItem("emotionData", JSON.stringify(data));
-
-  // ================= 🔥 FIRESTORE (INI PENTING) =================
-  if(typeof firebase !== "undefined"){
-
-    firebase.firestore().collection("aktivitiPelajar").add({
-
-      nama: nama || "-",
-      kelas: kelas || "-",
-      organisasi: organisasi || "-",
-
-      mood: selectedMood,
-      module: "Emotion Tracker",
-      komen: note || "",
-
-      // 🔥 INI UNTUK DASHBOARD
-      perluPerhatian: ["😢","😡"].includes(selectedMood),
-
-      tahap: (
-        ["😢","😡"].includes(selectedMood) ? "TINGGI" :
-        selectedMood === "😰" ? "SEDERHANA" :
-        "RENDAH"
-      ),
-
-      masa: firebase.firestore.FieldValue.serverTimestamp()
-
-    })
-    .then(()=> console.log("✅ Firestore saved"))
-    .catch(err => console.error("❌ Firestore error:", err));
-
-  }
-
-  // ================= UI =================
-  document.getElementById("trackerMsg").classList.remove("hidden");
-
-  selectedMood = "";
-  document.getElementById("note").value = "";
-
-  document.querySelectorAll("#trackerModal .emoji-card").forEach(e => {
-    e.classList.remove("emoji-selected");
-  });
-
-  loadHistory();
-
-  setTimeout(() => {
-    closeTracker();
-  }, 1200);
 
 /* OPEN DETAIL KOMEN */
 function openDetail(nama, kelas, module, komen){

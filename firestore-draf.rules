@@ -1,0 +1,486 @@
+rules_version = '2';
+
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+
+    // =====================================================
+    // SEMAK ADMIN PORTAL KAUNSELING
+    // =====================================================
+
+    function isPortalAdmin() {
+
+      return request.auth != null
+
+        && exists(
+          /databases/$(database)/documents/adminUsers/$(request.auth.uid)
+        )
+
+        && (
+
+          get(
+            /databases/$(database)/documents/adminUsers/$(request.auth.uid)
+          ).data.role == "superadmin"
+
+          ||
+
+          (
+            get(
+              /databases/$(database)/documents/adminUsers/$(request.auth.uid)
+            ).data.role == "schooladmin"
+
+            &&
+
+            get(
+              /databases/$(database)/documents/adminUsers/$(request.auth.uid)
+            ).data.sekolah == "SK KUALA KETIL"
+          )
+
+        );
+
+    }
+
+
+
+    // =====================================================
+    // MAKLUMAN
+    // Awam: baca
+    // Admin Portal: tambah / edit / padam
+    // =====================================================
+
+    match /makluman/{documentId} {
+
+      allow read: if true;
+
+      allow create, update, delete:
+        if isPortalAdmin();
+
+    }
+
+
+
+    // =====================================================
+    // MOTIVASI
+    // Awam: baca
+    // Admin Portal: tambah / edit / padam
+    // =====================================================
+
+    match /motivasi/{documentId} {
+
+      allow read: if true;
+
+      allow create, update, delete:
+        if isPortalAdmin();
+
+    }
+
+
+
+    // =====================================================
+    // AKTIVITI PRS
+    // Awam: baca
+    // Admin Portal: tambah / edit / padam
+    // =====================================================
+
+    match /aktivitiPRS/{documentId} {
+
+      allow read: if true;
+
+      allow create, update, delete:
+        if isPortalAdmin();
+
+    }
+
+
+
+    // =====================================================
+    // HALAMAN PORTAL
+    // Awam: baca
+    // Admin Portal: tambah / edit / padam
+    // =====================================================
+
+    match /halamanPortal/{documentId} {
+
+      allow read: if true;
+
+      allow create, update, delete:
+        if isPortalAdmin();
+
+    }
+
+
+
+    // =====================================================
+    // ADMIN USERS
+    //
+    // Pengguna login hanya boleh membaca profil admin
+    // miliknya sendiri.
+    //
+    // Role dan sekolah tidak boleh diubah melalui aplikasi.
+    // =====================================================
+
+    match /adminUsers/{userId} {
+
+      allow read:
+        if request.auth != null
+        && request.auth.uid == userId;
+
+      allow create, update, delete:
+        if false;
+
+    }
+
+
+
+    // =====================================================
+    // HEALINK - AKTIVITI PELAJAR (DRAF KESELAMATAN)
+    // Admin boleh membaca mengikut sekolah.
+    // Pelawat hanya boleh mencipta rekod berformat terhad.
+    // NOTA: Penulisan awam tetap berisiko spam/identiti palsu.
+    // =====================================================
+
+    function isSuperAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role == "superadmin";
+    }
+
+    function isSchoolAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role == "schooladmin";
+    }
+
+    function ownSchoolActivity() {
+      return isSchoolAdmin()
+        && resource.data.get("organisasi", "") ==
+          get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.sekolah;
+    }
+
+    function validActivityCreate() {
+      return request.resource.data.keys().hasOnly([
+                "nama", "jenis", "kelas", "organisasi", "komen",
+                "module", "mood", "perluPerhatian", "riskScore",
+                "tahap", "masa",
+                "aktiviti", "jenisAktiviti", "skor", "jumlahSoalan"
+              ])
+        && request.resource.data.keys().hasAll([
+          "nama", "kelas", "organisasi", "module", "masa"
+        ])
+        && request.resource.data.nama is string
+        && request.resource.data.nama.size() > 0
+        && request.resource.data.nama.size() <= 150
+        && request.resource.data.kelas is string
+        && request.resource.data.kelas.size() <= 100
+        && request.resource.data.organisasi is string
+        && request.resource.data.organisasi.size() > 0
+        && request.resource.data.organisasi.size() <= 200
+        && request.resource.data.module is string
+        && request.resource.data.module.size() > 0
+        && request.resource.data.module.size() <= 100
+        && request.resource.data.get("jenis", "") is string
+        && request.resource.data.get("komen", "") is string
+        && request.resource.data.get("komen", "").size() <= 2000
+        && request.resource.data.get("mood", "") is string
+        && request.resource.data.get("tahap", "") is string
+        && request.resource.data.get("perluPerhatian", false) is bool
+        && request.resource.data.get("riskScore", 0) is number
+        && request.resource.data.get("riskScore", 0) >= 0
+        && request.resource.data.get("riskScore", 0) <= 100
+        && request.resource.data.masa == request.time;
+    }
+
+    match /aktivitiPelajar/{documentId} {
+      allow get, list: if isSuperAdmin() || ownSchoolActivity();
+      allow create: if validActivityCreate();
+      allow update, delete: if false;
+    }
+
+
+    // =====================================================
+    // HEALINK - PENGUNJUNG
+    // Kekalkan tingkah laku sedia ada
+    // =====================================================
+
+    match /pengunjung/{documentId} {
+
+      allow read, write:
+        if true;
+
+    }
+
+
+
+    // =====================================================
+    // HEALINK - SYSTEM UPDATES
+    // Kekalkan tingkah laku sedia ada
+    // =====================================================
+
+    match /systemUpdates/{documentId} {
+
+      allow read: if true;
+      allow create, update, delete: if isPortalAdmin();
+
+    }
+
+
+
+    // =====================================================
+    // HEALINK - MAKLUM BALAS PENGGUNA
+    //
+    // Pengguna biasa:
+    //   ✓ Boleh menghantar maklum balas baharu
+    //   ✕ Tidak boleh membaca semua maklum balas
+    //   ✕ Tidak boleh edit
+    //   ✕ Tidak boleh padam
+    //
+    // Portal Admin:
+    //   ✓ Boleh membaca
+    //   ✓ Boleh mengemaskini status
+    //   ✓ Boleh padam
+    // =====================================================
+
+    match /maklumBalasPengguna/{feedbackId} {
+
+
+      // ===================================================
+      // CREATE - PENGGUNA HEALINK
+      // ===================================================
+
+      allow create: if
+
+        // Hanya field yang dibenarkan
+        request.resource.data.keys().hasOnly([
+
+          'nama',
+          'jenis',
+          'kelas',
+          'organisasi',
+
+          'kategori',
+          'rating',
+          'komen',
+
+          'status',
+          'halaman',
+          'versi',
+
+          'masa'
+
+        ])
+
+
+        // =================================================
+        // NAMA
+        // =================================================
+
+        && request.resource.data.nama is string
+        && request.resource.data.nama.size() > 0
+        && request.resource.data.nama.size() <= 150
+
+
+        // =================================================
+        // JENIS PENGGUNA
+        // =================================================
+
+        && request.resource.data.jenis is string
+        && request.resource.data.jenis.size() <= 50
+
+
+        // =================================================
+        // KELAS
+        // =================================================
+
+        && request.resource.data.kelas is string
+        && request.resource.data.kelas.size() <= 100
+
+
+        // =================================================
+        // ORGANISASI
+        // =================================================
+
+        && request.resource.data.organisasi is string
+        && request.resource.data.organisasi.size() <= 200
+
+
+        // =================================================
+        // KATEGORI
+        // Hanya kategori HEALINK yang sah
+        // =================================================
+
+        && request.resource.data.kategori in [
+
+          "Cadangan Penambahbaikan",
+          "Masalah Sistem",
+          "Kandungan dan Aktiviti",
+          "Reka Bentuk dan Paparan",
+          "Lain-lain"
+
+        ]
+
+
+        // =================================================
+        // RATING
+        // 1 hingga 5 sahaja
+        // =================================================
+
+        && request.resource.data.rating is int
+
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+
+
+        // =================================================
+        // KOMEN
+        // Wajib dan maksimum 500 aksara
+        // =================================================
+
+        && request.resource.data.komen is string
+
+        && request.resource.data.komen.size() > 0
+        && request.resource.data.komen.size() <= 500
+
+
+        // =================================================
+        // STATUS
+        // Pengguna hanya boleh mencipta status "Baru"
+        // =================================================
+
+        && request.resource.data.status == "Baru"
+
+
+        // =================================================
+        // SUMBER
+        // =================================================
+
+        && request.resource.data.halaman == "HEALINK 2.0"
+
+        && request.resource.data.versi == "V2"
+
+
+        // =================================================
+        // TIMESTAMP
+        // Mesti menggunakan server timestamp
+        // =================================================
+
+        && request.resource.data.masa == request.time;
+
+
+
+      // ===================================================
+      // READ - ADMIN SAHAJA
+      // ===================================================
+
+      allow read:
+        if isPortalAdmin();
+
+
+
+      // ===================================================
+      // UPDATE - ADMIN SAHAJA
+      // ===================================================
+
+      allow update:
+        if isPortalAdmin();
+
+
+
+      // ===================================================
+      // DELETE - ADMIN SAHAJA
+      // ===================================================
+
+      allow delete:
+        if isPortalAdmin();
+
+    }
+
+
+
+        // =====================================================
+    // PORTAL VISITOR COUNTER
+    // Kekalkan supaya index.html boleh increment count
+    // =====================================================
+
+    match /stats/{documentId} {
+
+      allow read, write:
+        if true;
+
+    }
+
+
+    // =====================================================
+    // HEALINK 2.0 - FCM ADMIN NOTIFICATIONS
+    // =====================================================
+
+    function isHealLinkAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid))
+        && get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data.role
+          in ["superadmin", "schooladmin"];
+    }
+
+    function adminProfile() {
+      return get(/databases/$(database)/documents/adminUsers/$(request.auth.uid)).data;
+    }
+
+    // Dokumen ID: <UID>_<SHA256 TOKEN DALAM HEX>
+    match /push_subscriptions/{subscriptionId} {
+
+      function ownSubscriptionId() {
+        return request.auth != null
+          && subscriptionId.matches('^' + request.auth.uid + '_[a-f0-9]{64}$');
+      }
+
+      // GET membenarkan semakan dokumen belum wujud; tidak membenarkan
+      // membaca dokumen sedia ada yang dimiliki UID lain.
+      allow get: if isHealLinkAdmin()
+        && ownSubscriptionId()
+        && (
+          !exists(/databases/$(database)/documents/push_subscriptions/$(subscriptionId))
+          || resource.data.uid == request.auth.uid
+        );
+
+      // Tiada senarai token melalui aplikasi klien.
+      allow list: if false;
+
+      allow create: if isHealLinkAdmin()
+        && ownSubscriptionId()
+        && request.resource.data.keys().hasOnly([
+          "uid", "token", "role", "sekolah", "createdAt", "updatedAt"
+        ])
+        && request.resource.data.keys().hasAll([
+          "uid", "token", "role", "sekolah", "createdAt", "updatedAt"
+        ])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.token is string
+        && request.resource.data.token.size() > 0
+        && request.resource.data.token.size() <= 4096
+        && request.resource.data.role == adminProfile().role
+        && request.resource.data.sekolah == adminProfile().get("sekolah", "")
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isHealLinkAdmin()
+        && ownSubscriptionId()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == adminProfile().role
+        && request.resource.data.sekolah == adminProfile().get("sekolah", "")
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "token", "updatedAt"
+        ])
+        && request.resource.data.token is string
+        && request.resource.data.token.size() > 0
+        && request.resource.data.token.size() <= 4096
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isHealLinkAdmin()
+        && ownSubscriptionId()
+        && resource.data.uid == request.auth.uid;
+    }
+
+  }
+}

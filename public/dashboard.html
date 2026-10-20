@@ -1615,9 +1615,24 @@ let barChart, pieChart;
 // 📡 REALTIME LISTENER - ROLE BASED DATA
 // =====================================================
 
+// Pertanyaan Firestore dihadkan di pelayan mengikut profil admin.
+// Jangan menapis hanya selepas menerima semua dokumen.
+function adminActivityQuery(){
+  const admin = window.currentAdmin;
+  if (!admin || !["superadmin", "schooladmin"].includes(admin.role)) {
+    throw new Error("Profil pentadbir belum disahkan.");
+  }
+  let query = db.collection("aktivitiPelajar");
+  if (admin.role === "schooladmin") {
+    if (!admin.sekolah) throw new Error("Sekolah pentadbir tidak ditetapkan.");
+    query = query.where("organisasi", "==", admin.sekolah);
+  }
+  return query;
+}
+
 function startMainDataListener(){
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
     .onSnapshot(snapshot => {
 
       rawData = [];
@@ -1885,22 +1900,32 @@ async function enableAdminNotifications() {
       throw new Error("Kebenaran notifikasi tidak diberikan.");
     }
 
-    const registration = await navigator.serviceWorker.register(
-      "/service-worker.js"
-    );
+    // ==========================================
+// HEALINK 2.0 - FIREBASE PUSH NOTIFICATION
+// ==========================================
 
-    await navigator.serviceWorker.ready;
+// Daftar Service Worker khusus FCM
+const registration = await navigator.serviceWorker.register(
+  "/firebase-messaging-sw.js",
+  { scope: "/firebase-cloud-messaging-push-scope" }
+);
 
-    const messaging = firebase.messaging();
+// Tunggu Service Worker aktif
+await navigator.serviceWorker.ready;
 
-    const token = await messaging.getToken({
-      vapidKey: HEALINK_VAPID_KEY,
-      serviceWorkerRegistration: registration
-    });
+const messaging = firebase.messaging();
 
-    if (!token) {
-      throw new Error("Token FCM tidak berjaya dijana.");
-    }
+// Dapatkan token FCM
+const token = await messaging.getToken({
+  vapidKey: HEALINK_VAPID_KEY,
+  serviceWorkerRegistration: registration
+});
+
+if (!token) {
+  throw new Error("Token FCM tidak berjaya dijana.");
+}
+
+console.log("HEALINK FCM: Token berjaya dijana.");
 
     // =====================================================
 // HEALINK 2.0 - SIMPAN TOKEN FCM PENTADBIR
@@ -1935,6 +1960,7 @@ const adminSchool = admin.sekolah || "";
 
 if (existingSubscription.exists) {
 
+  // Kemas kini token peranti sahaja
   await subscriptionRef.update({
     token: token,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1942,6 +1968,7 @@ if (existingSubscription.exists) {
 
 } else {
 
+  // Daftarkan peranti admin baharu
   await subscriptionRef.set({
     uid: user.uid,
     token: token,
@@ -2091,6 +2118,7 @@ firebase.auth().onAuthStateChanged(async user => {
     // ================= START ADMIN DATA =================
 
     startMainDataListener();
+    startLiveActivityListener();
 
     loadData();
     loadSidebar();
@@ -3069,7 +3097,7 @@ function startFeedbackBadgeListener() {
 // ================= LOAD DATA (KPI + FILTER) =================
 function loadData(){
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
   .orderBy("masa","desc")
   .onSnapshot(snapshot => {
 
@@ -3122,7 +3150,8 @@ function loadData(){
 const liveActivityRecords = {};
 let selectedLiveActivityDocId = null;
 
-db.collection("aktivitiPelajar")
+function startLiveActivityListener(){
+adminActivityQuery()
 .orderBy("masa", "desc")
 .limit(20)
 .onSnapshot(snapshot => {
@@ -3139,8 +3168,6 @@ db.collection("aktivitiPelajar")
   snapshot.forEach(doc => {
 
   const d = doc.data();
-  liveActivityRecords[doc.id] = d;
-
   // ==========================================
   // 🔐 FILTER SCHOOL ADMIN
   // ==========================================
@@ -3164,6 +3191,8 @@ db.collection("aktivitiPelajar")
       return;
     }
   }
+
+  liveActivityRecords[doc.id] = d;
 
   // ================= FILTER OPTION =================
   kelasSet.add(d.kelas);
@@ -3240,8 +3269,8 @@ db.collection("aktivitiPelajar")
     if(m) modulSelect.innerHTML += `<option value="${m.toLowerCase()}">${m}</option>`;
   });
 
-});
-
+ });
+}
 
 // =====================================================
 // 🔎 BUTIRAN AKTIVITI PENGGUNA
@@ -3262,8 +3291,8 @@ function openLiveActivityDetail(docId){
     document.getElementById("deleteLiveActivityButton");
 
   if(deleteButton){
-    deleteButton.disabled = false;
-    deleteButton.textContent = "🗑 Padam Rekod";
+    deleteButton.disabled = true;
+    deleteButton.textContent = "Padam dinyahaktifkan";
   }
 
   const masa = formatLiveActivityValue(d.masa);
@@ -3337,6 +3366,8 @@ function closeLiveActivityDetail(){
 }
 
 async function deleteLiveActivity(){
+  alert("Pemadaman rekod dinyahaktifkan sehingga kawalan akses disahkan.");
+  return;
 
   const docId = selectedLiveActivityDocId;
   const d = docId ? liveActivityRecords[docId] : null;
@@ -3463,7 +3494,7 @@ function loadSekolah(){
   const container = document.getElementById("listSekolah");
   if(!container) return;
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
   .onSnapshot(snapshot => {
 
     let sekolahSet = new Set();
@@ -3505,7 +3536,7 @@ function loadKelas(){
   const container = document.getElementById("listKelas");
   if(!container) return;
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
   .onSnapshot(snapshot => {
 
     let kelasSet = new Set();
@@ -3553,7 +3584,7 @@ function loadAlert(){
 
   const container = document.getElementById("alertList");
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
   .orderBy("masa","desc") // 🔥 TAMBAH INI
   .limit(10)
   .onSnapshot(snapshot => {
@@ -3668,7 +3699,7 @@ const sidebarActivityRecords = {};
 
 function loadSidebar(){
 
-  db.collection("aktivitiPelajar")
+  adminActivityQuery()
   .onSnapshot(snapshot => {
 
     // Set digunakan supaya badge sidebar mengira PENGGUNA UNIK,
@@ -4748,6 +4779,7 @@ z-[9999] flex items-center justify-center p-4">
         <button type="button"
                 id="deleteLiveActivityButton"
                 onclick="deleteLiveActivity()"
+                disabled
                 class="py-3 rounded-xl font-bold text-sm
                        bg-red-500/10 border border-red-400/20
                        text-red-200 hover:bg-red-500/20 transition

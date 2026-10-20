@@ -1,0 +1,4774 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HEALINK 2.0 | Portal Pentadbir</title>
+<link rel="icon" type="image/png" sizes="192x192" href="assets/healink-icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/healink-icon-512.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#07091d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- =====================================================
+     FIREBASE SDK - HEALINK 2.0
+===================================================== -->
+
+<!-- Firebase App -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
+<!-- Firebase Firestore -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Cloud Messaging -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
+
+<style>
+  .card { @apply bg-white/20 border border-white/20 backdrop-blur-lg rounded-2xl p-5 shadow-lg; }
+</style>
+<style>
+  body {
+    color: #ffffff;
+  }
+</style>
+<style>
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+.section-box {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(12px);
+}
+.sidebar-btn{
+  width:100%;
+  text-align:left;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:5px;
+  background:rgba(255,255,255,0.05);
+}
+.sidebar-btn:hover{
+  background:rgba(255,255,255,0.2);
+}
+
+.card{
+  background: rgba(255,255,255,0.1);
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.title{
+  font-size:16px;
+  font-weight:600;
+  margin-bottom:10px;
+}
+
+.label{
+  font-size:12px;
+  opacity:0.7;
+}
+.sidebar-item {
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.sidebar-item:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.badge {
+  font-size: 12px;
+  color: #fde047;
+  font-weight: bold;
+}
+.sidebar-item{
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover{
+  background: rgba(255,255,255,0.12);
+  transform: translateX(4px);
+}
+
+.sidebar-item.active{
+  background: linear-gradient(to right, #f59e0b, #f97316);
+  color: white;
+  font-weight: 600;
+}
+
+.badge{
+  background: #facc15;
+  color: black;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* =============== DASHBOARD BACKGROUND =============== */
+body {
+  background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+
+  background-size: 200% 200%;
+  animation: gradientMove 15s ease infinite;
+}
+
+/* subtle glow */
+body::before {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99,102,241,0.25), transparent);
+  top: -80px;
+  left: -80px;
+  filter: blur(100px);
+}
+
+body::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(59,130,246,0.25), transparent);
+  bottom: -80px;
+  right: -80px;
+  filter: blur(100px);
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0% { transform: translateY(0px); opacity: 0; }
+  50% { opacity: 0.5; }
+  100% { transform: translateY(-600px); opacity: 0; }
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 16px;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+</style>
+
+<style id="healink-admin-v2-theme">
+:root{
+  --hl-bg:#07091d;
+  --hl-panel:rgba(20,22,61,.78);
+  --hl-panel-2:rgba(13,16,45,.82);
+  --hl-line:rgba(151,129,255,.16);
+  --hl-muted:#a8a9c4;
+  --hl-cyan:#22d3ee;
+  --hl-violet:#8b5cf6;
+}
+html{background:var(--hl-bg);}
+body{
+  font-family:"Plus Jakarta Sans",Inter,system-ui,sans-serif !important;
+  background:
+    radial-gradient(circle at 10% 5%,rgba(124,58,237,.17),transparent 27%),
+    radial-gradient(circle at 90% 88%,rgba(6,182,212,.10),transparent 28%),
+    linear-gradient(135deg,#050716 0%,#090b24 48%,#070a20 100%) !important;
+  background-attachment:fixed !important;
+  animation:none !important;
+  color:#f8fafc;
+}
+body::before,body::after{opacity:.55;pointer-events:none;}
+#particles{opacity:.20}
+
+/* SIDEBAR */
+body > div:first-of-type{
+  width:272px !important;
+  background:linear-gradient(180deg,rgba(16,18,52,.96),rgba(8,11,31,.97)) !important;
+  border-right:1px solid rgba(139,92,246,.16) !important;
+  box-shadow:18px 0 55px rgba(0,0,0,.20);
+  padding:20px !important;
+}
+body > div:first-of-type > h2{
+  font-size:0 !important;
+  margin-bottom:20px !important;
+}
+body > div:first-of-type > h2::before{
+  content:"HEALINK 2.0";
+  display:block;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-.03em;
+  color:#fff;
+}
+body > div:first-of-type > h2::after{
+  content:"PORTAL PENTADBIR";
+  display:block;
+  margin-top:5px;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.18em;
+  color:#67e8f9;
+}
+
+/* Sidebar counters/search */
+body > div:first-of-type > .bg-white\/10,
+body > div:first-of-type .bg-white\/10{
+  background:rgba(255,255,255,.035) !important;
+  border:1px solid rgba(255,255,255,.065) !important;
+  box-shadow:none !important;
+}
+#visitorCount,#visitorHealink{
+  background:linear-gradient(90deg,#c084fc,#67e8f9);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent !important;
+}
+#searchNama,#filterKelas,#filterModul{
+  background:rgba(5,8,28,.74) !important;
+  border:1px solid rgba(148,163,184,.14) !important;
+  color:#fff !important;
+  border-radius:12px !important;
+}
+#searchNama:focus,#filterKelas:focus,#filterModul:focus{
+  border-color:rgba(34,211,238,.45) !important;
+  box-shadow:0 0 0 3px rgba(34,211,238,.06);
+}
+.sidebar-item,.sidebar-btn{
+  background:rgba(255,255,255,.035) !important;
+  border:1px solid rgba(255,255,255,.05);
+}
+.sidebar-item:hover,.sidebar-btn:hover{
+  background:rgba(139,92,246,.12) !important;
+  border-color:rgba(139,92,246,.22);
+  transform:translateX(3px);
+}
+.sidebar-item.active{
+  background:linear-gradient(90deg,rgba(124,58,237,.42),rgba(6,182,212,.18)) !important;
+  border-color:rgba(103,232,249,.25) !important;
+}
+.badge{
+  background:rgba(34,211,238,.13) !important;
+  color:#67e8f9 !important;
+  border:1px solid rgba(34,211,238,.18);
+}
+
+/* MAIN */
+body > .flex-1{
+  padding:24px 28px !important;
+  background:transparent !important;
+}
+#greetingText{
+  color:#c4b5fd !important;
+  font-size:15px !important;
+  font-weight:700 !important;
+}
+
+/* Global glass panels */
+.card,.section-box,
+#mainDashboardContent > .bg-white\/10,
+#feedbackManagementPanel > .bg-white\/10,
+#feedbackManagementPanel .bg-white\/10{
+  background:linear-gradient(145deg,rgba(26,27,72,.72),rgba(12,15,42,.78)) !important;
+  border:1px solid var(--hl-line) !important;
+  box-shadow:0 18px 45px rgba(0,0,0,.16) !important;
+  backdrop-filter:blur(18px) !important;
+}
+.card,.section-box{border-radius:20px !important;}
+.section-title,.title{color:#f8fafc !important;}
+.section-title{font-size:17px !important}
+
+/* Header */
+#mainDashboardContent > div:first-child h1{
+  font-size:26px !important;
+  letter-spacing:-.035em;
+}
+#mainDashboardContent > div:first-child p{color:var(--hl-muted) !important}
+#mainDashboardContent button{
+  border:1px solid rgba(255,255,255,.08);
+}
+
+/* Report */
+#fromDate,#toDate{
+  background:rgba(5,8,28,.78) !important;
+  color:#e5e7eb !important;
+  border:1px solid rgba(148,163,184,.14) !important;
+  border-radius:12px !important;
+  color-scheme:dark;
+}
+#mainDashboardContent > .bg-white\/10{
+  border-radius:20px !important;
+}
+
+/* KPI */
+#kpiTotal,#kpiModules,#kpiTop,#kpiAvg{
+  display:block;
+  margin-top:6px;
+  font-size:23px;
+  font-weight:800;
+  color:#fff;
+}
+.label{color:#9fa1bc !important;opacity:1 !important}
+
+/* Live/alerts */
+#alertList,#activityList{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(139,92,246,.5) transparent;
+}
+
+/* Feedback */
+#feedbackSidebarButton{
+  background:linear-gradient(135deg,rgba(139,92,246,.09),rgba(34,211,238,.045)) !important;
+  border-color:rgba(139,92,246,.16) !important;
+}
+#feedbackSidebarButton:hover{
+  background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(34,211,238,.08)) !important;
+}
+#feedbackManagementPanel select{
+  background:#0b0d2a !important;
+}
+
+/* Buttons */
+button.bg-cyan-500{
+  background:linear-gradient(90deg,#7c3aed,#06b6d4) !important;
+}
+button.bg-red-500{
+  background:rgba(244,63,94,.13) !important;
+  color:#fecdd3 !important;
+  border-color:rgba(251,113,133,.20) !important;
+}
+button.bg-red-500:hover{background:rgba(244,63,94,.22) !important}
+
+/* Charts/ranking */
+canvas{max-width:100%}
+#ranking .card{background:rgba(255,255,255,.035) !important}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(139,92,246,.38);border-radius:999px}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  body{display:block !important}
+  body > div:first-of-type{
+    width:100% !important;
+    min-height:auto !important;
+    position:relative !important;
+    border-right:0 !important;
+    border-bottom:1px solid rgba(139,92,246,.16) !important;
+  }
+  body > .flex-1{padding:18px 14px !important}
+}
+@media(max-width:640px){
+  body > div:first-of-type{padding:16px !important}
+  #mainDashboardContent > div:first-child h1{font-size:22px !important}
+  .card,.section-box{border-radius:17px !important}
+}
+</style>
+
+
+<style id="healink-admin-v2-final-polish">
+.admin-status-pill,.admin-role-pill{
+  display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;
+  border-radius:12px;font-size:11px;font-weight:800;letter-spacing:.02em;
+  border:1px solid rgba(255,255,255,.08);white-space:nowrap
+}
+.admin-status-pill{background:rgba(16,185,129,.08);color:#86efac;border-color:rgba(52,211,153,.16)}
+.admin-role-pill{background:rgba(139,92,246,.09);color:#c4b5fd;border-color:rgba(167,139,250,.16)}
+.admin-status-dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px rgba(52,211,153,.75)}
+
+.visitor-mini-kpi{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  background:rgba(255,255,255,.032);border:1px solid rgba(255,255,255,.06);
+  border-radius:15px;min-width:0
+}
+.visitor-mini-icon{
+  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
+  flex:0 0 38px;border-radius:11px;background:linear-gradient(145deg,rgba(139,92,246,.16),rgba(34,211,238,.08));
+  border:1px solid rgba(139,92,246,.14)
+}
+.visitor-mini-label{display:block;color:#9fa1bc;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.visitor-mini-kpi b{display:block;margin-top:2px;font-size:22px;line-height:1.15;color:#fff}
+
+.admin-kpi-card{position:relative;overflow:hidden;text-align:left !important;padding:18px 19px !important}
+.admin-kpi-card::after{
+  content:"";position:absolute;width:80px;height:80px;right:-30px;top:-34px;
+  background:radial-gradient(circle,rgba(139,92,246,.17),transparent 70%);pointer-events:none
+}
+.admin-kpi-head{display:flex;align-items:center;gap:9px}
+.admin-kpi-icon{
+  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:9px;background:linear-gradient(145deg,rgba(124,58,237,.20),rgba(6,182,212,.10));
+  color:#c4b5fd;border:1px solid rgba(167,139,250,.13);font-size:13px;font-weight:800
+}
+.admin-kpi-card #kpiTotal,.admin-kpi-card #kpiModules,.admin-kpi-card #kpiTop,.admin-kpi-card #kpiAvg{
+  margin-top:13px;font-size:24px;line-height:1.15
+}
+.admin-kpi-note{display:block;margin-top:6px;color:#777b9d;font-size:9px;font-weight:600}
+
+@media(max-width:1100px){
+  .admin-status-pill,.admin-role-pill{display:none}
+}
+</style>
+
+
+<style id="healink-live-activity-detail-style">
+#activityList .user-item{
+  cursor:pointer;
+  border:1px solid transparent;
+}
+#activityList .user-item:hover{
+  transform:translateY(-1px);
+  border-color:rgba(103,232,249,.16);
+  background:linear-gradient(135deg,rgba(139,92,246,.10),rgba(34,211,238,.06)) !important;
+}
+.live-detail-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.live-detail-item{
+  padding:13px 14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.035);
+  border:1px solid rgba(255,255,255,.065);
+  min-width:0;
+}
+.live-detail-label{
+  display:block;
+  color:#8589aa;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:5px;
+}
+.live-detail-value{
+  color:#f8fafc;
+  font-size:13px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+.live-extra-row{
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,.055);
+  font-size:12px;
+}
+.live-extra-row:last-child{border-bottom:0}
+.live-extra-key{color:#9295b3;min-width:120px}
+.live-extra-value{color:#f1f5f9;text-align:right;overflow-wrap:anywhere}
+@media(max-width:640px){
+  .live-detail-grid{grid-template-columns:1fr}
+  .live-extra-row{display:block}
+  .live-extra-value{text-align:left;margin-top:4px}
+}
+</style>
+
+</head>
+
+<body class="flex text-white">
+
+  <!-- ================= SIDEBAR ================= -->
+  <div class="w-64 min-h-screen bg-white/10 backdrop-blur-lg p-5 border-r border-white/10">
+
+    <div class="flex items-center gap-3 mb-6">
+  <img src="assets/healink-icon-192.png"
+       alt="HEALINK 2.0"
+       class="w-12 h-12 rounded-xl shadow-lg">
+  <div>
+    <div class="text-lg font-extrabold tracking-tight">HEALINK <span class="text-violet-300">2.0</span></div>
+    <div class="text-[9px] font-extrabold tracking-[0.18em] text-cyan-300 mt-1">PORTAL PENTADBIR</div>
+  </div>
+</div>
+
+    <!-- VISITOR -->
+    <div class="bg-white/10 p-4 rounded-xl text-center mt-6 shadow-inner">
+
+      <p class="text-xs text-gray-300 uppercase tracking-wide">
+        👁️ Pelawat Portal
+      </p>
+
+      <p id="visitorCount" class="text-4xl font-extrabold text-yellow-300 mt-1">
+        5
+      </p>
+
+      <p class="text-[10px] text-green-400 mt-1 animate-pulse">
+        ● LIVE
+      </p>
+
+    </div>
+
+<!-- HEALINK VISITOR -->
+<div class="bg-white/10 p-4 rounded-xl text-center mt-4 shadow-inner">
+
+  <p class="text-xs text-gray-300 uppercase tracking-wide">
+    🧠 Pelawat HEALINK
+  </p>
+
+  <p id="visitorHealink" class="text-4xl font-extrabold text-pink-300 mt-1">
+    0
+  </p>
+
+  <p class="text-[10px] text-green-400 mt-1 animate-pulse">
+    ● LIVE
+  </p>
+
+</div>
+
+<!-- ================= ADVANCED FILTER ================= -->
+<div class="bg-white/10 p-3 rounded-xl mt-6 space-y-3">
+
+  <p class="text-xs text-gray-300 uppercase">
+    🔍 Carian Murid
+  </p>
+
+  <!-- NAMA -->
+  <input 
+    type="text" 
+    id="searchNama"
+    placeholder="Nama..."
+    class="w-full px-3 py-2 rounded bg-white/20 text-white placeholder-gray-300 outline-none">
+
+  <!-- KELAS -->
+  <select id="filterKelas" 
+    class="w-full px-3 py-2 rounded bg-purple-900 text-white outline-none">
+    <option value="">Semua Kelas</option>
+  </select>
+
+  <!-- MODUL -->
+  <select id="filterModul" 
+    class="w-full px-3 py-2 rounded bg-purple-900 text-white outline-none">
+    <option value="">Semua Modul</option>
+  </select>
+
+  <!-- RESULT -->
+  <p id="resultCount" class="text-xs text-green-300">
+    0 result
+  </p>
+
+</div>
+
+<!-- ================= MAKLUM BALAS PENGGUNA ================= -->
+
+<div class="mt-5">
+
+  <div
+    id="feedbackSidebarButton"
+    onclick="openFeedbackManagement()"
+    class="
+      group
+      cursor-pointer
+      rounded-xl
+      border border-white/10
+      bg-white/5
+      px-3 py-3
+      transition duration-300
+      hover:bg-white/10
+      hover:border-cyan-300/30
+    "
+  >
+
+    <div class="flex items-center justify-between gap-3">
+
+      <!-- LEFT -->
+      <div class="flex items-center gap-3 min-w-0">
+
+        <div
+          class="
+            w-9 h-9
+            rounded-lg
+            flex items-center justify-center
+            bg-gradient-to-br
+            from-violet-500/30
+            to-cyan-500/20
+            border border-white/10
+            text-lg
+          "
+        >
+          💬
+        </div>
+
+
+        <div class="min-w-0">
+
+          <div class="text-sm font-semibold text-white">
+            Maklum Balas
+          </div>
+
+          <div class="text-[10px] text-white/50 mt-0.5">
+            Komen & cadangan pengguna
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BADGE -->
+      <span
+        id="feedbackNewBadge"
+        class="
+          hidden
+          min-w-[25px]
+          h-[25px]
+          px-2
+          rounded-full
+          items-center justify-center
+          bg-yellow-400
+          text-black
+          text-[11px]
+          font-extrabold
+          shadow-lg
+        "
+      >
+        0
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     🔔 HEALINK 2.0 - NOTIFIKASI ADMIN
+===================================================== -->
+
+<div id="adminNotificationSection" class="mt-4">
+
+  <button
+    id="enableNotificationBtn"
+    type="button"
+    class="sidebar-btn"
+    style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#67e8f9;
+      border:1px solid rgba(34,211,238,.25);
+      background:rgba(34,211,238,.08);
+    "
+  >
+    <span>🔔</span>
+    <span>Aktifkan Notifikasi</span>
+  </button>
+
+  <p
+    id="notificationStatus"
+    style="
+      font-size:10px;
+      color:#a8a9c4;
+      margin-top:6px;
+      padding-left:10px;
+    "
+  >
+    Notifikasi belum diaktifkan.
+  </p>
+
+</div>
+
+
+<!-- ================= SEKOLAH ================= -->
+<div onclick="toggleSection('sekolahList')"
+     class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+  <span>🏫 Sekolah</span>
+  <span id="arrowSekolah">▼</span>
+</div>
+<div id="sekolahList" class="space-y-2 hidden"></div>
+
+    <!-- ================= KELAS ================= -->
+    <div onclick="toggleSection('kelasList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🎓 Kelas</span>
+      <span id="arrowKelas">▼</span>
+    </div>
+    <div id="kelasList" class="space-y-2 hidden"></div>
+
+    <!-- ================= ORGANISASI ================= -->
+    <div onclick="toggleSection('organisasiList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🏢 Organisasi</span>
+      <span id="arrowOrg">▼</span>
+    </div>
+    <div id="organisasiList" class="space-y-2 hidden"></div>
+
+  </div>
+
+  <!-- ================= CONTENT ================= -->
+  <div class="flex-1 p-6 space-y-6 overflow-y-auto">
+
+ <div class="mb-4">
+  <h2 id="greetingText"
+    class="text-lg font-semibold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
+  </h2>
+</div>
+
+
+<!-- =====================================================
+     💬 PENGURUSAN MAKLUM BALAS PENGGUNA
+===================================================== -->
+
+<section
+  id="feedbackManagementPanel"
+  class="hidden"
+>
+
+  <!-- ================= HEADER ================= -->
+
+  <div
+    class="
+      bg-white/10
+      backdrop-blur-xl
+      border border-white/10
+      rounded-2xl
+      p-6
+      shadow-xl
+      mb-6
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-col
+        md:flex-row
+        md:items-center
+        md:justify-between
+        gap-4
+      "
+    >
+
+      <div>
+
+        <div
+          class="
+            flex
+            items-center
+            gap-3
+          "
+        >
+
+          <div
+            class="
+              w-12 h-12
+              rounded-xl
+              flex
+              items-center
+              justify-center
+              text-2xl
+              bg-gradient-to-br
+              from-violet-500/40
+              to-cyan-500/30
+              border border-white/10
+            "
+          >
+            💬
+          </div>
+
+          <div>
+
+            <h2
+              class="
+                text-xl
+                md:text-2xl
+                font-bold
+                text-white
+              "
+            >
+              Maklum Balas Pengguna
+            </h2>
+
+            <p
+              class="
+                text-sm
+                text-white/60
+                mt-1
+              "
+            >
+              Urus komen, cadangan dan pengalaman pengguna HEALINK.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- KEMBALI -->
+
+      <button
+        type="button"
+        onclick="closeFeedbackManagement()"
+        class="
+          px-4
+          py-2.5
+          rounded-xl
+          bg-white/10
+          border border-white/10
+          text-sm
+          font-semibold
+          text-white
+          hover:bg-white/20
+          transition
+        "
+      >
+        ← Kembali ke Dashboard
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= KPI ================= -->
+
+  <div
+    class="
+      grid
+      grid-cols-2
+      lg:grid-cols-4
+      gap-4
+      mb-6
+    "
+  >
+
+    <!-- JUMLAH -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Jumlah
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-violet-500/20
+          "
+        >
+          💬
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiTotal"
+        class="
+          text-3xl
+          font-extrabold
+          text-white
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Semua maklum balas
+      </div>
+
+    </div>
+
+
+    <!-- BARU -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-yellow-300/20
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Baru
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-yellow-400/20
+          "
+        >
+          🔔
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiNew"
+        class="
+          text-3xl
+          font-extrabold
+          text-yellow-300
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Belum disemak
+      </div>
+
+    </div>
+
+
+    <!-- RATING -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Purata Rating
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-orange-400/20
+          "
+        >
+          ⭐
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiRating"
+        class="
+          text-3xl
+          font-extrabold
+          text-orange-300
+        "
+      >
+        0.0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Daripada 5 bintang
+      </div>
+
+    </div>
+
+
+    <!-- SELESAI -->
+
+    <div
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-emerald-300/20
+        rounded-2xl
+        p-5
+      "
+    >
+
+      <div
+        class="
+          flex
+          items-center
+          justify-between
+          mb-3
+        "
+      >
+
+        <span class="text-white/60 text-sm">
+          Selesai
+        </span>
+
+        <span
+          class="
+            w-9 h-9
+            rounded-lg
+            flex
+            items-center
+            justify-center
+            bg-emerald-400/20
+          "
+        >
+          ✓
+        </span>
+
+      </div>
+
+      <div
+        id="feedbackKpiDone"
+        class="
+          text-3xl
+          font-extrabold
+          text-emerald-300
+        "
+      >
+        0
+      </div>
+
+      <div
+        class="
+          text-[11px]
+          text-white/40
+          mt-1
+        "
+      >
+        Telah diselesaikan
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= FILTER ================= -->
+
+  <div
+    class="
+      bg-white/5
+      border border-white/10
+      rounded-2xl
+      p-4
+      mb-5
+    "
+  >
+
+    <div
+      class="
+        flex
+        flex-wrap
+        gap-2
+      "
+    >
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white
+          text-purple-800
+          text-sm
+          font-bold
+        "
+        data-feedback-filter="Semua"
+      >
+        Semua
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Baru"
+      >
+        Baru
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Telah Dibaca"
+      >
+        Telah Dibaca
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Dalam Tindakan"
+      >
+        Dalam Tindakan
+      </button>
+
+      <button
+        type="button"
+        class="
+          feedback-filter-btn
+          px-4 py-2
+          rounded-xl
+          bg-white/10
+          text-white/70
+          text-sm
+          hover:bg-white/20
+          transition
+        "
+        data-feedback-filter="Selesai"
+      >
+        Selesai
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= SENARAI ================= -->
+
+  <div
+    id="feedbackManagementList"
+    class="space-y-4"
+  >
+    <div class="bg-white/10 border border-white/10 rounded-2xl p-6 text-center text-white/60">
+      Memuatkan maklum balas...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     📊 KANDUNGAN DASHBOARD UTAMA
+===================================================== -->
+
+<div id="mainDashboardContent" class="space-y-6">
+
+
+<!-- HEADER -->
+    <div class="flex justify-between items-center gap-3 flex-wrap">
+      <div>
+        <h1 class="text-2xl font-bold">📊 Dashboard Aktiviti Pelajar</h1>
+        <p class="text-white/70 text-sm">Analisis penggunaan modul (Real-time)</p>
+      </div>
+
+      <div class="flex gap-3 items-center flex-wrap">
+
+  <span class="admin-status-pill">
+    <span class="admin-status-dot"></span>
+    Sistem Aktif
+  </span>
+
+  <span class="admin-role-pill">Portal Pentadbir</span>
+
+  <!-- LOG KEMASKINI -->
+  <button onclick="openUpdateModal()" 
+    class="bg-cyan-500 hover:bg-cyan-400
+           px-4 py-2 rounded-xl shadow-lg
+           font-semibold transition duration-300">
+
+    🚀 Log Kemaskini
+
+  </button>
+
+  <!-- LOGOUT -->
+  <button onclick="logout()" 
+    class="bg-red-500 px-4 py-2 rounded-xl 
+           hover:bg-red-600 transition duration-300">
+
+    🚪 Logout
+
+  </button>
+
+</div>
+    </div>
+
+   <!-- ================= JANA LAPORAN ================= -->
+<div class="bg-white/10 backdrop-blur-lg p-6 rounded-2xl shadow-lg mt-6">
+
+  <!-- TAJUK -->
+  <h3 class="text-lg font-bold text-white mb-4 text-center">
+    📊 Jana Laporan HEALINK
+  </h3>
+
+  <!-- TARIKH -->
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div>
+      <label class="text-sm text-white/80">Tarikh Mula</label>
+      <input id="fromDate" type="date"
+        class="w-full p-2 rounded text-black mt-1">
+    </div>
+
+    <div>
+      <label class="text-sm text-white/80">Tarikh Tamat</label>
+      <input id="toDate" type="date"
+        class="w-full p-2 rounded text-black mt-1">
+    </div>
+
+  </div>
+
+  <!-- BUTTON -->
+  <div class="mt-6 text-center">
+    <button onclick="exportCSV()"
+      class="bg-gradient-to-r from-blue-500 to-purple-500 
+             px-6 py-3 rounded-xl font-semibold 
+             hover:scale-105 transition duration-300 shadow-lg">
+      📥 Jana & Muat Turun Laporan
+    </button>
+  </div>
+
+</div>
+
+    <!-- ================= PENGUNJUNG ================= -->
+    <div class="card">
+      <div class="title">👥 Analisis Pengunjung</div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-center">
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="visitor-mini-kpi">
+            <span class="visitor-mini-icon">🎓</span>
+            <div><span class="visitor-mini-label">Murid</span><b id="kpiMurid">0</b></div>
+          </div>
+          <div class="visitor-mini-kpi">
+            <span class="visitor-mini-icon">👨‍🏫</span>
+            <div><span class="visitor-mini-label">Guru</span><b id="kpiGuru">0</b></div>
+          </div>
+          <div class="visitor-mini-kpi">
+            <span class="visitor-mini-icon">👤</span>
+            <div><span class="visitor-mini-label">Pelawat</span><b id="kpiPelawat">0</b></div>
+          </div>
+        </div>
+
+        <div class="h-40">
+          <canvas id="visitorChart"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+<!-- ================= KPI ================= -->
+<div class="grid md:grid-cols-4 gap-4">
+
+  <div class="card admin-kpi-card">
+    <div class="admin-kpi-head"><span class="admin-kpi-icon">⚡</span><div class="label">Interaksi</div></div>
+    <b id="kpiTotal">0</b>
+    <span class="admin-kpi-note">Jumlah penggunaan modul</span>
+  </div>
+
+  <div class="card admin-kpi-card">
+    <div class="admin-kpi-head"><span class="admin-kpi-icon">◈</span><div class="label">Modul Aktif</div></div>
+    <b id="kpiModules">0</b>
+    <span class="admin-kpi-note">Modul dengan rekod aktiviti</span>
+  </div>
+
+  <div class="card admin-kpi-card">
+    <div class="admin-kpi-head"><span class="admin-kpi-icon">★</span><div class="label">Top Modul</div></div>
+    <b id="kpiTop">-</b>
+    <span class="admin-kpi-note">Modul paling banyak digunakan</span>
+  </div>
+
+  <div class="card admin-kpi-card">
+    <div class="admin-kpi-head"><span class="admin-kpi-icon">↗</span><div class="label">Purata</div></div>
+    <b id="kpiAvg">0</b>
+    <span class="admin-kpi-note">Purata interaksi setiap modul</span>
+  </div>
+
+</div>
+
+
+<!-- ================= ALERT + LIVE ================= -->
+<div class="grid md:grid-cols-2 gap-6 mt-6 items-stretch">
+
+  <!-- ALERT -->
+  <div class="section-box flex flex-col h-[420px]">
+
+    <div class="section-title text-red-400">
+      ⚠️ Murid Perlu Perhatian
+    </div>
+
+    <!-- 🔥 SCROLL DALAM -->
+    <div id="alertList"
+         class="space-y-3 mt-4 overflow-y-auto flex-1 pr-2">
+    </div>
+
+  </div>
+
+  <!-- LIVE -->
+  <div class="card flex flex-col h-[420px]">
+
+    <div class="title">
+      📋 Aktiviti Pengguna (Live)
+    </div>
+
+    <!-- 🔥 SCROLL DALAM -->
+    <div id="activityList"
+         class="space-y-2 mt-3 overflow-y-auto flex-1 pr-2">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================= CHART ================= -->
+<div class="grid md:grid-cols-2 gap-6 mt-6">
+
+  <div class="card">
+    <div class="title text-center">📊 Bar Chart</div>
+    <div class="h-64 md:h-72">
+      <canvas id="barChart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="title text-center">📊 Pie Chart</div>
+    <div class="h-64 md:h-72 flex justify-center items-center">
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ================= RANKING ================= -->
+
+<div class="card mt-6">
+
+  <div class="title">
+    🏆 Ranking Modul
+  </div>
+
+  <div
+    id="ranking"
+    class="grid md:grid-cols-3 gap-4">
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     📊 TAMAT KANDUNGAN DASHBOARD UTAMA
+===================================================== -->
+
+</div>
+
+
+<script>
+
+const SUPER_ADMIN = "fitrieusop@moe.gov.my";
+
+function generateGreeting(){
+
+  firebase.auth().onAuthStateChanged(user => {
+
+    let namaPaparan = "Pengguna";
+    let roleText = "";
+
+    if(user && user.email){
+
+      const email = user.email.toLowerCase();
+      const raw = email.split("@")[0];
+
+      const nama = raw.charAt(0).toUpperCase() + raw.slice(1);
+
+      // ================= ROLE LOGIC =================
+      if(email === SUPER_ADMIN){
+
+        roleText = "Admin";
+        namaPaparan = "Fitri";
+
+      }
+      else if(
+        window.currentAdmin &&
+        (
+          window.currentAdmin.role === "superadmin" ||
+          window.currentAdmin.role === "schooladmin"
+        )
+      ){
+
+        roleText = "Admin";
+
+        namaPaparan =
+        window.currentAdmin.nama || "";
+
+      }
+      else{
+        const jenis = sessionStorage.getItem("jenis");
+
+        if(jenis === "Guru"){
+          roleText = "Cikgu";
+          namaPaparan = sessionStorage.getItem("nama") || nama;
+        }
+        else if(jenis === "Murid"){
+          roleText = "";
+          namaPaparan = sessionStorage.getItem("nama") || nama;
+        }
+      }
+    }
+
+    // ================= MASA =================
+    const hour = new Date().getHours();
+
+    let greeting = "";
+
+    if(hour >= 5 && hour < 12){
+      greeting = "🌅 Selamat Pagi";
+    }
+    else if(hour >= 12 && hour < 18){
+      greeting = "🌤 Selamat Petang";
+    }
+    else{
+      greeting = "🌙 Selamat Malam";
+    }
+
+    // ================= OUTPUT =================
+    let fullText = greeting;
+
+    if(roleText && namaPaparan){
+      fullText += `, ${roleText} ${namaPaparan}`;
+    }
+    else if(roleText){
+      fullText += `, ${roleText}`;
+    }
+    else{
+      fullText += `, ${namaPaparan}`;
+    }
+
+    const el = document.getElementById("greetingText");
+
+    el.innerText = fullText;
+
+    // ================= WARNA ROLE =================
+    if(roleText === "Admin"){
+      el.className = "text-lg font-semibold text-yellow-300";
+    }
+    else if(roleText === "Cikgu"){
+      el.className = "text-lg font-semibold text-blue-300";
+    }
+    else{
+      el.className = "text-lg font-semibold text-green-300";
+    }
+
+  });
+
+}
+
+// =====================================================
+// FIREBASE CONFIG - HEALINK 2.0 + FCM
+// =====================================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+
+  databaseURL: "https://bimbingankaunselingskkk-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId: "bimbingankaunselingskkk",
+
+  storageBucket: "bimbingankaunselingskkk.firebasestorage.app",
+
+  messagingSenderId: "847162891153",
+
+  appId: "1:847162891153:web:0ff6aa5a6c7276133f1830"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// STATE
+let rawData = [];
+let stats = {};
+let barChart, pieChart;
+
+// =====================================================
+// 📡 REALTIME LISTENER - ROLE BASED DATA
+// =====================================================
+
+function startMainDataListener(){
+
+  db.collection("aktivitiPelajar")
+    .onSnapshot(snapshot => {
+
+      rawData = [];
+
+      snapshot.forEach(doc => {
+
+        const d = doc.data();
+
+        // ==========================================
+        // SCHOOL ADMIN
+        // HANYA DATA SEKOLAH SENDIRI
+        // ==========================================
+        if(
+          window.currentAdmin &&
+          window.currentAdmin.role === "schooladmin"
+        ){
+
+          const sekolahAdmin =
+            normalizeSekolah(
+              window.currentAdmin.sekolah
+            );
+
+          const sekolahData =
+            normalizeSekolah(
+              d.organisasi
+            );
+
+          if(sekolahData !== sekolahAdmin){
+            return;
+            }
+        }
+
+        // ==========================================
+        // SUPERADMIN
+        // SEMUA DATA DIBENARKAN
+        // ==========================================
+
+        rawData.push(d);
+
+      });
+
+      computeAndRender();
+
+      console.log(
+        "📊 DATA HEALINK:",
+        rawData.length,
+        window.currentAdmin?.role,
+        window.currentAdmin?.sekolah
+      );
+
+    });
+
+}
+
+// 🔎 FILTER TARIKH
+function applyFilter(){
+  computeAndRender();
+}
+
+function inRange(date){
+  const from = document.getElementById('fromDate').value;
+  const to   = document.getElementById('toDate').value;
+
+  if(!from && !to) return true;
+
+  const d = new Date(date?.seconds ? date.seconds*1000 : date);
+  if(from){
+    const f = new Date(from + "T00:00:00");
+    if(d < f) return false;
+  }
+  if(to){
+    const t = new Date(to + "T23:59:59");
+    if(d > t) return false;
+  }
+  return true;
+}
+
+// 🧠 COMPUTE
+function computeAndRender(){
+  stats = {};
+  let total = 0;
+
+  rawData.forEach(d => {
+    if(!inRange(d.masa)) return;
+
+    const m = d.module || "Lain";
+    if(!stats[m]) stats[m] = 0;
+    stats[m]++;
+    total++;
+  });
+
+  renderKPI(stats, total);
+  renderCharts(stats);
+  renderRanking(stats);
+}
+
+// 📊 KPI
+function renderKPI(stats, total){
+  const modules = Object.keys(stats).length;
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+  const top = sorted[0]?.[0] || "-";
+  const avg = modules ? Math.round(total/modules) : 0;
+
+  document.getElementById("kpiTotal").innerText = total;
+  document.getElementById("kpiModules").innerText = modules;
+  document.getElementById("kpiTop").innerText = top;
+  document.getElementById("kpiAvg").innerText = avg;
+}
+
+// 📈 CHART
+function renderCharts(stats){
+
+  const labels = Object.keys(stats);
+  const data = Object.values(stats);
+
+  // destroy lama
+  if(barChart) barChart.destroy();
+  if(pieChart) pieChart.destroy();
+
+  // ================= BAR =================
+  barChart = new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Jumlah Klik',
+        data,
+        backgroundColor: "rgba(255,255,255,0.3)",
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // 🔥 WAJIB
+
+      plugins: {
+        legend: {
+          labels: {
+            color: "#ffffff",
+            font: { size: 12 } // kecilkan legend
+          }
+        }
+      },
+
+      scales: {
+        x: {
+          ticks: { 
+            color: "#ffffff",
+            font: { size: 10 } // kecilkan label bawah
+          }
+        },
+        y: {
+          ticks: { 
+            color: "#ffffff",
+            font: { size: 10 }
+          }
+        }
+      }
+    }
+  });
+
+
+  // ================= PIE =================
+  pieChart = new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: [
+          "#60a5fa","#f87171","#fbbf24","#34d399","#a78bfa",
+          "#f472b6","#22d3ee","#facc15","#fb923c","#4ade80"
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // 🔥 WAJIB
+
+      plugins: {
+        legend: {
+          labels: {
+            color: "#ffffff",
+            font: { size: 11 } // kecilkan legend pie
+          }
+        }
+      }
+    }
+  });
+
+}
+
+// 🏆 RANKING
+function renderRanking(stats){
+  const container = document.getElementById("ranking");
+  container.innerHTML = "";
+
+  const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+  const max = sorted[0]?.[1] || 1;
+
+  sorted.forEach(([module, count], i)=>{
+    const percent = Math.round((count/max)*100);
+
+    container.innerHTML += `
+      <div class="card">
+        <div class="flex justify-between">
+          <div>#${i+1}</div>
+          <div class="text-xs">${percent}%</div>
+        </div>
+        <div class="font-bold mt-2">${module}</div>
+        <div class="text-3xl mt-1">${count}</div>
+        <div class="w-full bg-white/20 h-2 rounded mt-3">
+          <div class="h-2 rounded bg-gradient-to-r from-yellow-400 to-pink-500" style="width:${percent}%"></div>
+        </div>
+      </div>
+    `;
+  });
+}
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<!-- =====================================================
+     HEALINK 2.0 - FIREBASE CLOUD MESSAGING
+===================================================== -->
+
+<script>
+
+const HEALINK_VAPID_KEY =
+  "BKYhwy4UcU5p7UFMpI8xl7z2LD_nnmCa9-yN24XyB2dDgH6h_NBiSfQPSAYJfrbPwNYPs7H1hC6hKbsBojOcBAQ";
+
+async function enableAdminNotifications() {
+
+  const status = document.getElementById("notificationStatus");
+  const button = document.getElementById("enableNotificationBtn");
+
+  try {
+
+    const admin = window.currentAdmin;
+    const user = firebase.auth().currentUser;
+
+    if (
+      !user ||
+      !admin ||
+      admin.uid !== user.uid ||
+      !["superadmin", "schooladmin"].includes(admin.role)
+    ) {
+      throw new Error("Akses notifikasi hanya untuk pentadbir yang disahkan.");
+    }
+
+    if (
+      !("serviceWorker" in navigator) ||
+      !("Notification" in window) ||
+      !(await firebase.messaging.isSupported())
+    ) {
+      throw new Error("Peranti atau pelayar ini tidak menyokong notifikasi FCM.");
+    }
+
+    button.disabled = true;
+    status.textContent = "Sedang mengaktifkan notifikasi...";
+
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      throw new Error("Kebenaran notifikasi tidak diberikan.");
+    }
+
+    const registration = await navigator.serviceWorker.register(
+      "/service-worker.js"
+    );
+
+    await navigator.serviceWorker.ready;
+
+    const messaging = firebase.messaging();
+
+    const token = await messaging.getToken({
+      vapidKey: HEALINK_VAPID_KEY,
+      serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+      throw new Error("Token FCM tidak berjaya dijana.");
+    }
+
+    // =====================================================
+// HEALINK 2.0 - SIMPAN TOKEN FCM PENTADBIR
+// =====================================================
+
+// ID dokumen berasaskan UID dan token peranti.
+// Mengelakkan pendaftaran berulang bagi token yang sama.
+const encoder = new TextEncoder();
+
+const tokenBytes = encoder.encode(token);
+
+const tokenHash = await crypto.subtle.digest(
+  "SHA-256",
+  tokenBytes
+);
+
+const tokenId = Array.from(
+  new Uint8Array(tokenHash)
+)
+  .map(byte => byte.toString(16).padStart(2, "0"))
+  .join("");
+
+const subscriptionId = `${user.uid}_${tokenId}`;
+
+const subscriptionRef = db
+  .collection("push_subscriptions")
+  .doc(subscriptionId);
+
+const existingSubscription = await subscriptionRef.get();
+
+const adminSchool = admin.sekolah || "";
+
+if (existingSubscription.exists) {
+
+  await subscriptionRef.update({
+    token: token,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+} else {
+
+  await subscriptionRef.set({
+    uid: user.uid,
+    token: token,
+    role: admin.role,
+    sekolah: adminSchool,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+}
+
+console.log("✅ Token FCM pentadbir disimpan ke Firestore.");
+
+    status.textContent = "✅ Token FCM berjaya dijana.";
+    button.querySelector("span:last-child").textContent =
+      "Notifikasi Diaktifkan";
+
+    console.log("✅ Token FCM berjaya dijana untuk pentadbir.");
+
+  } catch (error) {
+
+    console.error("❌ HEALINK FCM:", error);
+
+    status.textContent = "❌ " + error.message;
+
+  } finally {
+
+    button.disabled = false;
+
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const button = document.getElementById("enableNotificationBtn");
+
+  if (button) {
+    button.addEventListener("click", enableAdminNotifications);
+  }
+
+});
+
+</script>
+
+<script>
+// =====================================================
+// HEALINK ADMIN ACCESS CONTROL
+// =====================================================
+
+window.currentAdmin = null;
+
+firebase.auth().onAuthStateChanged(async user => {
+
+  // ================= BELUM LOGIN =================
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+
+    // ================= BACA PROFIL ADMIN =================
+    const adminDoc = await db
+      .collection("adminUsers")
+      .doc(user.uid)
+      .get();
+
+    // ================= BUKAN ADMIN =================
+    if (!adminDoc.exists) {
+
+      alert("Akses terhad untuk pentadbir HEALINK sahaja.");
+
+      await firebase.auth().signOut();
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    // ================= SIMPAN PROFIL =================
+    const adminData = adminDoc.data();
+
+    window.currentAdmin = {
+      uid: user.uid,
+      email: user.email,
+      nama: adminData.nama || "Admin",
+      role: adminData.role || "",
+      sekolah: adminData.sekolah || ""
+    };
+
+    console.log(
+      "✅ HEALINK ADMIN:",
+      window.currentAdmin
+    );
+
+    // ================= VALIDASI ROLE =================
+    if (
+      window.currentAdmin.role !== "superadmin" &&
+      window.currentAdmin.role !== "schooladmin"
+    ) {
+
+      alert("Role pentadbir tidak sah.");
+
+      await firebase.auth().signOut();
+
+      window.location.href = "login.html";
+      return;
+    }
+
+    // ================= SCHOOL ADMIN =================
+    if (window.currentAdmin.role === "schooladmin") {
+
+      if (!window.currentAdmin.sekolah) {
+
+        alert("Maklumat sekolah untuk akaun ini belum ditetapkan.");
+
+        await firebase.auth().signOut();
+
+        window.location.href = "login.html";
+        return;
+      }
+
+      currentSekolah =
+        normalizeSekolah(
+          window.currentAdmin.sekolah
+        );
+
+      console.log(
+        "🏫 SCHOOL ADMIN:",
+        currentSekolah
+      );
+    }
+
+    // ================= SUPER ADMIN =================
+    if (window.currentAdmin.role === "superadmin") {
+
+      currentSekolah = "all";
+
+      console.log(
+        "👑 SUPER ADMIN — SEMUA SEKOLAH"
+      );
+    }
+
+    // ================= UCAPAN ADMIN =================
+    generateGreeting();
+
+    // ================= START ADMIN DATA =================
+
+    startMainDataListener();
+
+    loadData();
+    loadSidebar();
+    loadAlert();
+
+
+    // ================= MAKLUM BALAS =================
+
+    startFeedbackBadgeListener();
+
+    startFeedbackManagementListener();
+
+    }
+    catch(error) {
+
+      console.error(
+        "❌ ADMIN ACCESS ERROR:",
+        error
+      );
+
+      alert(
+        "Ralat semasa mendapatkan maklumat pentadbir."
+      );
+
+    }
+
+    });
+
+
+    // =====================================================
+// 💬 OPEN FEEDBACK MANAGEMENT
+// =====================================================
+
+function openFeedbackManagement() {
+
+  const dashboard =
+    document.getElementById(
+      "mainDashboardContent"
+    );
+
+  const feedbackPanel =
+    document.getElementById(
+      "feedbackManagementPanel"
+    );
+
+
+  if(!dashboard || !feedbackPanel) {
+
+    console.error(
+      "❌ Panel Maklum Balas tidak dijumpai."
+    );
+
+    return;
+  }
+
+
+  // ================= SEMBUNYIKAN DASHBOARD =================
+
+  dashboard.classList.add(
+    "hidden"
+  );
+
+
+  // ================= PAPARKAN FEEDBACK =================
+
+  feedbackPanel.classList.remove(
+    "hidden"
+  );
+
+
+  // ================= SCROLL ATAS =================
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+
+  console.log(
+    "💬 Pengurusan Maklum Balas dibuka"
+  );
+
+}
+
+
+
+// =====================================================
+// ← KEMBALI KE DASHBOARD
+// =====================================================
+
+function closeFeedbackManagement() {
+
+  const dashboard =
+    document.getElementById(
+      "mainDashboardContent"
+    );
+
+  const feedbackPanel =
+    document.getElementById(
+      "feedbackManagementPanel"
+    );
+
+
+  if(!dashboard || !feedbackPanel) {
+    return;
+  }
+
+
+  // ================= TUTUP FEEDBACK =================
+
+  feedbackPanel.classList.add(
+    "hidden"
+  );
+
+
+  // ================= PAPARKAN DASHBOARD =================
+
+  dashboard.classList.remove(
+    "hidden"
+  );
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+
+  console.log(
+    "📊 Kembali ke Dashboard"
+  );
+
+}
+
+</script>
+
+<script>
+// =====================================================
+// 💬 PENGURUSAN MAKLUM BALAS - FIRESTORE REALTIME
+// =====================================================
+
+let feedbackManagementData = [];
+let feedbackManagementFilter = "Semua";
+let feedbackManagementListenerStarted = false;
+
+function startFeedbackManagementListener() {
+
+  if (feedbackManagementListenerStarted) return;
+
+  feedbackManagementListenerStarted = true;
+
+  db.collection("maklumBalasPengguna")
+    .orderBy("masa", "desc")
+    .onSnapshot(
+      snapshot => {
+
+        feedbackManagementData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        renderFeedbackManagement();
+
+      },
+      error => {
+
+        console.error(
+          "❌ Gagal membaca maklum balas:",
+          error
+        );
+
+        const list =
+          document.getElementById("feedbackManagementList");
+
+        if (list) {
+          list.innerHTML = `
+            <div class="bg-red-500/10 border border-red-300/20 rounded-2xl p-6 text-center text-red-100">
+              Maklum balas tidak dapat dimuatkan. Sila cuba semula.
+            </div>
+          `;
+        }
+
+      }
+    );
+}
+
+
+function renderFeedbackManagement() {
+
+  const total = feedbackManagementData.length;
+
+  const totalBaru =
+    feedbackManagementData.filter(
+      item => item.status === "Baru"
+    ).length;
+
+  const totalSelesai =
+    feedbackManagementData.filter(
+      item => item.status === "Selesai"
+    ).length;
+
+  const ratings =
+    feedbackManagementData
+      .map(item => Number(item.rating))
+      .filter(rating =>
+        Number.isFinite(rating) &&
+        rating >= 1 &&
+        rating <= 5
+      );
+
+  const purataRating =
+    ratings.length
+      ? (
+          ratings.reduce(
+            (sum, rating) => sum + rating,
+            0
+          ) / ratings.length
+        ).toFixed(1)
+      : "0.0";
+
+
+  setFeedbackText("feedbackKpiTotal", total);
+  setFeedbackText("feedbackKpiNew", totalBaru);
+  setFeedbackText("feedbackKpiRating", purataRating);
+  setFeedbackText("feedbackKpiDone", totalSelesai);
+
+
+  const list =
+    document.getElementById("feedbackManagementList");
+
+  if (!list) return;
+
+
+  const filtered =
+    feedbackManagementFilter === "Semua"
+      ? feedbackManagementData
+      : feedbackManagementData.filter(
+          item =>
+            item.status === feedbackManagementFilter
+        );
+
+
+  if (!filtered.length) {
+
+    list.innerHTML = `
+      <div class="bg-white/10 border border-white/10 rounded-2xl p-8 text-center">
+        <div class="text-4xl mb-3">💬</div>
+        <div class="font-semibold text-white">
+          Tiada maklum balas
+        </div>
+        <div class="text-sm text-white/50 mt-1">
+          Tiada rekod untuk status yang dipilih.
+        </div>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  list.innerHTML =
+    filtered.map(
+      item => createFeedbackManagementCard(item)
+    ).join("");
+
+}
+
+
+function createFeedbackManagementCard(item) {
+
+  const category =
+    escapeFeedbackHTML(
+      item.kategori || "Lain-lain"
+    );
+
+  const comment =
+    escapeFeedbackHTML(
+      item.komen || "-"
+    );
+
+  const name =
+    escapeFeedbackHTML(
+      item.nama || "Pengguna"
+    );
+
+  const type =
+    escapeFeedbackHTML(
+      item.jenis || "-"
+    );
+
+  const organisation =
+    escapeFeedbackHTML(
+      item.organisasi || "-"
+    );
+
+  const className =
+    escapeFeedbackHTML(
+      item.kelas || "-"
+    );
+
+  const status =
+    normaliseFeedbackStatus(
+      item.status
+    );
+
+  const rating =
+    Math.max(
+      0,
+      Math.min(
+        5,
+        Number(item.rating) || 0
+      )
+    );
+
+  const stars =
+    "★".repeat(rating) +
+    "☆".repeat(5 - rating);
+
+  const time =
+    formatFeedbackTime(item.masa);
+
+  const statusClass =
+    getFeedbackStatusClass(status);
+
+
+  return `
+    <article
+      class="
+        bg-white/10
+        backdrop-blur-xl
+        border border-white/10
+        rounded-2xl
+        p-5 md:p-6
+        shadow-lg
+      "
+    >
+
+      <div
+        class="
+          flex
+          flex-col
+          lg:flex-row
+          lg:items-start
+          lg:justify-between
+          gap-4
+        "
+      >
+
+        <div class="min-w-0">
+
+          <div class="flex flex-wrap items-center gap-2">
+
+            <span
+              class="
+                inline-flex
+                px-3 py-1
+                rounded-full
+                bg-violet-400/20
+                border border-violet-300/20
+                text-violet-100
+                text-xs
+                font-semibold
+              "
+            >
+              ${category}
+            </span>
+
+            <span
+              class="
+                inline-flex
+                px-3 py-1
+                rounded-full
+                border
+                text-xs
+                font-semibold
+                ${statusClass}
+              "
+            >
+              ${escapeFeedbackHTML(status)}
+            </span>
+
+          </div>
+
+          <div
+            class="
+              text-yellow-300
+              mt-3
+              tracking-wider
+              text-lg
+            "
+            aria-label="${rating} daripada 5 bintang"
+          >
+            ${stars}
+          </div>
+
+        </div>
+
+
+        <div class="w-full lg:w-auto">
+
+          <label
+            class="
+              block
+              text-[11px]
+              uppercase
+              tracking-wide
+              text-white/40
+              mb-1
+            "
+          >
+            Status
+          </label>
+
+          <select
+            onchange="updateFeedbackStatus('${item.id}', this.value)"
+            class="
+              w-full
+              lg:w-48
+              bg-purple-950/70
+              border border-white/10
+              text-white
+              text-sm
+              rounded-xl
+              px-3 py-2.5
+              outline-none
+              focus:border-cyan-300/40
+            "
+          >
+            ${feedbackStatusOptions(status)}
+          </select>
+
+        </div>
+
+      </div>
+
+
+      <p
+        class="
+          text-white
+          text-base
+          leading-relaxed
+          mt-5
+          whitespace-pre-wrap
+          break-words
+        "
+      >${comment}</p>
+
+
+      <div
+        class="
+          mt-5
+          pt-4
+          border-t
+          border-white/10
+          grid
+          md:grid-cols-2
+          xl:grid-cols-4
+          gap-3
+          text-xs
+          text-white/55
+        "
+      >
+
+        <div>
+          👤 ${name} • ${type}
+        </div>
+
+        <div>
+          🏫 ${organisation}
+        </div>
+
+        <div>
+          🎓 ${className}
+        </div>
+
+        <div class="md:text-right">
+          🕐 ${escapeFeedbackHTML(time)}
+        </div>
+
+      </div>
+
+    </article>
+  `;
+
+}
+
+
+function feedbackStatusOptions(currentStatus) {
+
+  const statuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  return statuses
+    .map(status => `
+      <option
+        value="${status}"
+        ${status === currentStatus ? "selected" : ""}
+      >
+        ${status}
+      </option>
+    `)
+    .join("");
+
+}
+
+
+async function updateFeedbackStatus(
+  feedbackId,
+  newStatus
+) {
+
+  const allowedStatuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  if (!allowedStatuses.includes(newStatus)) {
+    return;
+  }
+
+  try {
+
+    await db
+      .collection("maklumBalasPengguna")
+      .doc(feedbackId)
+      .update({
+        status: newStatus
+      });
+
+    console.log(
+      "✅ Status maklum balas:",
+      newStatus
+    );
+
+  }
+  catch(error) {
+
+    console.error(
+      "❌ Gagal kemas kini status:",
+      error
+    );
+
+    alert(
+      "Status maklum balas tidak dapat dikemas kini."
+    );
+
+    renderFeedbackManagement();
+
+  }
+
+}
+
+
+function setFeedbackManagementFilter(filter) {
+
+  const allowedFilters = [
+    "Semua",
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  if (!allowedFilters.includes(filter)) {
+    return;
+  }
+
+  feedbackManagementFilter = filter;
+
+  document
+    .querySelectorAll(".feedback-filter-btn")
+    .forEach(button => {
+
+      const active =
+        button.dataset.feedbackFilter === filter;
+
+      button.classList.toggle(
+        "bg-white",
+        active
+      );
+
+      button.classList.toggle(
+        "text-purple-800",
+        active
+      );
+
+      button.classList.toggle(
+        "font-bold",
+        active
+      );
+
+      button.classList.toggle(
+        "bg-white/10",
+        !active
+      );
+
+      button.classList.toggle(
+        "text-white/70",
+        !active
+      );
+
+    });
+
+  renderFeedbackManagement();
+
+}
+
+
+function initFeedbackManagementFilters() {
+
+  document
+    .querySelectorAll(".feedback-filter-btn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          setFeedbackManagementFilter(
+            button.dataset.feedbackFilter
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+function setFeedbackText(id, value) {
+
+  const element =
+    document.getElementById(id);
+
+  if (element) {
+    element.textContent = value;
+  }
+
+}
+
+
+function normaliseFeedbackStatus(status) {
+
+  const allowedStatuses = [
+    "Baru",
+    "Telah Dibaca",
+    "Dalam Tindakan",
+    "Selesai"
+  ];
+
+  return allowedStatuses.includes(status)
+    ? status
+    : "Baru";
+
+}
+
+
+function getFeedbackStatusClass(status) {
+
+  if (status === "Selesai") {
+    return "bg-emerald-400/20 border-emerald-300/20 text-emerald-100";
+  }
+
+  if (status === "Dalam Tindakan") {
+    return "bg-cyan-400/20 border-cyan-300/20 text-cyan-100";
+  }
+
+  if (status === "Telah Dibaca") {
+    return "bg-blue-400/20 border-blue-300/20 text-blue-100";
+  }
+
+  return "bg-yellow-400/20 border-yellow-300/20 text-yellow-100";
+
+}
+
+
+function formatFeedbackTime(timestamp) {
+
+  if (!timestamp) return "-";
+
+  let date;
+
+  if (
+    timestamp &&
+    typeof timestamp.toDate === "function"
+  ) {
+    date = timestamp.toDate();
+  }
+  else {
+    date = new Date(timestamp);
+  }
+
+  if (Number.isNaN(date.getTime())) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "ms-MY",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+  );
+
+}
+
+
+function escapeFeedbackHTML(value) {
+
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initFeedbackManagementFilters
+);
+
+</script>
+
+<script>
+function logout(){
+  firebase.auth().signOut().then(()=>{
+    window.location.href = "healink.html"; // 🔥 balik ke homepage
+  });
+}
+
+let visitorChart;
+
+db.collection("pengunjung").onSnapshot(snapshot => {
+
+  let murid = 0;
+  let guru = 0;
+  let pelawat = 0;
+
+  snapshot.forEach(doc => {
+
+  const d = doc.data();  // ✅ guna d (konsisten)
+
+  // kira jenis pengguna
+  if(d.jenis === "Murid") murid++;
+  else if(d.jenis === "Guru") guru++;
+  else pelawat++;
+
+  // format masa
+  const time = d.masa?.toDate().toLocaleString('ms-MY', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }) || "-";
+
+  // contoh guna untuk display
+  console.log(d.nama, time);
+
+});
+
+  // UPDATE KPI
+  document.getElementById("kpiMurid").innerText = murid;
+  document.getElementById("kpiGuru").innerText = guru;
+  document.getElementById("kpiPelawat").innerText = pelawat;
+
+  // DESTROY CHART LAMA
+  if(visitorChart) visitorChart.destroy();
+
+  // CREATE CHART BARU
+  visitorChart = new Chart(document.getElementById("visitorChart"), {
+    type: 'doughnut',
+    data: {
+      labels: ["Murid", "Guru", "Pelawat"],
+      datasets: [{
+        data: [murid, guru, pelawat],
+        backgroundColor: [
+          "#34d399", // hijau
+          "#60a5fa", // biru
+          "#f59e0b"  // oren
+        ],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#fff",
+            font: { size: 12 }
+          }
+        }
+      }
+    }
+  });
+
+});
+</script>
+
+<script>
+
+// ================= FILTER =================
+let currentSekolah = "all";
+let currentKelas = "all";
+
+
+// =====================================================
+// 🏫 NORMALISASI NAMA SEKOLAH
+// =====================================================
+
+function normalizeSekolah(nama){
+
+  let value = (nama || "")
+    .toUpperCase()
+    .trim()
+    .replace(/\s+/g, " ");
+
+  // Nama penuh sekolah → singkatan standard
+  value = value
+    .replace(/^SEKOLAH MENENGAH KEBANGSAAN\s+/, "SMK ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(CINA\)\s+/, "SJKC ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+CINA\s+/, "SJKC ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(TAMIL\)\s+/, "SJKT ")
+    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+TAMIL\s+/, "SJKT ")
+    .replace(/^SEKOLAH KEBANGSAAN\s+/, "SK ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const aliases = {
+    "SKKK": "SK KUALA KETIL",
+    "SK KUALA KETIL": "SK KUALA KETIL",
+    "SKKP": "SK KUALA PEGANG",
+    "SK KUALA PEGANG": "SK KUALA PEGANG"
+  };
+
+  return aliases[value] || value;
+}
+
+
+function filterSekolah(s){
+
+  // ==========================================
+  // 🔐 SCHOOL ADMIN
+  // Tidak dibenarkan tukar ke sekolah lain
+  // ==========================================
+  if(
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ){
+
+    currentSekolah =
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
+
+    loadData();
+    return;
+  }
+
+  // ==========================================
+  // 👑 SUPER ADMIN
+  // Bebas memilih sekolah
+  // ==========================================
+  currentSekolah = s;
+
+  loadData();
+
+}
+
+function filterKelas(k){
+  currentKelas = k;
+  loadData();
+}
+
+// =====================================================
+// 💬 MAKLUM BALAS PENGGUNA - REALTIME BADGE
+// =====================================================
+
+let feedbackBadgeListenerStarted = false;
+
+
+function startFeedbackBadgeListener() {
+
+  if(feedbackBadgeListenerStarted) {
+    return;
+  }
+
+
+  feedbackBadgeListenerStarted = true;
+
+
+  db.collection("maklumBalasPengguna")
+    .where("status", "==", "Baru")
+    .onSnapshot(
+
+      snapshot => {
+
+        const badge =
+          document.getElementById(
+            "feedbackNewBadge"
+          );
+
+
+        if(!badge) {
+          return;
+        }
+
+
+        const totalBaru =
+          snapshot.size;
+
+
+        badge.textContent =
+          totalBaru;
+
+
+        if(totalBaru > 0) {
+
+          badge.classList.remove(
+            "hidden"
+          );
+
+          badge.classList.add(
+            "flex"
+          );
+
+        }
+        else {
+
+          badge.classList.add(
+            "hidden"
+          );
+
+          badge.classList.remove(
+            "flex"
+          );
+
+        }
+
+
+        console.log(
+          "💬 Maklum Balas Baru:",
+          totalBaru
+        );
+
+      },
+
+      error => {
+
+        console.error(
+          "❌ Gagal membaca badge maklum balas:",
+          error
+        );
+
+      }
+
+    );
+
+}
+
+// ================= LOAD DATA (KPI + FILTER) =================
+function loadData(){
+
+  db.collection("aktivitiPelajar")
+  .orderBy("masa","desc")
+  .onSnapshot(snapshot => {
+
+    let murid = 0, guru = 0, pelawat = 0;
+
+    snapshot.forEach(doc => {
+
+      const d = doc.data();
+
+      // =====================================================
+      // 🏫 FILTER SEKOLAH + NORMALISASI
+      // =====================================================
+      if(currentSekolah !== "all"){
+
+        const sekolahDipilih =
+        normalizeSekolah(currentSekolah);
+
+        const sekolahData =
+        normalizeSekolah(d.organisasi);
+
+        if(sekolahData !== sekolahDipilih){
+        return;
+      }
+
+  }
+
+      // 🔥 FILTER KELAS
+      if(
+  currentKelas !== "all" &&
+  d.kelas?.toLowerCase().trim() !== currentKelas.toLowerCase().trim()
+) return;
+
+      if(d.jenis === "Murid") murid++;
+      else if(d.jenis === "Guru") guru++;
+      else pelawat++;
+
+    });
+
+    document.getElementById("kpiMurid").innerText = murid;
+    document.getElementById("kpiGuru").innerText = guru;
+    document.getElementById("kpiPelawat").innerText = pelawat;
+
+  });
+
+}
+
+
+// ================= LIVE ACTIVITY =================
+// Cache rekod yang sedang dipaparkan supaya kad boleh dibuka tanpa query tambahan.
+const liveActivityRecords = {};
+let selectedLiveActivityDocId = null;
+
+db.collection("aktivitiPelajar")
+.orderBy("masa", "desc")
+.limit(20)
+.onSnapshot(snapshot => {
+
+  const container = document.getElementById("activityList");
+  if (!container) return;
+
+  let html = "";
+
+  // ✅ TAMBAH INI
+  const kelasSet = new Set();
+  const modulSet = new Set();
+
+  snapshot.forEach(doc => {
+
+  const d = doc.data();
+  liveActivityRecords[doc.id] = d;
+
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
+
+    const sekolahAdmin =
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+    );
+
+    const sekolahData =
+      normalizeSekolah(
+        d.organisasi
+    );
+
+    // Jangan paparkan data sekolah lain
+    if (sekolahData !== sekolahAdmin) {
+      return;
+    }
+  }
+
+  // ================= FILTER OPTION =================
+  kelasSet.add(d.kelas);
+  modulSet.add(d.module);
+    
+
+    const time = d.masa?.toDate().toLocaleString('ms-MY', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }) || "-";
+
+    let icon = "👤";
+    const jenis = (d.jenis || "").toString().trim().toLowerCase();
+
+    if (jenis === "murid") icon = "🧑‍🎓";
+    else if (jenis === "guru") icon = "👨‍🏫";
+    else if (jenis === "admin") icon = "🛠️";
+
+    html += `
+      <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center 
+                  hover:bg-white/20 transition duration-300"
+           role="button"
+           tabindex="0"
+           aria-label="Buka butiran aktiviti ${escapeLiveActivityHTML(d.nama || 'Pengguna')}"
+           onclick="openLiveActivityDetail('${doc.id}')"
+           onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLiveActivityDetail('${doc.id}'); }"
+           data-nama="${(d.nama || '').toLowerCase()}"
+           data-kelas="${(d.kelas || '').toLowerCase()}"
+           data-modul="${(d.module || '').toLowerCase()}">
+
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">${icon}</span>
+            <span class="nama font-semibold text-white">
+              ${d.nama || "Pengguna"}
+            </span>
+          </div>
+
+          <div class="text-xs text-white/70 mt-1">
+            ${d.jenis || "-"} • ${d.kelas || d.organisasi || "-"}
+          </div>
+        </div>
+
+        <div class="text-right">
+          <div class="text-yellow-300 font-semibold">
+            ${d.module || "-"}
+          </div>
+          <div class="text-xs text-white/60 mt-1">
+            ${time}
+          </div>
+        </div>
+
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+
+  // ✅ STEP 3 (BETUL)
+  const kelasSelect = document.getElementById("filterKelas");
+  const modulSelect = document.getElementById("filterModul");
+
+  kelasSelect.innerHTML = '<option value="">Semua Kelas</option>';
+  modulSelect.innerHTML = '<option value="">Semua Modul</option>';
+
+  kelasSet.forEach(k => {
+    if(k) kelasSelect.innerHTML += `<option value="${k.toLowerCase()}">${k}</option>`;
+  });
+
+  modulSet.forEach(m => {
+    if(m) modulSelect.innerHTML += `<option value="${m.toLowerCase()}">${m}</option>`;
+  });
+
+});
+
+
+// =====================================================
+// 🔎 BUTIRAN AKTIVITI PENGGUNA
+// =====================================================
+function openLiveActivityDetail(docId){
+
+  const d = liveActivityRecords[docId];
+  const modal = document.getElementById("liveActivityDetailModal");
+  const content = document.getElementById("liveActivityDetailContent");
+
+  if(!d || !modal || !content) return;
+
+  selectedLiveActivityDocId = docId;
+
+  // Reset state butang Padam setiap kali modal dibuka.
+  // Penting selepas rekod sebelumnya selesai dipadam.
+  const deleteButton =
+    document.getElementById("deleteLiveActivityButton");
+
+  if(deleteButton){
+    deleteButton.disabled = false;
+    deleteButton.textContent = "🗑 Padam Rekod";
+  }
+
+  const masa = formatLiveActivityValue(d.masa);
+  const commonKeys = new Set([
+    "nama","jenis","kelas","organisasi","module","masa"
+  ]);
+
+  const extraRows = Object.entries(d)
+    .filter(([key, value]) =>
+      !commonKeys.has(key) &&
+      value !== undefined &&
+      value !== null &&
+      value !== ""
+    )
+    .map(([key, value]) => `
+      <div class="live-extra-row">
+        <span class="live-extra-key">${escapeLiveActivityHTML(formatLiveActivityKey(key))}</span>
+        <span class="live-extra-value">${escapeLiveActivityHTML(formatLiveActivityValue(value))}</span>
+      </div>
+    `)
+    .join("");
+
+  content.innerHTML = `
+    <div class="flex items-start gap-3 mb-5">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center
+                  bg-gradient-to-br from-violet-500/20 to-cyan-500/10
+                  border border-white/10 text-xl">📋</div>
+      <div>
+        <div class="text-[10px] uppercase tracking-[0.14em] text-cyan-300 font-extrabold">
+          Butiran Aktiviti
+        </div>
+        <h3 class="text-xl font-extrabold text-white mt-1">
+          ${escapeLiveActivityHTML(d.module || "Aktiviti HEALINK")}
+        </h3>
+      </div>
+    </div>
+
+    <div class="live-detail-grid">
+      ${liveActivityDetailItem("Nama", d.nama || "Pengguna")}
+      ${liveActivityDetailItem("Jenis Pengguna", d.jenis || "-")}
+      ${liveActivityDetailItem("Kelas", d.kelas || "-")}
+      ${liveActivityDetailItem("Sekolah / Organisasi", d.organisasi || "-")}
+      ${liveActivityDetailItem("Modul", d.module || "-")}
+      ${liveActivityDetailItem("Tarikh & Masa", masa)}
+    </div>
+
+    ${extraRows ? `
+      <div class="mt-5">
+        <div class="text-xs font-bold text-white mb-2">Maklumat Aktiviti</div>
+        <div class="rounded-2xl px-4 py-1 bg-white/[0.025] border border-white/[0.06]">
+          ${extraRows}
+        </div>
+      </div>
+    ` : `
+      <div class="mt-5 rounded-2xl p-4 bg-white/[0.025] border border-white/[0.06]
+                  text-xs text-white/45 text-center">
+        Tiada maklumat tambahan direkodkan untuk aktiviti ini.
+      </div>
+    `}
+  `;
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeLiveActivityDetail(){
+  const modal = document.getElementById("liveActivityDetailModal");
+  if(modal) modal.classList.add("hidden");
+  document.body.style.overflow = "";
+  selectedLiveActivityDocId = null;
+}
+
+async function deleteLiveActivity(){
+
+  const docId = selectedLiveActivityDocId;
+  const d = docId ? liveActivityRecords[docId] : null;
+
+  if(!docId || !d){
+    alert("Rekod aktiviti tidak dijumpai.");
+    return;
+  }
+
+  const nama = d.nama || "Pengguna";
+  const modul = d.module || "Aktiviti HEALINK";
+
+  const confirmed = confirm(
+    `Padam rekod ini?\n\n${nama} — ${modul}\n\nTindakan ini akan memadam rekod daripada Firestore dan tidak boleh dibatalkan.`
+  );
+
+  if(!confirmed) return;
+
+  const button = document.getElementById("deleteLiveActivityButton");
+  if(button){
+    button.disabled = true;
+    button.textContent = "⏳ Memadam...";
+  }
+
+  try{
+    await db.collection("aktivitiPelajar").doc(docId).delete();
+
+    delete liveActivityRecords[docId];
+
+    closeLiveActivityDetail();
+
+    console.log("✅ Rekod aktiviti dipadam:", docId);
+  }
+  catch(error){
+    console.error("❌ Gagal memadam rekod aktiviti:", error);
+
+    alert(
+      "Rekod tidak dapat dipadam. Sila semak kebenaran Firestore atau cuba semula."
+    );
+
+    if(button){
+      button.disabled = false;
+      button.textContent = "🗑 Padam Rekod";
+    }
+  }
+}
+
+function liveActivityDetailItem(label, value){
+  return `
+    <div class="live-detail-item">
+      <span class="live-detail-label">${escapeLiveActivityHTML(label)}</span>
+      <span class="live-detail-value">${escapeLiveActivityHTML(formatLiveActivityValue(value))}</span>
+    </div>
+  `;
+}
+
+function formatLiveActivityKey(key){
+  return String(key || "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatLiveActivityValue(value){
+
+  if(value === null || value === undefined || value === "") return "-";
+
+  if(value && typeof value.toDate === "function"){
+    return value.toDate().toLocaleString("ms-MY", {
+      day:"2-digit", month:"short", year:"numeric",
+      hour:"2-digit", minute:"2-digit"
+    });
+  }
+
+  if(Array.isArray(value)){
+    return value.map(formatLiveActivityValue).join(", ");
+  }
+
+  if(typeof value === "object"){
+    try{
+      return Object.entries(value)
+        .map(([k,v]) => `${formatLiveActivityKey(k)}: ${formatLiveActivityValue(v)}`)
+        .join(" • ");
+    }catch(error){
+      return "-";
+    }
+  }
+
+  if(typeof value === "boolean"){
+    return value ? "Ya" : "Tidak";
+  }
+
+  return String(value);
+}
+
+function escapeLiveActivityHTML(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+document.addEventListener("keydown", event => {
+  if(event.key === "Escape"){
+    closeLiveActivityDetail();
+  }
+});
+
+
+// ================= AUTO LOAD (FINAL CLEAN VERSION) =================
+window.onload = function(){
+
+  document
+    .getElementById("sekolahList")
+    .classList.remove("hidden");
+
+};
+
+// ================= SEKOLAH =================
+function loadSekolah(){
+
+  const container = document.getElementById("listSekolah");
+  if(!container) return;
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    let sekolahSet = new Set();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if(d.organisasi){
+        sekolahSet.add(d.organisasi);
+      }
+    });
+
+    container.innerHTML = "";
+
+    container.innerHTML += `
+      <button onclick="filterSekolah('all')" class="sidebar-btn">
+        Semua
+      </button>
+    `;
+
+    [...sekolahSet]
+      .map(s => s.trim())
+      .sort()
+      .forEach(sekolah => {
+
+        container.innerHTML += `
+          <button onclick="filterSekolah('${sekolah}')" class="sidebar-btn">
+            ${sekolah}
+          </button>
+        `;
+      });
+
+  });
+
+}
+
+// ================= KELAS =================
+function loadKelas(){
+
+  const container = document.getElementById("listKelas");
+  if(!container) return;
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    let kelasSet = new Set();
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if(d.kelas){
+        kelasSet.add(d.kelas);
+      }
+    });
+
+    container.innerHTML = "";
+
+    container.innerHTML += `
+      <button onclick="filterKelas('all')" class="sidebar-btn">
+        Semua
+      </button>
+    `;
+
+    [...kelasSet]
+      .map(k => k.trim())
+      .sort()
+      .forEach(kelas => {
+
+        container.innerHTML += `
+          <button onclick="filterKelas('${kelas}')" class="sidebar-btn">
+            ${kelas}
+          </button>
+        `;
+      });
+
+  });
+
+}
+
+firebase.auth().onAuthStateChanged(user => {
+
+  if(!user){
+    window.location.href = "index.html"; // block access
+  }
+
+});
+
+function loadAlert(){
+
+  const container = document.getElementById("alertList");
+
+  db.collection("aktivitiPelajar")
+  .orderBy("masa","desc") // 🔥 TAMBAH INI
+  .limit(10)
+  .onSnapshot(snapshot => {
+
+    let html = "";
+
+    snapshot.forEach(doc => {
+
+  const d = doc.data();
+
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
+
+    const sekolahAdmin =
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
+
+    const sekolahData =
+      normalizeSekolah(
+        d.organisasi
+      );
+
+    // Jangan paparkan murid sekolah lain
+    if (sekolahData !== sekolahAdmin) {
+        return;
+    }
+  }
+
+  // ==========================================
+  // ⚠️ MURID PERLU PERHATIAN
+  // ==========================================
+  if(d.perluPerhatian !== true) return;
+
+      html += `
+  <div onclick="openDetail(
+    '${(d.nama||'').replace(/'/g,"")}',
+    '${(d.kelas||d.organisasi||'')}',
+    '${(d.module||'')}',
+    '${(d.komen||'').replace(/'/g,"")}'
+  )"
+  class="cursor-pointer bg-red-500/20 border border-red-400 p-4 rounded-xl hover:bg-red-500/30 transition">
+
+    <div class="font-bold text-white">
+      ⚠️ ${d.nama || "Tanpa Nama"}
+    </div>
+
+    <div class="text-sm text-white/80">
+      ${d.kelas || d.organisasi || "-"}
+    </div>
+
+    <div class="text-xs text-red-300 mt-1">
+      Modul: ${d.module || "-"}
+    </div>
+
+  </div>
+`;
+    });
+
+    container.innerHTML = html;
+
+  }, err => {
+    console.error("❌ FIRESTORE ERROR:", err);
+  });
+
+}
+
+console.log("🔥 ALERT LOADED");
+
+function openDetail(nama, kelas, module, komen){
+
+  console.log("CLICK DETECTED:", nama);
+
+  const modal = document.getElementById("detailModal");
+  const content = document.getElementById("detailContent");
+
+  if(!modal || !content){
+    console.error("❌ MODAL TAK JUMPA");
+    return;
+  }
+
+  content.innerHTML = `
+  <b>Nama:</b> ${nama}<br>
+  <b>Kelas:</b> ${kelas}<br>
+  <b>Modul:</b> ${module}<br><br>
+
+  <b>📝 Luahan Murid:</b>
+  <div class="bg-gray-100 text-black p-3 rounded mt-2 text-left">
+    ${komen || "Tiada maklumat"}
+  </div>
+
+  <br>
+  <span class="text-red-500 font-semibold">
+    ⚠️ Murid ini memerlukan perhatian
+  </span>
+`;
+
+  modal.classList.remove("hidden");
+
+}
+function closeDetail(){
+  document.getElementById("detailModal").classList.add("hidden");
+}
+
+// Cache penuh rekod sidebar untuk paparan butiran Sekolah / Kelas / Organisasi.
+const sidebarActivityRecords = {};
+
+function loadSidebar(){
+
+  db.collection("aktivitiPelajar")
+  .onSnapshot(snapshot => {
+
+    // Set digunakan supaya badge sidebar mengira PENGGUNA UNIK,
+    // bukan jumlah rekod aktiviti.
+    const sekolahUsers = {};
+    const kelasUsers = {};
+    const organisasiUsers = {};
+    const semuaUsers = new Set();
+
+    // Bersihkan cache supaya rekod yang telah dipadam tidak kekal.
+    Object.keys(sidebarActivityRecords).forEach(key => delete sidebarActivityRecords[key]);
+
+    snapshot.forEach(doc => {
+
+      const d = doc.data();
+
+      sidebarActivityRecords[doc.id] = d;
+      liveActivityRecords[doc.id] = d;
+
+      const orgRaw = normalizeSekolah(d.organisasi);
+      const kelas = (d.kelas || "-").toUpperCase().trim();
+
+      // ==========================================
+      // 🔐 FILTER SCHOOL ADMIN
+      // ==========================================
+      if(
+        window.currentAdmin &&
+        window.currentAdmin.role === "schooladmin"
+      ){
+        const sekolahAdmin = normalizeSekolah(window.currentAdmin.sekolah);
+        if(orgRaw !== sekolahAdmin) return;
+      }
+
+      let kategori = "LAIN";
+
+      if(
+        orgRaw.includes("SK") ||
+        orgRaw.includes("SMK") ||
+        orgRaw.includes("SJKC") ||
+        orgRaw.includes("SJKT")
+      ){
+        kategori = "SEKOLAH";
+      }
+      else if(
+        orgRaw.includes("PPD") ||
+        orgRaw.includes("JPN") ||
+        orgRaw.includes("PKG")
+      ){
+        kategori = "ORGANISASI";
+      }
+
+      const userKey = sidebarUserKey(d);
+      semuaUsers.add(userKey);
+
+      if(kategori === "SEKOLAH"){
+        if(!sekolahUsers[orgRaw]) sekolahUsers[orgRaw] = new Set();
+        sekolahUsers[orgRaw].add(userKey);
+      }
+
+      if(kategori === "ORGANISASI"){
+        if(!organisasiUsers[orgRaw]) organisasiUsers[orgRaw] = new Set();
+        organisasiUsers[orgRaw].add(userKey);
+      }
+
+      if(kategori === "LAIN"){
+        if(!organisasiUsers["LAIN-LAIN"]){
+          organisasiUsers["LAIN-LAIN"] = new Set();
+        }
+        organisasiUsers["LAIN-LAIN"].add(userKey);
+      }
+
+      if(!kelasUsers[kelas]) kelasUsers[kelas] = new Set();
+      kelasUsers[kelas].add(userKey);
+    });
+
+    // ================= SEKOLAH =================
+    let htmlSekolah = "";
+
+    if(
+      window.currentAdmin &&
+      window.currentAdmin.role === "superadmin"
+    ){
+      htmlSekolah = `
+        <div onclick="openSidebarActivityGroup('SEMUA', 'SEMUA')"
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>Semua</span>
+          <span class="badge" title="Jumlah pengguna unik">${semuaUsers.size}</span>
+        </div>
+      `;
+    }
+
+    Object.keys(sekolahUsers)
+    .sort((a,b) => sekolahUsers[b].size - sekolahUsers[a].size)
+    .forEach(s => {
+      htmlSekolah += `
+        <div onclick="openSidebarActivityGroup('SEKOLAH', decodeURIComponent('${encodeURIComponent(s)}'))"
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>${s}</span>
+          <span class="badge" title="Jumlah pengguna unik">${sekolahUsers[s].size}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("sekolahList").innerHTML = htmlSekolah;
+
+    // ================= KELAS =================
+    let htmlKelas = "";
+
+    Object.keys(kelasUsers)
+    .sort((a,b) => kelasUsers[b].size - kelasUsers[a].size)
+    .forEach(k => {
+      htmlKelas += `
+        <div onclick="openSidebarActivityGroup('KELAS', decodeURIComponent('${encodeURIComponent(k)}'))"
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>${k}</span>
+          <span class="badge" title="Jumlah pengguna unik">${kelasUsers[k].size}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("kelasList").innerHTML = htmlKelas;
+
+    // ================= ORGANISASI =================
+    let htmlOrg = "";
+
+    Object.keys(organisasiUsers)
+    .sort((a,b) => organisasiUsers[b].size - organisasiUsers[a].size)
+    .forEach(o => {
+      htmlOrg += `
+        <div onclick="openSidebarActivityGroup('ORGANISASI', decodeURIComponent('${encodeURIComponent(o)}'))"
+             class="sidebar-item flex justify-between cursor-pointer">
+          <span>${o}</span>
+          <span class="badge" title="Jumlah pengguna unik">${organisasiUsers[o].size}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("organisasiList").innerHTML = htmlOrg;
+
+  });
+}
+
+
+// =====================================================
+// 🗂️ BUTIRAN SIDEBAR — SEKOLAH / KELAS / ORGANISASI
+// =====================================================
+function sidebarUserKey(d){
+  return [
+    (d.nama || "Pengguna").toString().trim().toUpperCase(),
+    (d.jenis || "-").toString().trim().toUpperCase(),
+    (d.kelas || "-").toString().trim().toUpperCase(),
+    normalizeSekolah(d.organisasi || "-")
+  ].join("||");
+}
+
+function sidebarRecordMatches(type, value, d){
+  const targetType = (type || "").toUpperCase();
+  const targetValue = (value || "").toString().trim();
+  const org = normalizeSekolah(d.organisasi);
+  const kelas = (d.kelas || "-").toString().toUpperCase().trim();
+
+  if(window.currentAdmin && window.currentAdmin.role === "schooladmin"){
+    if(org !== normalizeSekolah(window.currentAdmin.sekolah)) return false;
+  }
+
+  if(targetType === "SEMUA") return true;
+  if(targetType === "SEKOLAH") return org === normalizeSekolah(targetValue);
+  if(targetType === "KELAS") return kelas === targetValue.toUpperCase();
+
+  if(targetType === "ORGANISASI"){
+    if(targetValue === "LAIN-LAIN"){
+      const isSekolah = org.includes("SK") || org.includes("SMK") ||
+                         org.includes("SJKC") || org.includes("SJKT");
+      const isOrganisasi = org.includes("PPD") || org.includes("JPN") || org.includes("PKG");
+      return !isSekolah && !isOrganisasi;
+    }
+    return org === normalizeSekolah(targetValue);
+  }
+  return false;
+}
+
+function openSidebarActivityGroup(type, value){
+  const modal = document.getElementById("sidebarActivityModal");
+  const title = document.getElementById("sidebarActivityTitle");
+  const subtitle = document.getElementById("sidebarActivitySubtitle");
+  const content = document.getElementById("sidebarActivityContent");
+  if(!modal || !title || !subtitle || !content) return;
+
+  const records = Object.entries(sidebarActivityRecords)
+    .filter(([docId,d]) => sidebarRecordMatches(type,value,d))
+    .map(([docId,data]) => ({docId,data}))
+    .sort((a,b) => getSidebarActivityMillis(b.data.masa) -
+                   getSidebarActivityMillis(a.data.masa));
+
+  const userMap = new Map();
+
+  records.forEach(item => {
+    const key = sidebarUserKey(item.data);
+    if(!userMap.has(key)){
+      userMap.set(key,{
+        nama: item.data.nama || "Pengguna",
+        jenis: item.data.jenis || "-",
+        kelas: item.data.kelas || "-",
+        organisasi: normalizeSekolah(item.data.organisasi || "-"),
+        records: []
+      });
+    }
+    userMap.get(key).records.push(item);
+  });
+
+  const users = Array.from(userMap.values());
+  window.sidebarUniqueUserGroups = {};
+
+  users.forEach((user,index) => {
+    window.sidebarUniqueUserGroups["user_"+index] = user;
+  });
+
+  const targetType = (type || "").toUpperCase();
+  const label = targetType === "SEMUA"
+    ? "Semua Pengguna"
+    : `${formatSidebarGroupType(targetType)} — ${value}`;
+
+  title.textContent = label;
+  subtitle.textContent =
+    `${users.length} pengguna • ${records.length} rekod aktiviti`;
+
+  if(!users.length){
+    content.innerHTML = `
+      <div class="rounded-2xl border border-white/10 bg-white/[0.03]
+                  p-8 text-center text-sm text-white/50">
+        Tiada pengguna dijumpai.
+      </div>`;
+  } else {
+    content.innerHTML = users.map((user,index) => `
+      <button type="button"
+              onclick="openSidebarUserActivities('user_${index}')"
+              class="w-full text-left rounded-2xl border border-white/10
+                     bg-white/[0.035] hover:bg-white/[0.075]
+                     hover:border-cyan-300/20 transition p-4">
+        <div class="flex items-center justify-between gap-4">
+          <div class="min-w-0">
+            <div class="font-extrabold text-white truncate">
+              ${escapeLiveActivityHTML(user.nama)}
+            </div>
+            <div class="text-xs text-white/45 mt-1">
+              ${escapeLiveActivityHTML(user.jenis)}
+              ${user.kelas && user.kelas !== "-" ? " • "+escapeLiveActivityHTML(user.kelas) : ""}
+            </div>
+            <div class="text-xs text-white/35 mt-1 truncate">
+              ${escapeLiveActivityHTML(user.organisasi)}
+            </div>
+          </div>
+          <div class="shrink-0 flex items-center gap-3">
+            <div class="rounded-xl border border-cyan-300/20
+                        bg-cyan-400/10 px-3 py-2 text-center">
+              <div class="text-lg leading-none font-extrabold text-cyan-300">
+                ${user.records.length}
+              </div>
+              <div class="text-[9px] uppercase tracking-wide text-white/45 mt-1">
+                Aktiviti
+              </div>
+            </div>
+            <span class="text-white/35 text-xl">›</span>
+          </div>
+        </div>
+      </button>
+    `).join("");
+  }
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function openSidebarUserActivities(userKey){
+  const user = window.sidebarUniqueUserGroups?.[userKey];
+  const modal = document.getElementById("sidebarUserActivitiesModal");
+  const title = document.getElementById("sidebarUserActivitiesTitle");
+  const subtitle = document.getElementById("sidebarUserActivitiesSubtitle");
+  const content = document.getElementById("sidebarUserActivitiesContent");
+  if(!user || !modal || !title || !subtitle || !content) return;
+
+  title.textContent = user.nama;
+  subtitle.textContent =
+    `${user.jenis} • ${user.organisasi} • ${user.records.length} aktiviti`;
+
+  content.innerHTML = user.records.map(({docId,data}) => `
+    <button type="button"
+            onclick="openSidebarRecordDetail('${docId}')"
+            class="w-full text-left rounded-2xl border border-white/10
+                   bg-white/[0.035] hover:bg-white/[0.075]
+                   hover:border-cyan-300/20 transition p-4">
+      <div class="flex items-center justify-between gap-4">
+        <div class="min-w-0">
+          <div class="font-bold text-white truncate">
+            ${escapeLiveActivityHTML(data.module || "Aktiviti HEALINK")}
+          </div>
+          <div class="text-xs text-white/40 mt-1">
+            ${escapeLiveActivityHTML(formatLiveActivityValue(data.masa))}
+          </div>
+        </div>
+        <span class="text-white/35 text-xl shrink-0">›</span>
+      </div>
+    </button>
+  `).join("");
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSidebarUserActivities(){
+  const modal = document.getElementById("sidebarUserActivitiesModal");
+  if(modal) modal.classList.add("hidden");
+}
+
+function closeSidebarActivityGroup(){
+  const modal = document.getElementById("sidebarActivityModal");
+  if(modal) modal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+function openSidebarRecordDetail(docId){
+  closeSidebarUserActivities();
+  closeSidebarActivityGroup();
+  openLiveActivityDetail(docId);
+}
+
+function formatSidebarGroupType(type){
+  if(type === "SEKOLAH") return "Sekolah";
+  if(type === "KELAS") return "Kelas";
+  if(type === "ORGANISASI") return "Organisasi";
+  return "Aktiviti";
+}
+
+function getSidebarActivityMillis(value){
+  try{
+    if(value && typeof value.toDate === "function"){
+      return value.toDate().getTime();
+    }
+    if(value instanceof Date) return value.getTime();
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch(error){
+    return 0;
+  }
+}
+
+function toggleSection(id){
+
+  const el = document.getElementById(id);
+  const arrow = document.querySelector(`[onclick*="${id}"] span:last-child`);
+
+  el.classList.toggle("hidden");
+
+  if(el.classList.contains("hidden")){
+    arrow.innerText = "▶";
+  } else {
+    arrow.innerText = "▼";
+  }
+}
+
+
+document.addEventListener("keydown", function(event){
+  if(event.key === "Escape"){
+    const sidebarModal = document.getElementById("sidebarActivityModal");
+    if(sidebarModal && !sidebarModal.classList.contains("hidden")){
+      closeSidebarActivityGroup();
+    }
+  }
+});
+
+</script>
+
+<!-- LETAK SEBELUM </body> -->
+<div id="detailModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[9999]">
+
+  <div class="bg-white p-6 rounded-2xl w-[90%] max-w-md text-center">
+
+    <h2 class="text-xl font-bold mb-4 text-black">
+      📋 Maklumat Murid
+    </h2>
+
+    <div id="detailContent" class="text-black text-sm"></div>
+
+    <button onclick="closeDetail()" 
+      class="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg">
+      Tutup
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const particles = document.getElementById("particles");
+
+for(let i=0; i<15; i++){
+  const p = document.createElement("div");
+  p.classList.add("particle");
+
+  p.style.left = Math.random()*100 + "%";
+  p.style.top = Math.random()*100 + "%";
+  p.style.animationDuration = (8 + Math.random()*10) + "s";
+
+  particles.appendChild(p);
+}
+</script>
+
+<script>
+const refVisitor = db.collection("stats").doc("visitors");
+
+refVisitor.onSnapshot(doc => {
+  if (doc.exists) {
+    document.getElementById("visitorCount").innerText = doc.data().count;
+  }
+});
+</script>
+
+<script>
+const list = document.getElementById("aktivitiList");
+
+// ambil data dari Firestore (guna collection pengunjung Cikgu)
+db.collection("pengunjung")
+  .orderBy("masa", "desc")
+  .limit(20)
+  .onSnapshot(snapshot => {
+
+    list.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      const item = doc.data();
+
+      const nama = (item.nama || "").toLowerCase();
+      const kelas = item.kelas || "-";
+      const aktiviti = item.jenis || "-";
+
+      list.innerHTML += `
+        <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center"
+             data-nama="${nama}">
+
+          <div>
+            <p class="font-bold text-white">${item.nama || "TIADA NAMA"}</p>
+            <p class="text-xs text-gray-300">${kelas}</p>
+          </div>
+
+          <div class="text-sm text-yellow-300 font-semibold">
+            ${aktiviti}
+          </div>
+
+        </div>
+      `;
+    });
+
+  });
+</script>
+
+<script>
+document.getElementById("searchNama").addEventListener("keyup", function() {
+
+  const keyword = this.value.toLowerCase();
+  const items = document.querySelectorAll(".user-item");
+
+  items.forEach(item => {
+    const nama = item.getAttribute("data-nama");
+
+    if (nama.includes(keyword)) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+});
+
+function applyFilter() {
+
+  const nama = document.getElementById("searchNama").value.toLowerCase();
+  const kelas = document.getElementById("filterKelas").value;
+  const modul = document.getElementById("filterModul").value;
+
+  const items = document.querySelectorAll(".user-item");
+
+  let count = 0;
+
+  items.forEach(item => {
+
+    const n = item.dataset.nama;
+    const k = item.dataset.kelas;
+    const m = item.dataset.modul;
+
+    const matchNama = n.includes(nama);
+    const matchKelas = !kelas || k === kelas;
+    const matchModul = !modul || m === modul;
+
+    if (matchNama && matchKelas && matchModul) {
+      item.style.display = "flex";
+      count++;
+
+      // highlight nama
+      const namaEl = item.querySelector(".nama");
+      namaEl.innerHTML = nama 
+        ? namaEl.textContent.replace(new RegExp(nama, "gi"), 
+          match => `<span class="bg-yellow-400 text-black px-1 rounded">${match}</span>`)
+        : namaEl.textContent;
+
+    } else {
+      item.style.display = "none";
+    }
+
+  });
+
+  document.getElementById("resultCount").innerText = `${count} result`;
+
+}
+
+// EVENT
+document.getElementById("searchNama").addEventListener("keyup", applyFilter);
+document.getElementById("filterKelas").addEventListener("change", applyFilter);
+document.getElementById("filterModul").addEventListener("change", applyFilter);
+</script>
+
+<script>
+const refHealink = db.collection("stats").doc("visitors_healink");
+
+refHealink.onSnapshot(doc => {
+  if (doc.exists) {
+    const el = document.getElementById("visitorHealink");
+    if (el) {
+      el.innerText = doc.data().count;
+    }
+  }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function updateChart(murid, guru, pelawat){
+
+  const ctx = document.getElementById("healinkChart").getContext("2d");
+
+  if(chart) chart.destroy();
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Murid', 'Guru', 'Pelawat'],
+      datasets: [{
+        label: 'Jumlah',
+        data: [murid, guru, pelawat],
+        backgroundColor: [
+          '#3b82f6', // murid
+          '#22c55e', // guru
+          '#facc15'  // pelawat
+        ],
+        borderRadius: 10
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+}
+
+window.exportCSV = function(){
+
+  console.log("CLICK EXPORT");
+
+  // =====================================================
+  // 🔐 SEMAK PROFIL ADMIN
+  // =====================================================
+  if(!window.currentAdmin){
+    alert("Maklumat pentadbir belum tersedia.");
+    return;
+  }
+
+  // =====================================================
+  // 📊 SEMAK DATA
+  // =====================================================
+  if(!rawData || rawData.length === 0){
+    alert("Tiada data untuk export");
+    return;
+  }
+
+  // =====================================================
+  // 🏫 TENTUKAN SEKOLAH LAPORAN
+  // =====================================================
+  let sekolahLaporan = "SEMUA SEKOLAH";
+
+  // SCHOOL ADMIN
+  if(window.currentAdmin.role === "schooladmin"){
+
+    sekolahLaporan =
+      (window.currentAdmin.sekolah || "")
+      .toUpperCase()
+      .trim();
+
+  }
+
+  // SUPER ADMIN + SEKOLAH TERTENTU DIPILIH
+  else if(
+    window.currentAdmin.role === "superadmin" &&
+    currentSekolah !== "all"
+  ){
+
+    sekolahLaporan =
+      (currentSekolah || "")
+      .toUpperCase()
+      .trim();
+
+  }
+
+  // =====================================================
+  // 📄 HEADER CSV
+  // =====================================================
+
+  // BOM supaya Excel baca UTF-8 dengan betul
+  let csv = "\uFEFF";
+
+  csv += "LAPORAN HEALINK\n";
+
+  csv +=
+    `"Sekolah","${sekolahLaporan}"\n`;
+
+  csv +=
+    `"Tarikh Jana","${new Date().toLocaleDateString("ms-MY")}"\n\n`;
+
+  csv +=
+    "Nama,Kelas,Sekolah,Modul,Jenis,Masa\n";
+
+  let count = 0;
+
+  // =====================================================
+  // 📊 PROSES DATA
+  // =====================================================
+  rawData.forEach(d => {
+
+    // ================= FILTER TARIKH =================
+    if(!inRange(d.masa)){
+      return;
+    }
+
+    const sekolahData =
+      normalizeSekolah(
+        d.organisasi
+      );
+
+    // =================================================
+    // 🔐 SCHOOL ADMIN
+    // HANYA SEKOLAH SENDIRI
+    // =================================================
+    if(window.currentAdmin.role === "schooladmin"){
+
+      const sekolahAdmin =
+        normalizeSekolah(
+          window.currentAdmin.sekolah
+        );
+
+      if(sekolahData !== sekolahAdmin){
+        return;
+      }
+
+    }
+
+    // =================================================
+    // 👑 SUPER ADMIN
+    // JIKA PILIH SEKOLAH TERTENTU
+    // =================================================
+    if(
+      window.currentAdmin.role === "superadmin" &&
+      currentSekolah !== "all"
+    ){
+
+      const sekolahDipilih =
+        normalizeSekolah(
+          currentSekolah
+        );
+
+      if(sekolahData !== sekolahDipilih){
+        return;
+      }
+
+    }
+
+    // =================================================
+    // 📋 DATA
+    // =================================================
+
+    const nama =
+      d.nama || "-";
+
+    const kelas =
+      d.kelas || "-";
+
+    const sekolah =
+      d.organisasi || "-";
+
+    const modul =
+      d.module || "-";
+
+    const jenis =
+      d.jenis || "-";
+
+    const masa =
+      d.masa?.toDate
+        ? d.masa.toDate().toLocaleString("ms-MY")
+        : "-";
+
+    // =================================================
+    // TAMBAH KE CSV
+    // =================================================
+
+    csv +=
+      `"${nama}",` +
+      `"${kelas}",` +
+      `"${sekolah}",` +
+      `"${modul}",` +
+      `"${jenis}",` +
+      `"${masa}"\n`;
+
+    count++;
+
+  });
+
+  // =====================================================
+  // ❌ TIADA DATA
+  // =====================================================
+  if(count === 0){
+
+    alert(
+      "Tiada data untuk sekolah dan julat tarikh yang dipilih."
+    );
+
+    return;
+  }
+
+  // =====================================================
+  // 📥 CIPTA FAIL CSV
+  // =====================================================
+
+  const blob =
+    new Blob(
+      [csv],
+      {
+        type: "text/csv;charset=utf-8;"
+      }
+    );
+
+  const link =
+    document.createElement("a");
+
+  const url =
+    URL.createObjectURL(blob);
+
+  // =====================================================
+  // 🏫 NAMA FAIL MENGIKUT SEKOLAH
+  // =====================================================
+
+  const namaSekolahFail =
+    sekolahLaporan
+    .replace(/\s+/g, "_")
+    .replace(/[^A-Z0-9_-]/gi, "");
+
+  link.setAttribute(
+    "href",
+    url
+  );
+
+  link.setAttribute(
+    "download",
+    `laporan_healink_${namaSekolahFail}.csv`
+  );
+
+  // =====================================================
+  // ⬇️ DOWNLOAD
+  // =====================================================
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+};
+
+function inRange(masa){
+
+  const from = document.getElementById("fromDate").value;
+  const to = document.getElementById("toDate").value;
+
+  if(!masa || !masa.toDate) return false;
+
+  const tarikh = masa.toDate();
+
+  if(from && tarikh < new Date(from)) return false;
+  if(to && tarikh > new Date(to + " 23:59:59")) return false;
+
+  return true;
+}
+
+// ================= UPDATE MODAL =================
+
+function openUpdateModal(){
+
+  document.getElementById("updateModal")
+  .classList.remove("hidden");
+
+}
+
+function closeUpdateModal(){
+
+  document.getElementById("updateModal")
+  .classList.add("hidden");
+
+}
+
+// ================= FIRESTORE =================
+
+db.collection("systemUpdates")
+.orderBy("createdAt","desc")
+.onSnapshot(snapshot=>{
+
+  const container =
+  document.getElementById("updateContainer");
+
+  if(!container) return;
+
+  container.innerHTML = "";
+
+  snapshot.forEach(doc=>{
+
+    const data = doc.data();
+
+    let list = "";
+
+    (data.description || []).forEach(item=>{
+
+      list += `
+        <li class="mb-2">
+          • ${item}
+        </li>
+      `;
+
+    });
+
+    container.innerHTML += `
+
+      <div class="bg-white/5 border border-cyan-500/20
+      rounded-3xl p-6">
+
+        <div class="inline-block bg-cyan-500/20
+        text-cyan-300 px-4 py-1 rounded-full text-sm mb-4">
+
+          ${data.date || "-"}
+
+        </div>
+
+        <h3 class="text-2xl font-bold text-white mb-3">
+
+          ${data.title || "-"}
+
+        </h3>
+
+        <div class="text-cyan-300 font-bold mb-4">
+
+          🚀 ${data.type || "UPDATE"}
+
+        </div>
+
+        <ul class="text-white/80 leading-8">
+
+          ${list}
+
+        </ul>
+
+      </div>
+
+    `;
+
+  });
+
+});
+
+</script>
+
+<!-- UPDATE MODAL -->
+<div id="updateModal"
+class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm
+z-[9999] flex items-center justify-center p-4">
+
+  <div class="bg-[#071226] border border-cyan-500/30
+  w-full max-w-4xl rounded-3xl shadow-2xl
+  max-h-[90vh] overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="flex justify-between items-center
+    p-6 border-b border-white/10">
+
+      <div>
+
+        <h2 class="text-3xl font-bold text-cyan-300">
+          🚀 Log Kemaskini Sistem
+        </h2>
+
+        <p class="text-white/60">
+          Rekod penambahbaikan terbaru HEALINK
+        </p>
+
+      </div>
+
+      <button onclick="closeUpdateModal()"
+      class="text-white text-3xl">
+        ✕
+      </button>
+
+    </div>
+
+    <!-- CONTENT -->
+    <div id="updateContainer"
+    class="p-6 space-y-8 overflow-y-auto max-h-[70vh]">
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="p-4 border-t border-white/10">
+
+      <button onclick="closeUpdateModal()"
+      class="w-full bg-cyan-600 hover:bg-cyan-500
+      text-white py-3 rounded-2xl font-bold">
+
+        Tutup
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     👤 MODAL SENARAI AKTIVITI PENGGUNA
+===================================================== -->
+<div id="sidebarUserActivitiesModal"
+     class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm p-4
+            flex items-center justify-center"
+     onclick="if(event.target === this) closeSidebarUserActivities()">
+  <div class="w-full max-w-2xl max-h-[88vh] overflow-hidden
+              rounded-3xl border border-violet-300/15
+              bg-[#0b0e2a]/95 shadow-2xl">
+    <div class="flex items-center justify-between gap-4 px-5 md:px-6 py-4
+                border-b border-white/10">
+      <div class="min-w-0">
+        <div class="text-[10px] uppercase tracking-[0.14em]
+                    text-cyan-300 font-extrabold">Aktiviti Pengguna</div>
+        <div id="sidebarUserActivitiesTitle"
+             class="text-lg font-extrabold text-white mt-1 truncate">Pengguna</div>
+        <div id="sidebarUserActivitiesSubtitle"
+             class="text-[10px] text-white/40 mt-1">Senarai aktiviti</div>
+      </div>
+      <button type="button" onclick="closeSidebarUserActivities()"
+              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
+                     hover:bg-white/10 transition text-white/70 shrink-0">✕</button>
+    </div>
+    <div id="sidebarUserActivitiesContent"
+         class="p-5 md:p-6 overflow-y-auto max-h-[70vh] space-y-3"></div>
+    <div class="px-5 md:px-6 py-4 border-t border-white/10">
+      <button type="button" onclick="closeSidebarUserActivities()"
+              class="w-full py-3 rounded-xl font-bold text-sm
+                     bg-gradient-to-r from-violet-600 to-cyan-500
+                     hover:opacity-90 transition">Kembali</button>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================
+     🗂️ MODAL SENARAI AKTIVITI SIDEBAR
+===================================================== -->
+<div id="sidebarActivityModal"
+     class="hidden fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm p-4
+            flex items-center justify-center"
+     onclick="if(event.target === this) closeSidebarActivityGroup()">
+
+  <div class="w-full max-w-3xl max-h-[88vh] overflow-hidden
+              rounded-3xl border border-violet-300/15
+              bg-[#0b0e2a]/95 shadow-2xl">
+
+    <div class="flex items-center justify-between gap-4
+                px-5 md:px-6 py-4 border-b border-white/10">
+      <div>
+        <div class="text-[10px] uppercase tracking-[0.14em]
+                    text-cyan-300 font-extrabold">
+          Aktiviti Pengguna
+        </div>
+        <div id="sidebarActivityTitle"
+             class="text-lg font-extrabold text-white mt-1">
+          Senarai Aktiviti
+        </div>
+        <div id="sidebarActivitySubtitle"
+             class="text-[10px] text-white/40 mt-1">
+          0 rekod aktiviti
+        </div>
+      </div>
+
+      <button type="button"
+              onclick="closeSidebarActivityGroup()"
+              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
+                     hover:bg-white/10 transition text-white/70"
+              aria-label="Tutup">
+        ✕
+      </button>
+    </div>
+
+    <div id="sidebarActivityContent"
+         class="p-5 md:p-6 overflow-y-auto max-h-[70vh] space-y-3">
+    </div>
+
+    <div class="px-5 md:px-6 py-4 border-t border-white/10">
+      <button type="button"
+              onclick="closeSidebarActivityGroup()"
+              class="w-full py-3 rounded-xl font-bold text-sm
+                     bg-gradient-to-r from-violet-600 to-cyan-500
+                     hover:opacity-90 transition">
+        Tutup
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- =====================================================
+     📋 MODAL BUTIRAN AKTIVITI PENGGUNA
+===================================================== -->
+<div id="liveActivityDetailModal"
+     class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm p-4
+            flex items-center justify-center"
+     onclick="if(event.target === this) closeLiveActivityDetail()">
+
+  <div class="w-full max-w-2xl max-h-[88vh] overflow-hidden
+              rounded-3xl border border-violet-300/15
+              bg-[#0b0e2a]/95 shadow-2xl">
+
+    <div class="flex items-center justify-between gap-4
+                px-5 md:px-6 py-4 border-b border-white/10">
+      <div>
+        <div class="text-sm font-extrabold text-white">Aktiviti Pengguna</div>
+        <div class="text-[10px] text-white/40 mt-1">Rekod aktiviti HEALINK yang dipilih</div>
+      </div>
+
+      <button type="button"
+              onclick="closeLiveActivityDetail()"
+              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
+                     hover:bg-white/10 transition text-white/70"
+              aria-label="Tutup">
+        ✕
+      </button>
+    </div>
+
+    <div id="liveActivityDetailContent"
+         class="p-5 md:p-6 overflow-y-auto max-h-[72vh]">
+    </div>
+
+    <div class="px-5 md:px-6 py-4 border-t border-white/10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button type="button"
+                id="deleteLiveActivityButton"
+                onclick="deleteLiveActivity()"
+                class="py-3 rounded-xl font-bold text-sm
+                       bg-red-500/10 border border-red-400/20
+                       text-red-200 hover:bg-red-500/20 transition
+                       disabled:opacity-50 disabled:cursor-not-allowed">
+          🗑 Padam Rekod
+        </button>
+
+        <button type="button"
+                onclick="closeLiveActivityDetail()"
+                class="py-3 rounded-xl font-bold text-sm
+                       bg-gradient-to-r from-violet-600 to-cyan-500
+                       hover:opacity-90 transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="particles"></div>
+
+</body>
+</html>
