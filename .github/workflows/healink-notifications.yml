@@ -1,6 +1,6 @@
 # =====================================================
 # HEALINK 2.0
-# GITHUB ACTIONS - FIREBASE NOTIFICATION DRY RUN
+# GITHUB ACTIONS - FCM NOTIFICATION
 # Authentication: Workload Identity Federation
 # =====================================================
 
@@ -8,10 +8,20 @@ name: HEALINK 2.0 Notifications
 
 on:
   workflow_dispatch:
+    inputs:
+      send_notification:
+        description: "Aktifkan penghantaran notifikasi sebenar?"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
   id-token: write
+
+concurrency:
+  group: healink-notifications
+  cancel-in-progress: false
 
 jobs:
   check-notifications:
@@ -21,34 +31,26 @@ jobs:
     timeout-minutes: 10
 
     env:
-      HEALINK_DRY_RUN: "true"
+      HEALINK_DRY_RUN: ${{ inputs.send_notification && 'false' || 'true' }}
 
     steps:
 
-      # ==========================================
       # 1. DOWNLOAD PROJECT
-      # ==========================================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # ==========================================
       # 2. SETUP NODE.JS
-      # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
 
-      # ==========================================
       # 3. INSTALL DEPENDENCIES
-      # ==========================================
       - name: Install Dependencies
         run: npm ci
 
-      # ==========================================
       # 4. GOOGLE CLOUD AUTHENTICATION
-      # ==========================================
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
@@ -58,8 +60,6 @@ jobs:
           create_credentials_file: true
           export_environment_variables: true
 
-      # ==========================================
-      # 5. RUN DRY RUN
-      # ==========================================
-      - name: Run HEALINK Notifications (Dry Run)
+      # 5. RUN NOTIFICATION SCRIPT
+      - name: Run HEALINK Notifications
         run: node scripts/send-healink-notifications.js
