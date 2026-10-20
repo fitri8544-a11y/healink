@@ -9,6 +9,11 @@
 
 const admin = require("firebase-admin");
 
+const {
+  Timestamp,
+  FieldValue
+} = require("firebase-admin/firestore");
+
 // ==========================================
 // HEALINK NOTIFICATION CONFIGURATION
 // ==========================================
@@ -18,7 +23,7 @@ const admin = require("firebase-admin");
 const DRY_RUN = process.env.HEALINK_DRY_RUN !== "false";
 
 // Had maksimum aktiviti bagi setiap pelaksanaan.
-const MAX_ACTIVITIES = 50;
+const MAX_ACTIVITIES = 1;
 
 // Tempoh semakan aktiviti dalam minit.
 const LOOKBACK_MINUTES = 30;
@@ -117,10 +122,6 @@ async function getRecentActivities(db) {
   console.log("Menyemak aktiviti HEALINK...");
 
   const now = Date.now();
-
-  // Semak aktiviti dalam tempoh 30 minit terakhir.
-  // Ini hanya untuk pembangunan dan ujian awal.
-  const { Timestamp, FieldValue } = require("firebase-admin/firestore");
 
   const thirtyMinutesAgo =
     Timestamp.fromMillis(
@@ -426,37 +427,23 @@ async function main() {
   console.log("HEALINK 2.0 - NOTIFIKASI AUTOMATIK");
   console.log("==================================");
 
-  // Keselamatan: hanya benarkan mod ujian buat masa ini.
-  if (!DRY_RUN) {
-    throw new Error(
-      "Penghantaran sebenar belum diaktifkan. Gunakan HEALINK_DRY_RUN=true."
-    );
-  }
-
-  const { db } = initializeFirebase();
+  const { db, messaging } = initializeFirebase();
 
   console.log("Firebase Admin SDK berjaya dimulakan.");
-  console.log("MOD UJIAN: AKTIF");
-  console.log("Tiada notifikasi akan dihantar.");
-
-  // ========================================
-  // 1. BACA AKTIVITI
-  // ========================================
+  console.log(
+    DRY_RUN ? "MOD UJIAN: AKTIF" : "MOD PENGHANTARAN: AKTIF"
+  );
 
   const activities = await getRecentActivities(db);
 
-  const selectedActivities = activities.slice(
-    0,
-    MAX_ACTIVITIES
-  );
+  // Hanya rekod yang memerlukan perhatian pentadbir
+  const selectedActivities = activities
+    .filter(activity => activity.perluPerhatian === true)
+    .slice(0, MAX_ACTIVITIES);
 
   console.log(
-    `Aktiviti untuk disemak: ${selectedActivities.length}`
+    `Aktiviti memerlukan perhatian: ${selectedActivities.length}`
   );
-
-  // ========================================
-  // 2. SEMAK PENERIMA
-  // ========================================
 
   for (const activity of selectedActivities) {
 
@@ -466,17 +453,77 @@ async function main() {
     );
 
     console.log(
-      `Aktiviti disemak | Penerima layak: ${tokens.length}`
+      `Aktiviti ${activity.id} | Penerima layak: ${tokens.length}`
     );
 
-    // DRY RUN:
-    // Tidak menghantar FCM.
-    // Tidak mencipta notification_logs.
-    // Tidak mengubah data Firestore.
+    if (DRY_RUN) {
+      console.log("DRY RUN: Notifikasi tidak dihantar.");
+      continue;
+    }
+
+    // Elakkan penghantaran berulang
+    const claimed = await claimNotification(
+      db,
+      activity.id
+    );
+
+    if (!claimed) {
+      console.log("Rekod telah diproses. Langkau.");
+      continue;
+    }
+
+    try {
+
+      if (tokens.length === 0) {
+
+        await updateNotificationStatus(
+          db,
+          activity.id,
+          "no_recipients"
+        );
+
+        continue;
+      }
+
+      const result = await sendAdminNotification(
+        messaging,
+        tokens,
+        activity
+      );
+
+      let status = "failed";
+
+      if (result.failureCount === 0 && result.successCount > 0) {
+        status = "sent";
+      } else if (result.successCount > 0) {
+        status = "partial";
+      }
+
+      await updateNotificationStatus(
+        db,
+        activity.id,
+        status,
+        result
+      );
+
+    } catch (error) {
+
+      console.error(
+        `Gagal menghantar aktiviti ${activity.id}:`,
+        error.message
+      );
+
+      await updateNotificationStatus(
+        db,
+        activity.id,
+        "failed"
+      );
+
+    }
   }
 
   console.log("==================================");
-  console.log("UJIAN SELESAI");
+  console.log("PROSES NOTIFIKASI SELESAI");
   console.log("==================================");
 }
 
