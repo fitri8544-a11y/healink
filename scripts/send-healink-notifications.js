@@ -120,8 +120,10 @@ async function getRecentActivities(db) {
 
   // Semak aktiviti dalam tempoh 30 minit terakhir.
   // Ini hanya untuk pembangunan dan ujian awal.
+  const { Timestamp, FieldValue } = require("firebase-admin/firestore");
+
   const thirtyMinutesAgo =
-    admin.firestore.Timestamp.fromMillis(
+    Timestamp.fromMillis(
       now - (30 * 60 * 1000)
     );
 
@@ -322,8 +324,8 @@ async function claimNotification(db, activityId) {
       transaction.create(logRef, {
         status: "processing",
         attempts: 1,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp()
       });
 
       return true;
@@ -366,7 +368,7 @@ async function claimNotification(db, activityId) {
       transaction.update(logRef, {
         status: "processing",
         attempts: attempts + 1,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        updatedAt: FieldValue.serverTimestamp()
       });
 
       return true;
@@ -406,7 +408,7 @@ async function updateNotificationStatus(
     status,
     successCount: details.successCount || 0,
     failureCount: details.failureCount || 0,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    updatedAt: FieldValue.serverTimestamp()
   });
 
   console.log(
