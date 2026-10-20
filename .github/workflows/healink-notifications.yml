@@ -12,7 +12,7 @@ on:
   # AUTOMATIC SCHEDULE - EVERY 15 MINUTES
   # ==========================================
   schedule:
-  - cron: "7,22,37,52 * * * *"
+    - cron: "7,22,37,52 * * * *"
 
   # ==========================================
   # MANUAL WORKFLOW
@@ -41,7 +41,9 @@ jobs:
     timeout-minutes: 10
 
     env:
-      HEALINK_DRY_RUN: ${{ inputs.send_notification && 'false' || 'true' }}
+      # Scheduled: penghantaran notifikasi sebenar
+      # Manual: DRY RUN kecuali diaktifkan
+      HEALINK_DRY_RUN: ${{ (github.event_name == 'schedule' || inputs.send_notification == true) && 'false' || 'true' }}
 
     steps:
 
