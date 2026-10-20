@@ -17,9 +17,18 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- Firebase (compat) -->
+<!-- =====================================================
+     FIREBASE SDK - HEALINK 2.0
+===================================================== -->
+
+<!-- Firebase App -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
+<!-- Firebase Firestore -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<!-- Firebase Cloud Messaging -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
 <style>
   .card { @apply bg-white/20 border border-white/20 backdrop-blur-lg rounded-2xl p-5 shadow-lg; }
@@ -673,13 +682,51 @@ canvas{max-width:100%}
 </div>
 
 
-    <!-- ================= SEKOLAH ================= -->
-    <div onclick="toggleSection('sekolahList')" 
-         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
-      <span>🏫 Sekolah</span>
-      <span id="arrowSekolah">▼</span>
-    </div>
-    <div id="sekolahList" class="space-y-2 hidden"></div>
+<!-- =====================================================
+     🔔 HEALINK 2.0 - NOTIFIKASI ADMIN
+===================================================== -->
+
+<div id="adminNotificationSection" class="mt-4">
+
+  <button
+    id="enableNotificationBtn"
+    type="button"
+    class="sidebar-btn"
+    style="
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#67e8f9;
+      border:1px solid rgba(34,211,238,.25);
+      background:rgba(34,211,238,.08);
+    "
+  >
+    <span>🔔</span>
+    <span>Aktifkan Notifikasi</span>
+  </button>
+
+  <p
+    id="notificationStatus"
+    style="
+      font-size:10px;
+      color:#a8a9c4;
+      margin-top:6px;
+      padding-left:10px;
+    "
+  >
+    Notifikasi belum diaktifkan.
+  </p>
+
+</div>
+
+
+<!-- ================= SEKOLAH ================= -->
+<div onclick="toggleSection('sekolahList')"
+     class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+  <span>🏫 Sekolah</span>
+  <span id="arrowSekolah">▼</span>
+</div>
+<div id="sekolahList" class="space-y-2 hidden"></div>
 
     <!-- ================= KELAS ================= -->
     <div onclick="toggleSection('kelasList')" 
@@ -1536,11 +1583,24 @@ function generateGreeting(){
 
 }
 
-// 🔥 CONFIG (guna config cikgu)
+// =====================================================
+// FIREBASE CONFIG - HEALINK 2.0 + FCM
+// =====================================================
+
 const firebaseConfig = {
   apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+
   authDomain: "bimbingankaunselingskkk.firebaseapp.com",
-  projectId: "bimbingankaunselingskkk"
+
+  databaseURL: "https://bimbingankaunselingskkk-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+  projectId: "bimbingankaunselingskkk",
+
+  storageBucket: "bimbingankaunselingskkk.firebasestorage.app",
+
+  messagingSenderId: "847162891153",
+
+  appId: "1:847162891153:web:0ff6aa5a6c7276133f1830"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1779,6 +1839,153 @@ function renderRanking(stats){
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+<!-- =====================================================
+     HEALINK 2.0 - FIREBASE CLOUD MESSAGING
+===================================================== -->
+
+<script>
+
+const HEALINK_VAPID_KEY =
+  "BKYhwy4UcU5p7UFMpI8xl7z2LD_nnmCa9-yN24XyB2dDgH6h_NBiSfQPSAYJfrbPwNYPs7H1hC6hKbsBojOcBAQ";
+
+async function enableAdminNotifications() {
+
+  const status = document.getElementById("notificationStatus");
+  const button = document.getElementById("enableNotificationBtn");
+
+  try {
+
+    const admin = window.currentAdmin;
+    const user = firebase.auth().currentUser;
+
+    if (
+      !user ||
+      !admin ||
+      admin.uid !== user.uid ||
+      !["superadmin", "schooladmin"].includes(admin.role)
+    ) {
+      throw new Error("Akses notifikasi hanya untuk pentadbir yang disahkan.");
+    }
+
+    if (
+      !("serviceWorker" in navigator) ||
+      !("Notification" in window) ||
+      !(await firebase.messaging.isSupported())
+    ) {
+      throw new Error("Peranti atau pelayar ini tidak menyokong notifikasi FCM.");
+    }
+
+    button.disabled = true;
+    status.textContent = "Sedang mengaktifkan notifikasi...";
+
+    const permission = await Notification.requestPermission();
+
+    if (permission !== "granted") {
+      throw new Error("Kebenaran notifikasi tidak diberikan.");
+    }
+
+    const registration = await navigator.serviceWorker.register(
+      "/service-worker.js"
+    );
+
+    await navigator.serviceWorker.ready;
+
+    const messaging = firebase.messaging();
+
+    const token = await messaging.getToken({
+      vapidKey: HEALINK_VAPID_KEY,
+      serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+      throw new Error("Token FCM tidak berjaya dijana.");
+    }
+
+    // =====================================================
+// HEALINK 2.0 - SIMPAN TOKEN FCM PENTADBIR
+// =====================================================
+
+// ID dokumen berasaskan UID dan token peranti.
+// Mengelakkan pendaftaran berulang bagi token yang sama.
+const encoder = new TextEncoder();
+
+const tokenBytes = encoder.encode(token);
+
+const tokenHash = await crypto.subtle.digest(
+  "SHA-256",
+  tokenBytes
+);
+
+const tokenId = Array.from(
+  new Uint8Array(tokenHash)
+)
+  .map(byte => byte.toString(16).padStart(2, "0"))
+  .join("");
+
+const subscriptionId = `${user.uid}_${tokenId}`;
+
+const subscriptionRef = db
+  .collection("push_subscriptions")
+  .doc(subscriptionId);
+
+const existingSubscription = await subscriptionRef.get();
+
+const adminSchool = admin.sekolah || "";
+
+if (existingSubscription.exists) {
+
+  await subscriptionRef.update({
+    token: token,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+} else {
+
+  await subscriptionRef.set({
+    uid: user.uid,
+    token: token,
+    role: admin.role,
+    sekolah: adminSchool,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+}
+
+console.log("✅ Token FCM pentadbir disimpan ke Firestore.");
+
+    status.textContent = "✅ Token FCM berjaya dijana.";
+    button.querySelector("span:last-child").textContent =
+      "Notifikasi Diaktifkan";
+
+    console.log("✅ Token FCM berjaya dijana untuk pentadbir.");
+
+  } catch (error) {
+
+    console.error("❌ HEALINK FCM:", error);
+
+    status.textContent = "❌ " + error.message;
+
+  } finally {
+
+    button.disabled = false;
+
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const button = document.getElementById("enableNotificationBtn");
+
+  if (button) {
+    button.addEventListener("click", enableAdminNotifications);
+  }
+
+});
+
+</script>
 
 <script>
 // =====================================================

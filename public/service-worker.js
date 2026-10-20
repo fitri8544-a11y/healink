@@ -4,7 +4,7 @@
 ========================================================= */
 
 const CACHE_NAME =
-  "healink-v2-cache-v2";
+  "healink-v2-cache-v3";
 
 
 /* =========================================================
@@ -260,6 +260,104 @@ self.addEventListener(
 
         })
 
+    );
+
+  }
+);
+
+/* =========================================================
+   HEALINK 2.0
+   FIREBASE CLOUD MESSAGING
+   BACKGROUND NOTIFICATIONS
+========================================================= */
+
+// Firebase SDK untuk Service Worker
+importScripts(
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"
+);
+
+importScripts(
+  "https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"
+);
+
+// Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
+  authDomain: "bimbingankaunselingskkk.firebaseapp.com",
+  databaseURL: "https://bimbingankaunselingskkk-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "bimbingankaunselingskkk",
+  storageBucket: "bimbingankaunselingskkk.firebasestorage.app",
+  messagingSenderId: "847162891153",
+  appId: "1:847162891153:web:0ff6aa5a6c7276133f1830"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Firebase Messaging
+const messaging = firebase.messaging();
+
+// =====================================================
+// HEALINK 2.0 - BACKGROUND NOTIFICATION
+// Untuk mesej FCM jenis DATA-ONLY
+// =====================================================
+
+messaging.onBackgroundMessage((payload) => {
+
+  console.log(
+    "🔔 HEALINK Background Message Received"
+  );
+
+  // Elakkan paparan kedua jika mesej mempunyai
+  // notification payload yang dipaparkan oleh Firebase.
+  if (payload.notification) {
+    return;
+  }
+
+  const data = payload.data || {};
+
+  const notificationTitle =
+    data.title || "🔔 HEALINK 2.0";
+
+  const notificationOptions = {
+
+    body:
+      data.body ||
+      "Terdapat makluman baharu untuk pentadbir.",
+
+    icon:
+      "/assets/healink-icon-192.png",
+
+    badge:
+      "/assets/healink-icon-192.png",
+
+    tag:
+      data.eventId || "healink-admin-notification",
+
+    data: {
+      url: "/dashboard.html"
+    }
+
+  };
+
+  return self.registration.showNotification(
+    notificationTitle,
+    notificationOptions
+  );
+
+});
+
+// Apabila notifikasi diklik
+self.addEventListener(
+  "notificationclick",
+  event => {
+
+    event.notification.close();
+
+    event.waitUntil(
+      clients.openWindow(
+        "/dashboard.html"
+      )
     );
 
   }
