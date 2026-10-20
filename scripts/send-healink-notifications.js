@@ -31,21 +31,31 @@ function initializeFirebase() {
 
   if (!process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     throw new Error(
-      "GOOGLE_APPLICATION_CREDENTIALS belum dikonfigurasi."
+      "GOOGLE_APPLICATION_CREDENTIALIALS belum dikonfigurasi."
     );
   }
 
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.applicationDefault(),
-      projectId: "bimbingankaunselingskkk"
-    });
-  }
+  const {
+    initializeApp,
+    getApps,
+    applicationDefault
+  } = require("firebase-admin/app");
+
+  const { getFirestore } = require("firebase-admin/firestore");
+  const { getMessaging } = require("firebase-admin/messaging");
+
+  const app = getApps().length
+    ? getApps()[0]
+    : initializeApp({
+        credential: applicationDefault(),
+        projectId: "bimbingankaunselingskkk"
+      });
 
   return {
-    db: admin.firestore(),
-    messaging: admin.messaging()
+    db: getFirestore(app),
+    messaging: getMessaging(app)
   };
+
 }
 
 // ==========================================
