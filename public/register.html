@@ -469,56 +469,35 @@ function(e){
 
 
     /* =================================================
-       SIMPAN FIRESTORE
+       SIMPAN FIRESTORE SEBELUM MASUK HEALINK
+       Mengekalkan struktur rekod asal untuk keserasian Rules.
     ================================================= */
 
-    db
-    .collection("pengunjung")
-    .add({
+    const submitButton = document.querySelector('#formDaftar button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "⏳ Merekod pendaftaran...";
+    }
 
-        jenis:
-        jenis,
-
-        nama:
-        nama,
-
-        organisasi:
-        organisasi,
-
-        kelas:
-        kelas || "-",
-
-        masa:
-        firebase.firestore
-        .FieldValue
-        .serverTimestamp()
-
+    db.collection("pengunjung").add({
+        jenis: jenis,
+        nama: nama,
+        organisasi: organisasi,
+        kelas: kelas || "-",
+        masa: firebase.firestore.FieldValue.serverTimestamp()
     })
-
     .then(() => {
-
-        console.log(
-            "✅ Pengunjung berjaya direkodkan"
-        );
-
+        console.log("✅ Pengunjung berjaya direkodkan");
+        window.location.href = "healink-v2.html";
     })
-
     .catch(error => {
-
-        console.error(
-            "❌ Firestore:",
-            error
-        );
-
+        console.error("❌ Pendaftaran Firestore gagal:", error);
+        alert("Pendaftaran tidak berjaya disimpan. Semak sambungan internet dan cuba lagi.");
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "✦ Daftar & Teruskan";
+        }
     });
-
-
-    /* =================================================
-       MASUK HEALINK
-    ================================================= */
-
-    window.location.href =
-    "healink-v2.html";
 
 });
 

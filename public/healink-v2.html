@@ -7347,6 +7347,45 @@ if(!firebase.apps.length) {
 const db =
   firebase.firestore();
 
+/* =====================================================
+   HEALINK - SIMPAN AKTIVITI & STATUS SESI
+   Firestore kekal sebagai rekod rasmi Dashboard Admin.
+   Hanya metadata minimum disimpan dalam sessionStorage.
+===================================================== */
+const HEALINK_SESSION_KEY = "healinkSessionActivities";
+
+async function saveHealinkActivity(record) {
+  // Jangan rekod ke sesi jika simpanan Firestore gagal.
+  const docRef = await db.collection("aktivitiPelajar").add(record);
+
+  try {
+    const previous = JSON.parse(
+      sessionStorage.getItem(HEALINK_SESSION_KEY) || "[]"
+    );
+    const activities = Array.isArray(previous) ? previous : [];
+    activities.push({
+      id: docRef.id,
+      aktiviti: String(record.aktiviti || ""),
+      module: String(record.module || ""),
+      emoji: String(record.emoji || ""),
+      emosi: String(record.emosi || ""),
+      nilaiEmosi: String(record.nilaiEmosi || ""),
+      masaSesi: new Date().toISOString()
+    });
+    // Hadkan sejarah sementara, tanpa nama, sekolah, komen atau catatan peribadi.
+    sessionStorage.setItem(
+      HEALINK_SESSION_KEY,
+      JSON.stringify(activities.slice(-100))
+    );
+  } catch (error) {
+    console.warn("Status sesi tidak dapat dikemas kini:", error);
+  }
+
+  return docRef;
+}
+
+
+
 
 console.log(
   "🔥 HEALINK V2 Firebase Ready"
@@ -7638,227 +7677,27 @@ function selectDailyMood(button) {
 
 /* =====================================================
    LOAD TODAY'S DAILY MOOD
+   HEALINK 2.0 - SAFE VERSION
 
-   Memuatkan semula check-in terakhir pengguna untuk
-   hari semasa tanpa mencipta rekod baharu.
+   Tidak membaca rekod emosi daripada Firestore.
+   Rekod baharu masih disimpan melalui fungsi asal.
 ===================================================== */
 
 async function loadTodayDailyMood() {
 
-  const nama =
-    sessionStorage.getItem("nama") ||
-    "";
-
-  const organisasi =
-    sessionStorage.getItem("organisasi") ||
-    "";
-
-  const jenis =
-    sessionStorage.getItem("jenis") ||
-    "";
-
-
-  if(!nama) {
-    return;
-  }
-
-
-  try {
-
-    /*
-      Query berdasarkan nama sahaja supaya tidak
-      memerlukan Firestore composite index.
-
-      Penapisan pengguna, aktiviti dan tarikh
-      dibuat dalam JavaScript.
-    */
-
-    const snapshot =
-      await db
-        .collection("aktivitiPelajar")
-        .where("nama", "==", nama)
-        .get();
-
-
-    const today =
-      new Date();
-
-    const todayKey =
-      [
-        today.getFullYear(),
-        String(today.getMonth() + 1).padStart(2, "0"),
-        String(today.getDate()).padStart(2, "0")
-      ].join("-");
-
-
-    const records = [];
-
-
-    snapshot.forEach(doc => {
-
-      const data =
-        doc.data();
-
-
-      if(
-        data.aktiviti !==
-        "Check-in Hari Ini"
-      ) {
-        return;
-      }
-
-
-      /*
-        Jika rekod mempunyai organisasi / jenis,
-        pastikan ia sepadan dengan pengguna semasa.
-        Rekod lama yang tiada medan ini masih boleh dibaca.
-      */
-
-      if(
-        organisasi &&
-        data.organisasi &&
-        data.organisasi !== organisasi
-      ) {
-        return;
-      }
-
-
-      if(
-        jenis &&
-        data.jenis &&
-        data.jenis !== jenis
-      ) {
-        return;
-      }
-
-
-      if(
-        !data.masa ||
-        typeof data.masa.toDate !== "function"
-      ) {
-        return;
-      }
-
-
-      const recordDate =
-        data.masa.toDate();
-
-
-      const recordDateKey =
-        [
-          recordDate.getFullYear(),
-          String(recordDate.getMonth() + 1).padStart(2, "0"),
-          String(recordDate.getDate()).padStart(2, "0")
-        ].join("-");
-
-
-      if(recordDateKey !== todayKey) {
-        return;
-      }
-
-
-      records.push({
-        id: doc.id,
-        ...data
-      });
-
-    });
-
-
-    if(records.length === 0) {
-
-      console.log(
-        "💜 Belum ada Daily Check-in untuk hari ini."
-      );
-
-      return;
-    }
-
-
-    records.sort((a,b) => {
-
-      const timeA =
-        a.masa &&
-        typeof a.masa.toMillis === "function"
-          ? a.masa.toMillis()
-          : 0;
-
-      const timeB =
-        b.masa &&
-        typeof b.masa.toMillis === "function"
-          ? b.masa.toMillis()
-          : 0;
-
-      return timeB - timeA;
-
-    });
-
-
-    const latest =
-      records[0];
-
-
-    const moodValue =
-      latest.nilaiEmosi ||
-      "";
-
-
-    if(!moodValue) {
-      return;
-    }
-
-
-    const button =
-      document.querySelector(
-        `.heal-emotion-option[data-mood="${moodValue}"]`
-      );
-
-
-    if(!button) {
-
-      console.warn(
-        "⚠️ Pilihan Daily Mood tidak ditemui:",
-        moodValue
-      );
-
-      return;
-    }
-
-
-    /*
-      Gunakan fungsi sedia ada supaya:
-      - butang selected dikemas kini
-      - badge Dipilih dipindahkan
-      - Pilihan semasa dikemas kini
-      - selectedDailyMood diselaraskan
-    */
-
-    selectDailyMood(
-      button
-    );
-
-
-    console.log(
-      "💜 Daily Check-in hari ini dimuatkan:",
-      latest.emoji,
-      latest.emosi
-    );
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "❌ Gagal memuatkan Daily Check-in hari ini:",
-      error
-    );
-
-    /*
-      Jangan ganggu penggunaan HEALINK jika bacaan gagal.
-      UI akan kekal pada pilihan default Biasa.
-    */
-
-  }
+  /*
+    Pengguna biasa tidak membaca sejarah emosi
+    daripada Firestore bagi melindungi data murid.
+
+    Pilihan emosi hanya dipaparkan berdasarkan
+    pilihan semasa dalam halaman ini.
+  */
+
+  console.log(
+    "💜 HEALINK Daily Check-in sedia digunakan."
+  );
+
+  return;
 
 }
 
@@ -8024,13 +7863,7 @@ async function openDailyMoodTracker() {
 
   try {
 
-    await db
-      .collection(
-        "aktivitiPelajar"
-      )
-      .add(
-        moodData
-      );
+    await saveHealinkActivity(moodData);
 
 
     console.log(
@@ -8720,15 +8553,10 @@ async function healTalkAction(
      SAVE
   ================================================= */
 
+
   try {
 
-    await db
-      .collection(
-        "aktivitiPelajar"
-      )
-      .add(
-        healTalkData
-      );
+    await saveHealinkActivity(healTalkData);
 
 
     console.log(
@@ -9708,13 +9536,7 @@ async function completeIntervention() {
   try {
 
     const docRef =
-      await db
-        .collection(
-          "aktivitiPelajar"
-        )
-        .add(
-          interventionRecord
-        );
+      await saveHealinkActivity(interventionRecord);
 
 
     console.log(
@@ -10635,13 +10457,7 @@ async function completeCopingSkill() {
   try {
 
     const docRef =
-      await db
-        .collection(
-          "aktivitiPelajar"
-        )
-        .add(
-          copingRecord
-        );
+      await saveHealinkActivity(copingRecord);
 
 
     console.log(
@@ -11643,9 +11459,7 @@ async function completeEmotionRegulation() {
     /* ================= FIRESTORE ================= */
 
     const docRef =
-      await db
-        .collection("aktivitiPelajar")
-        .add(regulationRecord);
+      await saveHealinkActivity(regulationRecord);
 
 
     console.log(
@@ -12637,9 +12451,7 @@ async function completeControlChallenge() {
     /* ================= FIRESTORE ================= */
 
     const docRef =
-      await db
-        .collection("aktivitiPelajar")
-        .add(controlRecord);
+      await saveHealinkActivity(controlRecord);
 
 
     console.log(
@@ -13693,9 +13505,7 @@ async function completePsychoeducation() {
 
   try {
 
-    await db
-      .collection("aktivitiPelajar")
-      .add(record);
+    await saveHealinkActivity(record);
 
 
     console.log(
@@ -15021,9 +14831,7 @@ async function completeHealthyMindTraits() {
 
   try {
 
-    await db
-      .collection("aktivitiPelajar")
-      .add(record);
+    await saveHealinkActivity(record);
 
 
     console.log(
@@ -16194,7 +16002,11 @@ function closeStatusModal() {
 
 
 /* =====================================================
-   LOAD STATUS DATA
+   HEALINK 2.0
+   STATUS AKTIVITI - SESSION SAFE VERSION
+
+   Tidak membaca rekod daripada Firestore.
+   Hanya menggunakan aktiviti sesi semasa.
 ===================================================== */
 
 async function loadStatusData() {
@@ -16222,459 +16034,182 @@ async function loadStatusData() {
 
   let user = {};
 
-
   try {
-
-    user =
-      JSON.parse(
-        sessionStorage.getItem("healinkUser")
-      ) || {};
-
+    user = JSON.parse(
+      sessionStorage.getItem("healinkUser")
+    ) || {};
   }
   catch(error) {
-
-    console.error(
-      "HEALINK user profile error:",
-      error
-    );
-
+    console.error("HEALINK user profile error:", error);
   }
-
 
   const nama =
     user.nama ||
-    sessionStorage.getItem("nama");
-
+    sessionStorage.getItem("nama") ||
+    "";
 
   if(!nama) {
+    console.warn("Nama pengguna tidak ditemui.");
+    return;
+  }
 
-    console.warn(
-      "Nama pengguna tidak ditemui."
+
+  /* ================= SESSION RECORDS ================= */
+
+  const sessionKey = HEALINK_SESSION_KEY;
+
+  let records = [];
+
+  try {
+    const stored = JSON.parse(
+      sessionStorage.getItem(sessionKey) || "[]"
     );
 
-    return;
-
+    records = Array.isArray(stored) ? stored : [];
+  }
+  catch(error) {
+    console.warn("HEALINK session records error:", error);
   }
 
 
-  /* ================= LOADING ================= */
+  /* ================= FILTER ================= */
 
-  if(latestEmoji) {
-    latestEmoji.textContent = "⏳";
-  }
+  const checkins = records.filter(
+    item => item.aktiviti === "Check-in Hari Ini"
+  );
 
-  if(latestMood) {
-    latestMood.textContent = "Memuatkan...";
-  }
+  const completedActivities = records.filter(
+    item =>
+      item.aktiviti &&
+      item.aktiviti !== "Check-in Hari Ini"
+  );
+
+  const emotionRecords = records.filter(
+    item =>
+      (
+        item.aktiviti === "Check-in Hari Ini" ||
+        item.aktiviti === "Catatan Emosi"
+      ) &&
+      item.emoji
+  );
+
+
+  /* ================= COUNTS ================= */
 
   if(checkinCount) {
-    checkinCount.textContent = "—";
+    checkinCount.textContent = checkins.length;
   }
 
   if(activityCount) {
-    activityCount.textContent = "—";
+    activityCount.textContent = completedActivities.length;
   }
+
+
+  /* ================= LATEST EMOTION ================= */
+
+  const latest = emotionRecords.length
+    ? emotionRecords[emotionRecords.length - 1]
+    : null;
+
+  if(latestEmoji) {
+    latestEmoji.textContent = latest
+      ? latest.emoji || "🌱"
+      : "—";
+  }
+
+  if(latestMood) {
+    latestMood.textContent = latest
+      ? latest.emosi || "Catatan Emosi"
+      : "Belum Ada";
+  }
+
+
+  /* ================= EMOTION HISTORY ================= */
 
   if(historyBox) {
 
-    historyBox.innerHTML = `
-      <div
-        class="
-          col-span-7
-          py-5
-          text-center
-          text-xs
-          text-slate-400
-        "
-      >
-        ⏳ Memuatkan rekod HEALINK...
-      </div>
-    `;
+    historyBox.innerHTML = "";
 
-  }
+    const recentEmotions = emotionRecords.slice(-7);
 
-
-  try {
-
-    /*
-      Kita query berdasarkan nama sahaja dahulu.
-
-      Sorting dibuat dalam JavaScript supaya tidak
-      memerlukan Firestore composite index.
-    */
-
-    const snapshot =
-      await db
-        .collection("aktivitiPelajar")
-        .where("nama", "==", nama)
-        .get();
-
-
-    const records = [];
-
-
-    snapshot.forEach(doc => {
-
-      records.push({
-        id: doc.id,
-        ...doc.data()
-      });
-
-    });
-
-
-    /* ================= SORT ================= */
-
-    records.sort((a,b) => {
-
-      const timeA =
-        a.masa &&
-        typeof a.masa.toMillis === "function"
-          ? a.masa.toMillis()
-          : 0;
-
-      const timeB =
-        b.masa &&
-        typeof b.masa.toMillis === "function"
-          ? b.masa.toMillis()
-          : 0;
-
-      return timeB - timeA;
-
-    });
-
-
-    /* =================================================
-       CHECK-IN RECORDS
-    ================================================= */
-
-    const checkins =
-      records.filter(
-        item =>
-          item.aktiviti ===
-          "Check-in Hari Ini"
-      );
-
-
-    if(checkinCount) {
-
-      checkinCount.textContent =
-        checkins.length;
-
-    }
-
-
-    /* =================================================
-       ALL COMPLETED ACTIVITIES
-    ================================================= */
-
-    const completedActivities =
-      records.filter(
-        item =>
-          item.aktiviti &&
-          item.aktiviti !==
-          "Check-in Hari Ini"
-      );
-
-
-    if(activityCount) {
-
-      activityCount.textContent =
-        completedActivities.length;
-
-    }
-
-
-    /* =================================================
-       EMOTION RECORDS
-
-       Gabungkan:
-       - Check-in Hari Ini
-       - Catatan Emosi
-    ================================================= */
-
-    const emotionRecords =
-      records.filter(
-        item =>
-
-          (
-            item.aktiviti ===
-            "Check-in Hari Ini"
-
-            ||
-
-            item.aktiviti ===
-            "Catatan Emosi"
-          )
-
-          &&
-
-          item.emoji
-      );
-
-
-    /* ================= LATEST ================= */
-
-    if(emotionRecords.length > 0) {
-
-      const latest =
-        emotionRecords[0];
-
-
-      if(latestEmoji) {
-
-        latestEmoji.textContent =
-          latest.emoji || "🌱";
-
-      }
-
-
-      if(latestMood) {
-
-        latestMood.textContent =
-          latest.emosi ||
-          "Catatan Emosi";
-
-      }
-
-    }
-
-    else {
-
-      if(latestEmoji) {
-        latestEmoji.textContent = "—";
-      }
-
-      if(latestMood) {
-        latestMood.textContent = "Belum Ada";
-      }
-
-    }
-
-
-    /* =================================================
-       LAST 7 EMOTIONS
-    ================================================= */
-
-    const recentEmotions =
-      emotionRecords.slice(0,7);
-
-
-    if(historyBox) {
-
-      historyBox.innerHTML = "";
-
-
-      if(recentEmotions.length === 0) {
-
-        historyBox.innerHTML = `
-          <div
-            class="
-              col-span-7
-              py-5
-              text-center
-              text-xs
-              text-slate-500
-            "
-          >
-            Belum ada catatan emosi.
-          </div>
-        `;
-
-      }
-
-      else {
-
-        recentEmotions
-          .slice()
-          .reverse()
-          .forEach(item => {
-
-            const emotion =
-              document.createElement("div");
-
-
-            emotion.className = `
-              flex
-              flex-col
-              items-center
-              justify-center
-              gap-1
-              min-h-[68px]
-              rounded-xl
-              border
-              border-white/10
-              bg-white/5
-            `;
-
-
-            let dateLabel = "";
-
-
-            if(
-              item.masa &&
-              typeof item.masa.toDate ===
-              "function"
-            ) {
-
-              dateLabel =
-                item.masa
-                  .toDate()
-                  .toLocaleDateString(
-                    "ms-MY",
-                    {
-                      day: "numeric",
-                      month: "short"
-                    }
-                  );
-
-            }
-
-
-            emotion.innerHTML = `
-              <span class="text-2xl">
-                ${item.emoji}
-              </span>
-
-              <span
-                class="
-                  text-[8px]
-                  text-slate-500
-                "
-              >
-                ${dateLabel}
-              </span>
-            `;
-
-
-            emotion.title =
-              item.emosi || "Catatan Emosi";
-
-
-            historyBox.appendChild(
-              emotion
-            );
-
-          });
-
-      }
-
-    }
-
-
-    /* =================================================
-       SUPPORTIVE SUMMARY
-       Bukan diagnosis / penilaian klinikal.
-    ================================================= */
-
-    if(insight) {
-
-      if(emotionRecords.length === 0) {
-
-        insight.textContent =
-          "Belum ada catatan emosi untuk diringkaskan. Mulakan dengan Check-in Hari Ini atau Emotion Tracker.";
-
-      }
-
-      else {
-
-        const latest =
-          emotionRecords[0];
-
-
-        if(
-          latest.nilaiEmosi ===
-          "perlukan-sokongan"
-        ) {
-
-          insight.textContent =
-            "Catatan terkini menunjukkan anda memilih “Perlukan Sokongan”. Pertimbangkan untuk berbual dengan orang dewasa yang dipercayai atau menggunakan ruang sokongan HEALINK.";
-
-        }
-
-        else if(
-          latest.nilaiEmosi ===
-          "kurang-baik" ||
-
-          latest.emosi === "Sedih" ||
-          latest.emosi === "Marah" ||
-          latest.emosi === "Risau"
-        ) {
-
-          insight.textContent =
-            "Catatan terkini menunjukkan emosi yang mungkin terasa mencabar. Beri ruang kepada diri, gunakan strategi yang membantu dan dapatkan sokongan jika diperlukan.";
-
-        }
-
-        else {
-
-          insight.textContent =
-            "Teruskan mengenali dan mencatat emosi anda. Catatan dari semasa ke semasa boleh membantu anda melihat semula perjalanan kesejahteraan diri.";
-
-        }
-
-      }
-
-    }
-
-
-    console.log(
-      "📊 HEALINK Status:",
-      {
-        jumlahRekod:
-          records.length,
-
-        checkin:
-          checkins.length,
-
-        aktiviti:
-          completedActivities.length,
-
-        emosi:
-          emotionRecords.length
-      }
-    );
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Status HEALINK Firestore error:",
-      error
-    );
-
-
-    if(latestEmoji) {
-      latestEmoji.textContent = "⚠️";
-    }
-
-
-    if(latestMood) {
-      latestMood.textContent = "Tidak dapat dimuatkan";
-    }
-
-
-    if(historyBox) {
+    if(recentEmotions.length === 0) {
 
       historyBox.innerHTML = `
-        <div
-          class="
-            col-span-7
-            py-5
-            text-center
-            text-xs
-            text-rose-300
-          "
-        >
-          Rekod tidak dapat dimuatkan.
-          Sila cuba lagi.
+        <div class="col-span-7 py-5 text-center text-xs text-slate-500">
+          Tiada catatan emosi dalam sesi ini.
         </div>
       `;
 
     }
+    else {
+
+      recentEmotions.forEach(item => {
+
+        const emotion = document.createElement("div");
+
+        emotion.className = `
+          flex flex-col items-center justify-center gap-1
+          min-h-[68px] rounded-xl border border-white/10 bg-white/5
+        `;
+
+        const emoji = document.createElement("span");
+        emoji.className = "text-2xl";
+        emoji.textContent = item.emoji || "🌱";
+
+        emotion.appendChild(emoji);
+
+        emotion.title = item.emosi || "Catatan Emosi";
+
+        historyBox.appendChild(emotion);
+
+      });
+
+    }
 
   }
+
+
+  /* ================= SUPPORTIVE SUMMARY ================= */
+
+  if(insight) {
+
+    if(!latest) {
+
+      insight.textContent =
+        "Belum ada catatan emosi dalam sesi ini. Mulakan dengan Check-in Hari Ini atau Emotion Tracker.";
+
+    }
+    else if(latest.nilaiEmosi === "perlukan-sokongan") {
+
+      insight.textContent =
+        "Anda memilih Perlukan Sokongan. Pertimbangkan untuk berbual dengan orang dewasa yang dipercayai.";
+
+    }
+    else if(
+      latest.nilaiEmosi === "kurang-baik" ||
+      ["Sedih", "Marah", "Risau"].includes(latest.emosi)
+    ) {
+
+      insight.textContent =
+        "Emosi yang mencabar boleh berlaku. Beri ruang kepada diri dan dapatkan sokongan jika diperlukan.";
+
+    }
+    else {
+
+      insight.textContent =
+        "Teruskan mengenali emosi anda dan menjaga kesejahteraan diri.";
+
+    }
+
+  }
+
+
+  console.log("📊 HEALINK Status sesi semasa:", {
+    jumlahRekod: records.length,
+    checkin: checkins.length,
+    aktiviti: completedActivities.length,
+    emosi: emotionRecords.length
+  });
 
 }
 
@@ -17529,13 +17064,7 @@ async function saveMood() {
 
   try {
 
-    await db
-      .collection(
-        "aktivitiPelajar"
-      )
-      .add(
-        emotionData
-      );
+    await saveHealinkActivity(emotionData);
 
 
     console.log(
