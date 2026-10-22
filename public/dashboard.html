@@ -2,33 +2,16 @@
 <html lang="ms">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HEALINK 2.0 | Portal Pentadbir</title>
-<link rel="icon" type="image/png" sizes="192x192" href="assets/healink-icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="assets/healink-icon-512.png">
-<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#07091d">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>Dashboard Aktiviti Pelajar</title>
+<link rel="icon" type="image/png" href="assets/admin.png">
 <script src="https://cdn.tailwindcss.com"></script>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- =====================================================
-     FIREBASE SDK - HEALINK 2.0
-===================================================== -->
-
-<!-- Firebase App -->
+<!-- Firebase (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-
-<!-- Firebase Firestore -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<!-- Firebase Cloud Messaging -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
 <style>
   .card { @apply bg-white/20 border border-white/20 backdrop-blur-lg rounded-2xl p-5 shadow-lg; }
@@ -203,334 +186,14 @@ body::after {
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
 }
 </style>
-
-<style id="healink-admin-v2-theme">
-:root{
-  --hl-bg:#07091d;
-  --hl-panel:rgba(20,22,61,.78);
-  --hl-panel-2:rgba(13,16,45,.82);
-  --hl-line:rgba(151,129,255,.16);
-  --hl-muted:#a8a9c4;
-  --hl-cyan:#22d3ee;
-  --hl-violet:#8b5cf6;
-}
-html{background:var(--hl-bg);}
-body{
-  font-family:"Plus Jakarta Sans",Inter,system-ui,sans-serif !important;
-  background:
-    radial-gradient(circle at 10% 5%,rgba(124,58,237,.17),transparent 27%),
-    radial-gradient(circle at 90% 88%,rgba(6,182,212,.10),transparent 28%),
-    linear-gradient(135deg,#050716 0%,#090b24 48%,#070a20 100%) !important;
-  background-attachment:fixed !important;
-  animation:none !important;
-  color:#f8fafc;
-}
-body::before,body::after{opacity:.55;pointer-events:none;}
-#particles{opacity:.20}
-
-/* SIDEBAR */
-body > div:first-of-type{
-  width:272px !important;
-  background:linear-gradient(180deg,rgba(16,18,52,.96),rgba(8,11,31,.97)) !important;
-  border-right:1px solid rgba(139,92,246,.16) !important;
-  box-shadow:18px 0 55px rgba(0,0,0,.20);
-  padding:20px !important;
-}
-body > div:first-of-type > h2{
-  font-size:0 !important;
-  margin-bottom:20px !important;
-}
-body > div:first-of-type > h2::before{
-  content:"HEALINK 2.0";
-  display:block;
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:-.03em;
-  color:#fff;
-}
-body > div:first-of-type > h2::after{
-  content:"PORTAL PENTADBIR";
-  display:block;
-  margin-top:5px;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.18em;
-  color:#67e8f9;
-}
-
-/* Sidebar counters/search */
-body > div:first-of-type > .bg-white\/10,
-body > div:first-of-type .bg-white\/10{
-  background:rgba(255,255,255,.035) !important;
-  border:1px solid rgba(255,255,255,.065) !important;
-  box-shadow:none !important;
-}
-#visitorCount,#visitorHealink{
-  background:linear-gradient(90deg,#c084fc,#67e8f9);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent !important;
-}
-#searchNama,#filterKelas,#filterModul{
-  background:rgba(5,8,28,.74) !important;
-  border:1px solid rgba(148,163,184,.14) !important;
-  color:#fff !important;
-  border-radius:12px !important;
-}
-#searchNama:focus,#filterKelas:focus,#filterModul:focus{
-  border-color:rgba(34,211,238,.45) !important;
-  box-shadow:0 0 0 3px rgba(34,211,238,.06);
-}
-.sidebar-item,.sidebar-btn{
-  background:rgba(255,255,255,.035) !important;
-  border:1px solid rgba(255,255,255,.05);
-}
-.sidebar-item:hover,.sidebar-btn:hover{
-  background:rgba(139,92,246,.12) !important;
-  border-color:rgba(139,92,246,.22);
-  transform:translateX(3px);
-}
-.sidebar-item.active{
-  background:linear-gradient(90deg,rgba(124,58,237,.42),rgba(6,182,212,.18)) !important;
-  border-color:rgba(103,232,249,.25) !important;
-}
-.badge{
-  background:rgba(34,211,238,.13) !important;
-  color:#67e8f9 !important;
-  border:1px solid rgba(34,211,238,.18);
-}
-
-/* MAIN */
-body > .flex-1{
-  padding:24px 28px !important;
-  background:transparent !important;
-}
-#greetingText{
-  color:#c4b5fd !important;
-  font-size:15px !important;
-  font-weight:700 !important;
-}
-
-/* Global glass panels */
-.card,.section-box,
-#mainDashboardContent > .bg-white\/10,
-#feedbackManagementPanel > .bg-white\/10,
-#feedbackManagementPanel .bg-white\/10{
-  background:linear-gradient(145deg,rgba(26,27,72,.72),rgba(12,15,42,.78)) !important;
-  border:1px solid var(--hl-line) !important;
-  box-shadow:0 18px 45px rgba(0,0,0,.16) !important;
-  backdrop-filter:blur(18px) !important;
-}
-.card,.section-box{border-radius:20px !important;}
-.section-title,.title{color:#f8fafc !important;}
-.section-title{font-size:17px !important}
-
-/* Header */
-#mainDashboardContent > div:first-child h1{
-  font-size:26px !important;
-  letter-spacing:-.035em;
-}
-#mainDashboardContent > div:first-child p{color:var(--hl-muted) !important}
-#mainDashboardContent button{
-  border:1px solid rgba(255,255,255,.08);
-}
-
-/* Report */
-#fromDate,#toDate{
-  background:rgba(5,8,28,.78) !important;
-  color:#e5e7eb !important;
-  border:1px solid rgba(148,163,184,.14) !important;
-  border-radius:12px !important;
-  color-scheme:dark;
-}
-#mainDashboardContent > .bg-white\/10{
-  border-radius:20px !important;
-}
-
-/* KPI */
-#kpiTotal,#kpiModules,#kpiTop,#kpiAvg{
-  display:block;
-  margin-top:6px;
-  font-size:23px;
-  font-weight:800;
-  color:#fff;
-}
-.label{color:#9fa1bc !important;opacity:1 !important}
-
-/* Live/alerts */
-#alertList,#activityList{
-  scrollbar-width:thin;
-  scrollbar-color:rgba(139,92,246,.5) transparent;
-}
-
-/* Feedback */
-#feedbackSidebarButton{
-  background:linear-gradient(135deg,rgba(139,92,246,.09),rgba(34,211,238,.045)) !important;
-  border-color:rgba(139,92,246,.16) !important;
-}
-#feedbackSidebarButton:hover{
-  background:linear-gradient(135deg,rgba(139,92,246,.16),rgba(34,211,238,.08)) !important;
-}
-#feedbackManagementPanel select{
-  background:#0b0d2a !important;
-}
-
-/* Buttons */
-button.bg-cyan-500{
-  background:linear-gradient(90deg,#7c3aed,#06b6d4) !important;
-}
-button.bg-red-500{
-  background:rgba(244,63,94,.13) !important;
-  color:#fecdd3 !important;
-  border-color:rgba(251,113,133,.20) !important;
-}
-button.bg-red-500:hover{background:rgba(244,63,94,.22) !important}
-
-/* Charts/ranking */
-canvas{max-width:100%}
-#ranking .card{background:rgba(255,255,255,.035) !important}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:8px;height:8px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:rgba(139,92,246,.38);border-radius:999px}
-
-/* RESPONSIVE */
-@media(max-width:900px){
-  body{display:block !important}
-  body > div:first-of-type{
-    width:100% !important;
-    min-height:auto !important;
-    position:relative !important;
-    border-right:0 !important;
-    border-bottom:1px solid rgba(139,92,246,.16) !important;
-  }
-  body > .flex-1{padding:18px 14px !important}
-}
-@media(max-width:640px){
-  body > div:first-of-type{padding:16px !important}
-  #mainDashboardContent > div:first-child h1{font-size:22px !important}
-  .card,.section-box{border-radius:17px !important}
-}
-</style>
-
-
-<style id="healink-admin-v2-final-polish">
-.admin-status-pill,.admin-role-pill{
-  display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;
-  border-radius:12px;font-size:11px;font-weight:800;letter-spacing:.02em;
-  border:1px solid rgba(255,255,255,.08);white-space:nowrap
-}
-.admin-status-pill{background:rgba(16,185,129,.08);color:#86efac;border-color:rgba(52,211,153,.16)}
-.admin-role-pill{background:rgba(139,92,246,.09);color:#c4b5fd;border-color:rgba(167,139,250,.16)}
-.admin-status-dot{width:7px;height:7px;border-radius:50%;background:#34d399;box-shadow:0 0 10px rgba(52,211,153,.75)}
-
-.visitor-mini-kpi{
-  display:flex;align-items:center;gap:12px;padding:14px;
-  background:rgba(255,255,255,.032);border:1px solid rgba(255,255,255,.06);
-  border-radius:15px;min-width:0
-}
-.visitor-mini-icon{
-  width:38px;height:38px;display:flex;align-items:center;justify-content:center;
-  flex:0 0 38px;border-radius:11px;background:linear-gradient(145deg,rgba(139,92,246,.16),rgba(34,211,238,.08));
-  border:1px solid rgba(139,92,246,.14)
-}
-.visitor-mini-label{display:block;color:#9fa1bc;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
-.visitor-mini-kpi b{display:block;margin-top:2px;font-size:22px;line-height:1.15;color:#fff}
-
-.admin-kpi-card{position:relative;overflow:hidden;text-align:left !important;padding:18px 19px !important}
-.admin-kpi-card::after{
-  content:"";position:absolute;width:80px;height:80px;right:-30px;top:-34px;
-  background:radial-gradient(circle,rgba(139,92,246,.17),transparent 70%);pointer-events:none
-}
-.admin-kpi-head{display:flex;align-items:center;gap:9px}
-.admin-kpi-icon{
-  width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
-  border-radius:9px;background:linear-gradient(145deg,rgba(124,58,237,.20),rgba(6,182,212,.10));
-  color:#c4b5fd;border:1px solid rgba(167,139,250,.13);font-size:13px;font-weight:800
-}
-.admin-kpi-card #kpiTotal,.admin-kpi-card #kpiModules,.admin-kpi-card #kpiTop,.admin-kpi-card #kpiAvg{
-  margin-top:13px;font-size:24px;line-height:1.15
-}
-.admin-kpi-note{display:block;margin-top:6px;color:#777b9d;font-size:9px;font-weight:600}
-
-@media(max-width:1100px){
-  .admin-status-pill,.admin-role-pill{display:none}
-}
-</style>
-
-
-<style id="healink-live-activity-detail-style">
-#activityList .user-item{
-  cursor:pointer;
-  border:1px solid transparent;
-}
-#activityList .user-item:hover{
-  transform:translateY(-1px);
-  border-color:rgba(103,232,249,.16);
-  background:linear-gradient(135deg,rgba(139,92,246,.10),rgba(34,211,238,.06)) !important;
-}
-.live-detail-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-.live-detail-item{
-  padding:13px 14px;
-  border-radius:14px;
-  background:rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.065);
-  min-width:0;
-}
-.live-detail-label{
-  display:block;
-  color:#8589aa;
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  margin-bottom:5px;
-}
-.live-detail-value{
-  color:#f8fafc;
-  font-size:13px;
-  font-weight:700;
-  overflow-wrap:anywhere;
-}
-.live-extra-row{
-  display:flex;
-  justify-content:space-between;
-  gap:18px;
-  padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,.055);
-  font-size:12px;
-}
-.live-extra-row:last-child{border-bottom:0}
-.live-extra-key{color:#9295b3;min-width:120px}
-.live-extra-value{color:#f1f5f9;text-align:right;overflow-wrap:anywhere}
-@media(max-width:640px){
-  .live-detail-grid{grid-template-columns:1fr}
-  .live-extra-row{display:block}
-  .live-extra-value{text-align:left;margin-top:4px}
-}
-</style>
-
 </head>
 
-<body class="flex text-white">
+<body class="flex bg-gradient-to-br from-[#1e1b4b] via-purple-700 to-blue-600 text-white">
 
   <!-- ================= SIDEBAR ================= -->
   <div class="w-64 min-h-screen bg-white/10 backdrop-blur-lg p-5 border-r border-white/10">
 
-    <div class="flex items-center gap-3 mb-6">
-  <img src="assets/healink-icon-192.png"
-       alt="HEALINK 2.0"
-       class="w-12 h-12 rounded-xl shadow-lg">
-  <div>
-    <div class="text-lg font-extrabold tracking-tight">HEALINK <span class="text-violet-300">2.0</span></div>
-    <div class="text-[9px] font-extrabold tracking-[0.18em] text-cyan-300 mt-1">PORTAL PENTADBIR</div>
-  </div>
-</div>
+    <h2 class="text-xl font-bold mb-6">📊 Dashboard</h2>
 
     <!-- VISITOR -->
     <div class="bg-white/10 p-4 rounded-xl text-center mt-6 shadow-inner">
@@ -682,51 +345,13 @@ canvas{max-width:100%}
 </div>
 
 
-<!-- =====================================================
-     🔔 HEALINK 2.0 - NOTIFIKASI ADMIN
-===================================================== -->
-
-<div id="adminNotificationSection" class="mt-4">
-
-  <button
-    id="enableNotificationBtn"
-    type="button"
-    class="sidebar-btn"
-    style="
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color:#67e8f9;
-      border:1px solid rgba(34,211,238,.25);
-      background:rgba(34,211,238,.08);
-    "
-  >
-    <span>🔔</span>
-    <span>Aktifkan Notifikasi</span>
-  </button>
-
-  <p
-    id="notificationStatus"
-    style="
-      font-size:10px;
-      color:#a8a9c4;
-      margin-top:6px;
-      padding-left:10px;
-    "
-  >
-    Notifikasi belum diaktifkan.
-  </p>
-
-</div>
-
-
-<!-- ================= SEKOLAH ================= -->
-<div onclick="toggleSection('sekolahList')"
-     class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
-  <span>🏫 Sekolah</span>
-  <span id="arrowSekolah">▼</span>
-</div>
-<div id="sekolahList" class="space-y-2 hidden"></div>
+    <!-- ================= SEKOLAH ================= -->
+    <div onclick="toggleSection('sekolahList')" 
+         class="flex justify-between items-center cursor-pointer mt-6 mb-2 text-xs text-white/60 uppercase">
+      <span>🏫 Sekolah</span>
+      <span id="arrowSekolah">▼</span>
+    </div>
+    <div id="sekolahList" class="space-y-2 hidden"></div>
 
     <!-- ================= KELAS ================= -->
     <div onclick="toggleSection('kelasList')" 
@@ -1281,14 +906,7 @@ canvas{max-width:100%}
         <p class="text-white/70 text-sm">Analisis penggunaan modul (Real-time)</p>
       </div>
 
-      <div class="flex gap-3 items-center flex-wrap">
-
-  <span class="admin-status-pill">
-    <span class="admin-status-dot"></span>
-    Sistem Aktif
-  </span>
-
-  <span class="admin-role-pill">Portal Pentadbir</span>
+      <div class="flex gap-3">
 
   <!-- LOG KEMASKINI -->
   <button onclick="openUpdateModal()" 
@@ -1355,19 +973,10 @@ canvas{max-width:100%}
 
       <div class="grid md:grid-cols-2 gap-6 items-center">
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div class="visitor-mini-kpi">
-            <span class="visitor-mini-icon">🎓</span>
-            <div><span class="visitor-mini-label">Murid</span><b id="kpiMurid">0</b></div>
-          </div>
-          <div class="visitor-mini-kpi">
-            <span class="visitor-mini-icon">👨‍🏫</span>
-            <div><span class="visitor-mini-label">Guru</span><b id="kpiGuru">0</b></div>
-          </div>
-          <div class="visitor-mini-kpi">
-            <span class="visitor-mini-icon">👤</span>
-            <div><span class="visitor-mini-label">Pelawat</span><b id="kpiPelawat">0</b></div>
-          </div>
+        <div class="grid grid-cols-3 text-center">
+          <div>👨‍🎓 <br><b id="kpiMurid">0</b></div>
+          <div>👨‍🏫 <br><b id="kpiGuru">0</b></div>
+          <div>👤 <br><b id="kpiPelawat">0</b></div>
         </div>
 
         <div class="h-40">
@@ -1380,28 +989,24 @@ canvas{max-width:100%}
 <!-- ================= KPI ================= -->
 <div class="grid md:grid-cols-4 gap-4">
 
-  <div class="card admin-kpi-card">
-    <div class="admin-kpi-head"><span class="admin-kpi-icon">⚡</span><div class="label">Interaksi</div></div>
+  <div class="card text-center">
+    <div class="label">Interaksi</div>
     <b id="kpiTotal">0</b>
-    <span class="admin-kpi-note">Jumlah penggunaan modul</span>
   </div>
 
-  <div class="card admin-kpi-card">
-    <div class="admin-kpi-head"><span class="admin-kpi-icon">◈</span><div class="label">Modul Aktif</div></div>
+  <div class="card text-center">
+    <div class="label">Modul Aktif</div>
     <b id="kpiModules">0</b>
-    <span class="admin-kpi-note">Modul dengan rekod aktiviti</span>
   </div>
 
-  <div class="card admin-kpi-card">
-    <div class="admin-kpi-head"><span class="admin-kpi-icon">★</span><div class="label">Top Modul</div></div>
+  <div class="card text-center">
+    <div class="label">Top Modul</div>
     <b id="kpiTop">-</b>
-    <span class="admin-kpi-note">Modul paling banyak digunakan</span>
   </div>
 
-  <div class="card admin-kpi-card">
-    <div class="admin-kpi-head"><span class="admin-kpi-icon">↗</span><div class="label">Purata</div></div>
+  <div class="card text-center">
+    <div class="label">Purata</div>
     <b id="kpiAvg">0</b>
-    <span class="admin-kpi-note">Purata interaksi setiap modul</span>
   </div>
 
 </div>
@@ -1583,24 +1188,11 @@ function generateGreeting(){
 
 }
 
-// =====================================================
-// FIREBASE CONFIG - HEALINK 2.0 + FCM
-// =====================================================
-
+// 🔥 CONFIG (guna config cikgu)
 const firebaseConfig = {
   apiKey: "AIzaSyA9R5jKqeJNvBHD-SIOuseAqyb_x909R3Q",
-
   authDomain: "bimbingankaunselingskkk.firebaseapp.com",
-
-  databaseURL: "https://bimbingankaunselingskkk-default-rtdb.asia-southeast1.firebasedatabase.app",
-
-  projectId: "bimbingankaunselingskkk",
-
-  storageBucket: "bimbingankaunselingskkk.firebasestorage.app",
-
-  messagingSenderId: "847162891153",
-
-  appId: "1:847162891153:web:0ff6aa5a6c7276133f1830"
+  projectId: "bimbingankaunselingskkk"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -1615,24 +1207,9 @@ let barChart, pieChart;
 // 📡 REALTIME LISTENER - ROLE BASED DATA
 // =====================================================
 
-// Pertanyaan Firestore dihadkan di pelayan mengikut profil admin.
-// Jangan menapis hanya selepas menerima semua dokumen.
-function adminActivityQuery(){
-  const admin = window.currentAdmin;
-  if (!admin || !["superadmin", "schooladmin"].includes(admin.role)) {
-    throw new Error("Profil pentadbir belum disahkan.");
-  }
-  let query = db.collection("aktivitiPelajar");
-  if (admin.role === "schooladmin") {
-    if (!admin.sekolah) throw new Error("Sekolah pentadbir tidak ditetapkan.");
-    query = query.where("organisasi", "==", admin.sekolah);
-  }
-  return query;
-}
-
 function startMainDataListener(){
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
     .onSnapshot(snapshot => {
 
       rawData = [];
@@ -1855,165 +1432,6 @@ function renderRanking(stats){
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
-<!-- =====================================================
-     HEALINK 2.0 - FIREBASE CLOUD MESSAGING
-===================================================== -->
-
-<script>
-
-const HEALINK_VAPID_KEY =
-  "BKYhwy4UcU5p7UFMpI8xl7z2LD_nnmCa9-yN24XyB2dDgH6h_NBiSfQPSAYJfrbPwNYPs7H1hC6hKbsBojOcBAQ";
-
-async function enableAdminNotifications() {
-
-  const status = document.getElementById("notificationStatus");
-  const button = document.getElementById("enableNotificationBtn");
-
-  try {
-
-    const admin = window.currentAdmin;
-    const user = firebase.auth().currentUser;
-
-    if (
-      !user ||
-      !admin ||
-      admin.uid !== user.uid ||
-      !["superadmin", "schooladmin"].includes(admin.role)
-    ) {
-      throw new Error("Akses notifikasi hanya untuk pentadbir yang disahkan.");
-    }
-
-    if (
-      !("serviceWorker" in navigator) ||
-      !("Notification" in window) ||
-      !(await firebase.messaging.isSupported())
-    ) {
-      throw new Error("Peranti atau pelayar ini tidak menyokong notifikasi FCM.");
-    }
-
-    button.disabled = true;
-    status.textContent = "Sedang mengaktifkan notifikasi...";
-
-    const permission = await Notification.requestPermission();
-
-    if (permission !== "granted") {
-      throw new Error("Kebenaran notifikasi tidak diberikan.");
-    }
-
-    // ==========================================
-// HEALINK 2.0 - FIREBASE PUSH NOTIFICATION
-// ==========================================
-
-// Daftar Service Worker khusus FCM
-const registration = await navigator.serviceWorker.register(
-  "/firebase-messaging-sw.js",
-  { scope: "/firebase-cloud-messaging-push-scope" }
-);
-
-// Tunggu Service Worker aktif
-await navigator.serviceWorker.ready;
-
-const messaging = firebase.messaging();
-
-// Dapatkan token FCM
-const token = await messaging.getToken({
-  vapidKey: HEALINK_VAPID_KEY,
-  serviceWorkerRegistration: registration
-});
-
-if (!token) {
-  throw new Error("Token FCM tidak berjaya dijana.");
-}
-
-console.log("HEALINK FCM: Token berjaya dijana.");
-
-    // =====================================================
-// HEALINK 2.0 - SIMPAN TOKEN FCM PENTADBIR
-// =====================================================
-
-// ID dokumen berasaskan UID dan token peranti.
-// Mengelakkan pendaftaran berulang bagi token yang sama.
-const encoder = new TextEncoder();
-
-const tokenBytes = encoder.encode(token);
-
-const tokenHash = await crypto.subtle.digest(
-  "SHA-256",
-  tokenBytes
-);
-
-const tokenId = Array.from(
-  new Uint8Array(tokenHash)
-)
-  .map(byte => byte.toString(16).padStart(2, "0"))
-  .join("");
-
-const subscriptionId = `${user.uid}_${tokenId}`;
-
-const subscriptionRef = db
-  .collection("push_subscriptions")
-  .doc(subscriptionId);
-
-const existingSubscription = await subscriptionRef.get();
-
-const adminSchool = admin.sekolah || "";
-
-if (existingSubscription.exists) {
-
-  // Kemas kini token peranti sahaja
-  await subscriptionRef.update({
-    token: token,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-} else {
-
-  // Daftarkan peranti admin baharu
-  await subscriptionRef.set({
-    uid: user.uid,
-    token: token,
-    role: admin.role,
-    sekolah: adminSchool,
-    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-}
-
-console.log("✅ Token FCM pentadbir disimpan ke Firestore.");
-
-    status.textContent = "✅ Token FCM berjaya dijana.";
-    button.querySelector("span:last-child").textContent =
-      "Notifikasi Diaktifkan";
-
-    console.log("✅ Token FCM berjaya dijana untuk pentadbir.");
-
-  } catch (error) {
-
-    console.error("❌ HEALINK FCM:", error);
-
-    status.textContent = "❌ " + error.message;
-
-  } finally {
-
-    button.disabled = false;
-
-  }
-
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  const button = document.getElementById("enableNotificationBtn");
-
-  if (button) {
-    button.addEventListener("click", enableAdminNotifications);
-  }
-
-});
-
-</script>
-
 <script>
 // =====================================================
 // HEALINK ADMIN ACCESS CONTROL
@@ -2118,7 +1536,6 @@ firebase.auth().onAuthStateChanged(async user => {
     // ================= START ADMIN DATA =================
 
     startMainDataListener();
-    startLiveActivityListener();
 
     loadData();
     loadSidebar();
@@ -2946,30 +2363,25 @@ let currentKelas = "all";
 
 function normalizeSekolah(nama){
 
-  let value = (nama || "")
+  const value = (nama || "")
     .toUpperCase()
     .trim()
     .replace(/\s+/g, " ");
 
-  // Nama penuh sekolah → singkatan standard
-  value = value
-    .replace(/^SEKOLAH MENENGAH KEBANGSAAN\s+/, "SMK ")
-    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(CINA\)\s+/, "SJKC ")
-    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+CINA\s+/, "SJKC ")
-    .replace(/^SEKOLAH JENIS KEBANGSAAN\s*\(TAMIL\)\s+/, "SJKT ")
-    .replace(/^SEKOLAH JENIS KEBANGSAAN\s+TAMIL\s+/, "SJKT ")
-    .replace(/^SEKOLAH KEBANGSAAN\s+/, "SK ")
-    .replace(/\s+/g, " ")
-    .trim();
-
   const aliases = {
+
+    // ================= SK KUALA KETIL =================
     "SKKK": "SK KUALA KETIL",
     "SK KUALA KETIL": "SK KUALA KETIL",
+
+    // ================= SK KUALA PEGANG =================
     "SKKP": "SK KUALA PEGANG",
     "SK KUALA PEGANG": "SK KUALA PEGANG"
+
   };
 
   return aliases[value] || value;
+
 }
 
 
@@ -3097,7 +2509,7 @@ function startFeedbackBadgeListener() {
 // ================= LOAD DATA (KPI + FILTER) =================
 function loadData(){
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
   .orderBy("masa","desc")
   .onSnapshot(snapshot => {
 
@@ -3146,12 +2558,7 @@ function loadData(){
 
 
 // ================= LIVE ACTIVITY =================
-// Cache rekod yang sedang dipaparkan supaya kad boleh dibuka tanpa query tambahan.
-const liveActivityRecords = {};
-let selectedLiveActivityDocId = null;
-
-function startLiveActivityListener(){
-adminActivityQuery()
+db.collection("aktivitiPelajar")
 .orderBy("masa", "desc")
 .limit(20)
 .onSnapshot(snapshot => {
@@ -3168,6 +2575,7 @@ adminActivityQuery()
   snapshot.forEach(doc => {
 
   const d = doc.data();
+
   // ==========================================
   // 🔐 FILTER SCHOOL ADMIN
   // ==========================================
@@ -3192,8 +2600,6 @@ adminActivityQuery()
     }
   }
 
-  liveActivityRecords[doc.id] = d;
-
   // ================= FILTER OPTION =================
   kelasSet.add(d.kelas);
   modulSet.add(d.module);
@@ -3217,11 +2623,6 @@ adminActivityQuery()
     html += `
       <div class="user-item bg-white/10 p-4 rounded-xl flex justify-between items-center 
                   hover:bg-white/20 transition duration-300"
-           role="button"
-           tabindex="0"
-           aria-label="Buka butiran aktiviti ${escapeLiveActivityHTML(d.nama || 'Pengguna')}"
-           onclick="openLiveActivityDetail('${doc.id}')"
-           onkeydown="if(event.key === 'Enter' || event.key === ' '){ event.preventDefault(); openLiveActivityDetail('${doc.id}'); }"
            data-nama="${(d.nama || '').toLowerCase()}"
            data-kelas="${(d.kelas || '').toLowerCase()}"
            data-modul="${(d.module || '').toLowerCase()}">
@@ -3269,213 +2670,6 @@ adminActivityQuery()
     if(m) modulSelect.innerHTML += `<option value="${m.toLowerCase()}">${m}</option>`;
   });
 
- });
-}
-
-// =====================================================
-// 🔎 BUTIRAN AKTIVITI PENGGUNA
-// =====================================================
-function openLiveActivityDetail(docId){
-
-  const d = liveActivityRecords[docId];
-  const modal = document.getElementById("liveActivityDetailModal");
-  const content = document.getElementById("liveActivityDetailContent");
-
-  if(!d || !modal || !content) return;
-
-  selectedLiveActivityDocId = docId;
-
-  // Reset state butang Padam setiap kali modal dibuka.
-  // Penting selepas rekod sebelumnya selesai dipadam.
-  const deleteButton =
-    document.getElementById("deleteLiveActivityButton");
-
-  if(deleteButton){
-    deleteButton.disabled = true;
-    deleteButton.textContent = "Padam dinyahaktifkan";
-  }
-
-  const masa = formatLiveActivityValue(d.masa);
-  const commonKeys = new Set([
-    "nama","jenis","kelas","organisasi","module","masa"
-  ]);
-
-  const extraRows = Object.entries(d)
-    .filter(([key, value]) =>
-      !commonKeys.has(key) &&
-      value !== undefined &&
-      value !== null &&
-      value !== ""
-    )
-    .map(([key, value]) => `
-      <div class="live-extra-row">
-        <span class="live-extra-key">${escapeLiveActivityHTML(formatLiveActivityKey(key))}</span>
-        <span class="live-extra-value">${escapeLiveActivityHTML(formatLiveActivityValue(value))}</span>
-      </div>
-    `)
-    .join("");
-
-  content.innerHTML = `
-    <div class="flex items-start gap-3 mb-5">
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center
-                  bg-gradient-to-br from-violet-500/20 to-cyan-500/10
-                  border border-white/10 text-xl">📋</div>
-      <div>
-        <div class="text-[10px] uppercase tracking-[0.14em] text-cyan-300 font-extrabold">
-          Butiran Aktiviti
-        </div>
-        <h3 class="text-xl font-extrabold text-white mt-1">
-          ${escapeLiveActivityHTML(d.module || "Aktiviti HEALINK")}
-        </h3>
-      </div>
-    </div>
-
-    <div class="live-detail-grid">
-      ${liveActivityDetailItem("Nama", d.nama || "Pengguna")}
-      ${liveActivityDetailItem("Jenis Pengguna", d.jenis || "-")}
-      ${liveActivityDetailItem("Kelas", d.kelas || "-")}
-      ${liveActivityDetailItem("Sekolah / Organisasi", d.organisasi || "-")}
-      ${liveActivityDetailItem("Modul", d.module || "-")}
-      ${liveActivityDetailItem("Tarikh & Masa", masa)}
-    </div>
-
-    ${extraRows ? `
-      <div class="mt-5">
-        <div class="text-xs font-bold text-white mb-2">Maklumat Aktiviti</div>
-        <div class="rounded-2xl px-4 py-1 bg-white/[0.025] border border-white/[0.06]">
-          ${extraRows}
-        </div>
-      </div>
-    ` : `
-      <div class="mt-5 rounded-2xl p-4 bg-white/[0.025] border border-white/[0.06]
-                  text-xs text-white/45 text-center">
-        Tiada maklumat tambahan direkodkan untuk aktiviti ini.
-      </div>
-    `}
-  `;
-
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
-function closeLiveActivityDetail(){
-  const modal = document.getElementById("liveActivityDetailModal");
-  if(modal) modal.classList.add("hidden");
-  document.body.style.overflow = "";
-  selectedLiveActivityDocId = null;
-}
-
-async function deleteLiveActivity(){
-  alert("Pemadaman rekod dinyahaktifkan sehingga kawalan akses disahkan.");
-  return;
-
-  const docId = selectedLiveActivityDocId;
-  const d = docId ? liveActivityRecords[docId] : null;
-
-  if(!docId || !d){
-    alert("Rekod aktiviti tidak dijumpai.");
-    return;
-  }
-
-  const nama = d.nama || "Pengguna";
-  const modul = d.module || "Aktiviti HEALINK";
-
-  const confirmed = confirm(
-    `Padam rekod ini?\n\n${nama} — ${modul}\n\nTindakan ini akan memadam rekod daripada Firestore dan tidak boleh dibatalkan.`
-  );
-
-  if(!confirmed) return;
-
-  const button = document.getElementById("deleteLiveActivityButton");
-  if(button){
-    button.disabled = true;
-    button.textContent = "⏳ Memadam...";
-  }
-
-  try{
-    await db.collection("aktivitiPelajar").doc(docId).delete();
-
-    delete liveActivityRecords[docId];
-
-    closeLiveActivityDetail();
-
-    console.log("✅ Rekod aktiviti dipadam:", docId);
-  }
-  catch(error){
-    console.error("❌ Gagal memadam rekod aktiviti:", error);
-
-    alert(
-      "Rekod tidak dapat dipadam. Sila semak kebenaran Firestore atau cuba semula."
-    );
-
-    if(button){
-      button.disabled = false;
-      button.textContent = "🗑 Padam Rekod";
-    }
-  }
-}
-
-function liveActivityDetailItem(label, value){
-  return `
-    <div class="live-detail-item">
-      <span class="live-detail-label">${escapeLiveActivityHTML(label)}</span>
-      <span class="live-detail-value">${escapeLiveActivityHTML(formatLiveActivityValue(value))}</span>
-    </div>
-  `;
-}
-
-function formatLiveActivityKey(key){
-  return String(key || "")
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/[_-]+/g, " ")
-    .replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function formatLiveActivityValue(value){
-
-  if(value === null || value === undefined || value === "") return "-";
-
-  if(value && typeof value.toDate === "function"){
-    return value.toDate().toLocaleString("ms-MY", {
-      day:"2-digit", month:"short", year:"numeric",
-      hour:"2-digit", minute:"2-digit"
-    });
-  }
-
-  if(Array.isArray(value)){
-    return value.map(formatLiveActivityValue).join(", ");
-  }
-
-  if(typeof value === "object"){
-    try{
-      return Object.entries(value)
-        .map(([k,v]) => `${formatLiveActivityKey(k)}: ${formatLiveActivityValue(v)}`)
-        .join(" • ");
-    }catch(error){
-      return "-";
-    }
-  }
-
-  if(typeof value === "boolean"){
-    return value ? "Ya" : "Tidak";
-  }
-
-  return String(value);
-}
-
-function escapeLiveActivityHTML(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-document.addEventListener("keydown", event => {
-  if(event.key === "Escape"){
-    closeLiveActivityDetail();
-  }
 });
 
 
@@ -3494,7 +2688,7 @@ function loadSekolah(){
   const container = document.getElementById("listSekolah");
   if(!container) return;
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
   .onSnapshot(snapshot => {
 
     let sekolahSet = new Set();
@@ -3536,7 +2730,7 @@ function loadKelas(){
   const container = document.getElementById("listKelas");
   if(!container) return;
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
   .onSnapshot(snapshot => {
 
     let kelasSet = new Set();
@@ -3584,7 +2778,7 @@ function loadAlert(){
 
   const container = document.getElementById("alertList");
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
   .orderBy("masa","desc") // 🔥 TAMBAH INI
   .limit(10)
   .onSnapshot(snapshot => {
@@ -3694,45 +2888,49 @@ function closeDetail(){
   document.getElementById("detailModal").classList.add("hidden");
 }
 
-// Cache penuh rekod sidebar untuk paparan butiran Sekolah / Kelas / Organisasi.
-const sidebarActivityRecords = {};
-
 function loadSidebar(){
 
-  adminActivityQuery()
+  db.collection("aktivitiPelajar")
   .onSnapshot(snapshot => {
 
-    // Set digunakan supaya badge sidebar mengira PENGGUNA UNIK,
-    // bukan jumlah rekod aktiviti.
-    const sekolahUsers = {};
-    const kelasUsers = {};
-    const organisasiUsers = {};
-    const semuaUsers = new Set();
-
-    // Bersihkan cache supaya rekod yang telah dipadam tidak kekal.
-    Object.keys(sidebarActivityRecords).forEach(key => delete sidebarActivityRecords[key]);
+    const sekolahCount = {};
+    const kelasCount = {};
+    const organisasiCount = {};
 
     snapshot.forEach(doc => {
 
-      const d = doc.data();
+  const d = doc.data();
 
-      sidebarActivityRecords[doc.id] = d;
-      liveActivityRecords[doc.id] = d;
+  const orgRaw =
+  normalizeSekolah(
+    d.organisasi
+  );
 
-      const orgRaw = normalizeSekolah(d.organisasi);
-      const kelas = (d.kelas || "-").toUpperCase().trim();
+  const kelas =
+    (d.kelas || "-")
+      .toUpperCase()
+      .trim();
 
-      // ==========================================
-      // 🔐 FILTER SCHOOL ADMIN
-      // ==========================================
-      if(
-        window.currentAdmin &&
-        window.currentAdmin.role === "schooladmin"
-      ){
-        const sekolahAdmin = normalizeSekolah(window.currentAdmin.sekolah);
-        if(orgRaw !== sekolahAdmin) return;
-      }
+  // ==========================================
+  // 🔐 FILTER SCHOOL ADMIN
+  // ==========================================
+  if (
+    window.currentAdmin &&
+    window.currentAdmin.role === "schooladmin"
+  ) {
 
+    const sekolahAdmin =
+      normalizeSekolah(
+        window.currentAdmin.sekolah
+      );
+
+    // Abaikan semua sekolah lain
+    if (orgRaw !== sekolahAdmin) {
+      return;
+    }
+  }
+
+      // ================= CLASSIFY =================
       let kategori = "LAIN";
 
       if(
@@ -3745,60 +2943,56 @@ function loadSidebar(){
       }
       else if(
         orgRaw.includes("PPD") ||
-        orgRaw.includes("JPN") ||
-        orgRaw.includes("PKG")
+        orgRaw.includes("JPN")
       ){
         kategori = "ORGANISASI";
       }
 
-      const userKey = sidebarUserKey(d);
-      semuaUsers.add(userKey);
-
+      // ================= COUNT =================
       if(kategori === "SEKOLAH"){
-        if(!sekolahUsers[orgRaw]) sekolahUsers[orgRaw] = new Set();
-        sekolahUsers[orgRaw].add(userKey);
+        sekolahCount[orgRaw] = (sekolahCount[orgRaw] || 0) + 1;
       }
 
       if(kategori === "ORGANISASI"){
-        if(!organisasiUsers[orgRaw]) organisasiUsers[orgRaw] = new Set();
-        organisasiUsers[orgRaw].add(userKey);
+        organisasiCount[orgRaw] = (organisasiCount[orgRaw] || 0) + 1;
       }
 
       if(kategori === "LAIN"){
-        if(!organisasiUsers["LAIN-LAIN"]){
-          organisasiUsers["LAIN-LAIN"] = new Set();
-        }
-        organisasiUsers["LAIN-LAIN"].add(userKey);
+        organisasiCount["LAIN-LAIN"] = (organisasiCount["LAIN-LAIN"] || 0) + 1;
       }
 
-      if(!kelasUsers[kelas]) kelasUsers[kelas] = new Set();
-      kelasUsers[kelas].add(userKey);
+      // kelas semua
+      kelasCount[kelas] = (kelasCount[kelas] || 0) + 1;
     });
 
     // ================= SEKOLAH =================
     let htmlSekolah = "";
 
-    if(
-      window.currentAdmin &&
-      window.currentAdmin.role === "superadmin"
-    ){
-      htmlSekolah = `
-        <div onclick="openSidebarActivityGroup('SEMUA', 'SEMUA')"
-             class="sidebar-item flex justify-between cursor-pointer">
-          <span>Semua</span>
-          <span class="badge" title="Jumlah pengguna unik">${semuaUsers.size}</span>
-        </div>
-      `;
-    }
+// ==========================================
+// 👑 "SEMUA" HANYA UNTUK SUPERADMIN
+// ==========================================
+if (
+  window.currentAdmin &&
+  window.currentAdmin.role === "superadmin"
+) {
 
-    Object.keys(sekolahUsers)
-    .sort((a,b) => sekolahUsers[b].size - sekolahUsers[a].size)
+  htmlSekolah = `
+    <div onclick="filterSekolah('all')" 
+         class="sidebar-item flex justify-between cursor-pointer">
+      <span>Semua</span>
+      <span class="badge">${snapshot.size}</span>
+    </div>
+  `;
+}
+
+    Object.keys(sekolahCount)
+    .sort((a,b) => sekolahCount[b] - sekolahCount[a])
     .forEach(s => {
       htmlSekolah += `
-        <div onclick="openSidebarActivityGroup('SEKOLAH', decodeURIComponent('${encodeURIComponent(s)}'))"
+        <div onclick="filterSekolah('${s}')" 
              class="sidebar-item flex justify-between cursor-pointer">
           <span>${s}</span>
-          <span class="badge" title="Jumlah pengguna unik">${sekolahUsers[s].size}</span>
+          <span class="badge">${sekolahCount[s]}</span>
         </div>
       `;
     });
@@ -3808,14 +3002,14 @@ function loadSidebar(){
     // ================= KELAS =================
     let htmlKelas = "";
 
-    Object.keys(kelasUsers)
-    .sort((a,b) => kelasUsers[b].size - kelasUsers[a].size)
+    Object.keys(kelasCount)
+    .sort((a,b) => kelasCount[b] - kelasCount[a])
     .forEach(k => {
       htmlKelas += `
-        <div onclick="openSidebarActivityGroup('KELAS', decodeURIComponent('${encodeURIComponent(k)}'))"
+        <div onclick="filterKelas('${k}')" 
              class="sidebar-item flex justify-between cursor-pointer">
           <span>${k}</span>
-          <span class="badge" title="Jumlah pengguna unik">${kelasUsers[k].size}</span>
+          <span class="badge">${kelasCount[k]}</span>
         </div>
       `;
     });
@@ -3825,14 +3019,13 @@ function loadSidebar(){
     // ================= ORGANISASI =================
     let htmlOrg = "";
 
-    Object.keys(organisasiUsers)
-    .sort((a,b) => organisasiUsers[b].size - organisasiUsers[a].size)
+    Object.keys(organisasiCount)
+    .sort((a,b) => organisasiCount[b] - organisasiCount[a])
     .forEach(o => {
       htmlOrg += `
-        <div onclick="openSidebarActivityGroup('ORGANISASI', decodeURIComponent('${encodeURIComponent(o)}'))"
-             class="sidebar-item flex justify-between cursor-pointer">
+        <div class="sidebar-item flex justify-between cursor-pointer">
           <span>${o}</span>
-          <span class="badge" title="Jumlah pengguna unik">${organisasiUsers[o].size}</span>
+          <span class="badge">${organisasiCount[o]}</span>
         </div>
       `;
     });
@@ -3840,210 +3033,6 @@ function loadSidebar(){
     document.getElementById("organisasiList").innerHTML = htmlOrg;
 
   });
-}
-
-
-// =====================================================
-// 🗂️ BUTIRAN SIDEBAR — SEKOLAH / KELAS / ORGANISASI
-// =====================================================
-function sidebarUserKey(d){
-  return [
-    (d.nama || "Pengguna").toString().trim().toUpperCase(),
-    (d.jenis || "-").toString().trim().toUpperCase(),
-    (d.kelas || "-").toString().trim().toUpperCase(),
-    normalizeSekolah(d.organisasi || "-")
-  ].join("||");
-}
-
-function sidebarRecordMatches(type, value, d){
-  const targetType = (type || "").toUpperCase();
-  const targetValue = (value || "").toString().trim();
-  const org = normalizeSekolah(d.organisasi);
-  const kelas = (d.kelas || "-").toString().toUpperCase().trim();
-
-  if(window.currentAdmin && window.currentAdmin.role === "schooladmin"){
-    if(org !== normalizeSekolah(window.currentAdmin.sekolah)) return false;
-  }
-
-  if(targetType === "SEMUA") return true;
-  if(targetType === "SEKOLAH") return org === normalizeSekolah(targetValue);
-  if(targetType === "KELAS") return kelas === targetValue.toUpperCase();
-
-  if(targetType === "ORGANISASI"){
-    if(targetValue === "LAIN-LAIN"){
-      const isSekolah = org.includes("SK") || org.includes("SMK") ||
-                         org.includes("SJKC") || org.includes("SJKT");
-      const isOrganisasi = org.includes("PPD") || org.includes("JPN") || org.includes("PKG");
-      return !isSekolah && !isOrganisasi;
-    }
-    return org === normalizeSekolah(targetValue);
-  }
-  return false;
-}
-
-function openSidebarActivityGroup(type, value){
-  const modal = document.getElementById("sidebarActivityModal");
-  const title = document.getElementById("sidebarActivityTitle");
-  const subtitle = document.getElementById("sidebarActivitySubtitle");
-  const content = document.getElementById("sidebarActivityContent");
-  if(!modal || !title || !subtitle || !content) return;
-
-  const records = Object.entries(sidebarActivityRecords)
-    .filter(([docId,d]) => sidebarRecordMatches(type,value,d))
-    .map(([docId,data]) => ({docId,data}))
-    .sort((a,b) => getSidebarActivityMillis(b.data.masa) -
-                   getSidebarActivityMillis(a.data.masa));
-
-  const userMap = new Map();
-
-  records.forEach(item => {
-    const key = sidebarUserKey(item.data);
-    if(!userMap.has(key)){
-      userMap.set(key,{
-        nama: item.data.nama || "Pengguna",
-        jenis: item.data.jenis || "-",
-        kelas: item.data.kelas || "-",
-        organisasi: normalizeSekolah(item.data.organisasi || "-"),
-        records: []
-      });
-    }
-    userMap.get(key).records.push(item);
-  });
-
-  const users = Array.from(userMap.values());
-  window.sidebarUniqueUserGroups = {};
-
-  users.forEach((user,index) => {
-    window.sidebarUniqueUserGroups["user_"+index] = user;
-  });
-
-  const targetType = (type || "").toUpperCase();
-  const label = targetType === "SEMUA"
-    ? "Semua Pengguna"
-    : `${formatSidebarGroupType(targetType)} — ${value}`;
-
-  title.textContent = label;
-  subtitle.textContent =
-    `${users.length} pengguna • ${records.length} rekod aktiviti`;
-
-  if(!users.length){
-    content.innerHTML = `
-      <div class="rounded-2xl border border-white/10 bg-white/[0.03]
-                  p-8 text-center text-sm text-white/50">
-        Tiada pengguna dijumpai.
-      </div>`;
-  } else {
-    content.innerHTML = users.map((user,index) => `
-      <button type="button"
-              onclick="openSidebarUserActivities('user_${index}')"
-              class="w-full text-left rounded-2xl border border-white/10
-                     bg-white/[0.035] hover:bg-white/[0.075]
-                     hover:border-cyan-300/20 transition p-4">
-        <div class="flex items-center justify-between gap-4">
-          <div class="min-w-0">
-            <div class="font-extrabold text-white truncate">
-              ${escapeLiveActivityHTML(user.nama)}
-            </div>
-            <div class="text-xs text-white/45 mt-1">
-              ${escapeLiveActivityHTML(user.jenis)}
-              ${user.kelas && user.kelas !== "-" ? " • "+escapeLiveActivityHTML(user.kelas) : ""}
-            </div>
-            <div class="text-xs text-white/35 mt-1 truncate">
-              ${escapeLiveActivityHTML(user.organisasi)}
-            </div>
-          </div>
-          <div class="shrink-0 flex items-center gap-3">
-            <div class="rounded-xl border border-cyan-300/20
-                        bg-cyan-400/10 px-3 py-2 text-center">
-              <div class="text-lg leading-none font-extrabold text-cyan-300">
-                ${user.records.length}
-              </div>
-              <div class="text-[9px] uppercase tracking-wide text-white/45 mt-1">
-                Aktiviti
-              </div>
-            </div>
-            <span class="text-white/35 text-xl">›</span>
-          </div>
-        </div>
-      </button>
-    `).join("");
-  }
-
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
-function openSidebarUserActivities(userKey){
-  const user = window.sidebarUniqueUserGroups?.[userKey];
-  const modal = document.getElementById("sidebarUserActivitiesModal");
-  const title = document.getElementById("sidebarUserActivitiesTitle");
-  const subtitle = document.getElementById("sidebarUserActivitiesSubtitle");
-  const content = document.getElementById("sidebarUserActivitiesContent");
-  if(!user || !modal || !title || !subtitle || !content) return;
-
-  title.textContent = user.nama;
-  subtitle.textContent =
-    `${user.jenis} • ${user.organisasi} • ${user.records.length} aktiviti`;
-
-  content.innerHTML = user.records.map(({docId,data}) => `
-    <button type="button"
-            onclick="openSidebarRecordDetail('${docId}')"
-            class="w-full text-left rounded-2xl border border-white/10
-                   bg-white/[0.035] hover:bg-white/[0.075]
-                   hover:border-cyan-300/20 transition p-4">
-      <div class="flex items-center justify-between gap-4">
-        <div class="min-w-0">
-          <div class="font-bold text-white truncate">
-            ${escapeLiveActivityHTML(data.module || "Aktiviti HEALINK")}
-          </div>
-          <div class="text-xs text-white/40 mt-1">
-            ${escapeLiveActivityHTML(formatLiveActivityValue(data.masa))}
-          </div>
-        </div>
-        <span class="text-white/35 text-xl shrink-0">›</span>
-      </div>
-    </button>
-  `).join("");
-
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
-function closeSidebarUserActivities(){
-  const modal = document.getElementById("sidebarUserActivitiesModal");
-  if(modal) modal.classList.add("hidden");
-}
-
-function closeSidebarActivityGroup(){
-  const modal = document.getElementById("sidebarActivityModal");
-  if(modal) modal.classList.add("hidden");
-  document.body.style.overflow = "";
-}
-
-function openSidebarRecordDetail(docId){
-  closeSidebarUserActivities();
-  closeSidebarActivityGroup();
-  openLiveActivityDetail(docId);
-}
-
-function formatSidebarGroupType(type){
-  if(type === "SEKOLAH") return "Sekolah";
-  if(type === "KELAS") return "Kelas";
-  if(type === "ORGANISASI") return "Organisasi";
-  return "Aktiviti";
-}
-
-function getSidebarActivityMillis(value){
-  try{
-    if(value && typeof value.toDate === "function"){
-      return value.toDate().getTime();
-    }
-    if(value instanceof Date) return value.getTime();
-    const parsed = new Date(value).getTime();
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch(error){
-    return 0;
-  }
 }
 
 function toggleSection(id){
@@ -4059,17 +3048,6 @@ function toggleSection(id){
     arrow.innerText = "▼";
   }
 }
-
-
-document.addEventListener("keydown", function(event){
-  if(event.key === "Escape"){
-    const sidebarModal = document.getElementById("sidebarActivityModal");
-    if(sidebarModal && !sidebarModal.classList.contains("hidden")){
-      closeSidebarActivityGroup();
-    }
-  }
-});
-
 </script>
 
 <!-- LETAK SEBELUM </body> -->
@@ -4648,156 +3626,6 @@ z-[9999] flex items-center justify-center p-4">
 
   </div>
 
-</div>
-
-
-
-<!-- =====================================================
-     👤 MODAL SENARAI AKTIVITI PENGGUNA
-===================================================== -->
-<div id="sidebarUserActivitiesModal"
-     class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm p-4
-            flex items-center justify-center"
-     onclick="if(event.target === this) closeSidebarUserActivities()">
-  <div class="w-full max-w-2xl max-h-[88vh] overflow-hidden
-              rounded-3xl border border-violet-300/15
-              bg-[#0b0e2a]/95 shadow-2xl">
-    <div class="flex items-center justify-between gap-4 px-5 md:px-6 py-4
-                border-b border-white/10">
-      <div class="min-w-0">
-        <div class="text-[10px] uppercase tracking-[0.14em]
-                    text-cyan-300 font-extrabold">Aktiviti Pengguna</div>
-        <div id="sidebarUserActivitiesTitle"
-             class="text-lg font-extrabold text-white mt-1 truncate">Pengguna</div>
-        <div id="sidebarUserActivitiesSubtitle"
-             class="text-[10px] text-white/40 mt-1">Senarai aktiviti</div>
-      </div>
-      <button type="button" onclick="closeSidebarUserActivities()"
-              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
-                     hover:bg-white/10 transition text-white/70 shrink-0">✕</button>
-    </div>
-    <div id="sidebarUserActivitiesContent"
-         class="p-5 md:p-6 overflow-y-auto max-h-[70vh] space-y-3"></div>
-    <div class="px-5 md:px-6 py-4 border-t border-white/10">
-      <button type="button" onclick="closeSidebarUserActivities()"
-              class="w-full py-3 rounded-xl font-bold text-sm
-                     bg-gradient-to-r from-violet-600 to-cyan-500
-                     hover:opacity-90 transition">Kembali</button>
-    </div>
-  </div>
-</div>
-
-<!-- =====================================================
-     🗂️ MODAL SENARAI AKTIVITI SIDEBAR
-===================================================== -->
-<div id="sidebarActivityModal"
-     class="hidden fixed inset-0 z-[9999] bg-black/75 backdrop-blur-sm p-4
-            flex items-center justify-center"
-     onclick="if(event.target === this) closeSidebarActivityGroup()">
-
-  <div class="w-full max-w-3xl max-h-[88vh] overflow-hidden
-              rounded-3xl border border-violet-300/15
-              bg-[#0b0e2a]/95 shadow-2xl">
-
-    <div class="flex items-center justify-between gap-4
-                px-5 md:px-6 py-4 border-b border-white/10">
-      <div>
-        <div class="text-[10px] uppercase tracking-[0.14em]
-                    text-cyan-300 font-extrabold">
-          Aktiviti Pengguna
-        </div>
-        <div id="sidebarActivityTitle"
-             class="text-lg font-extrabold text-white mt-1">
-          Senarai Aktiviti
-        </div>
-        <div id="sidebarActivitySubtitle"
-             class="text-[10px] text-white/40 mt-1">
-          0 rekod aktiviti
-        </div>
-      </div>
-
-      <button type="button"
-              onclick="closeSidebarActivityGroup()"
-              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
-                     hover:bg-white/10 transition text-white/70"
-              aria-label="Tutup">
-        ✕
-      </button>
-    </div>
-
-    <div id="sidebarActivityContent"
-         class="p-5 md:p-6 overflow-y-auto max-h-[70vh] space-y-3">
-    </div>
-
-    <div class="px-5 md:px-6 py-4 border-t border-white/10">
-      <button type="button"
-              onclick="closeSidebarActivityGroup()"
-              class="w-full py-3 rounded-xl font-bold text-sm
-                     bg-gradient-to-r from-violet-600 to-cyan-500
-                     hover:opacity-90 transition">
-        Tutup
-      </button>
-    </div>
-
-  </div>
-</div>
-
-<!-- =====================================================
-     📋 MODAL BUTIRAN AKTIVITI PENGGUNA
-===================================================== -->
-<div id="liveActivityDetailModal"
-     class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm p-4
-            flex items-center justify-center"
-     onclick="if(event.target === this) closeLiveActivityDetail()">
-
-  <div class="w-full max-w-2xl max-h-[88vh] overflow-hidden
-              rounded-3xl border border-violet-300/15
-              bg-[#0b0e2a]/95 shadow-2xl">
-
-    <div class="flex items-center justify-between gap-4
-                px-5 md:px-6 py-4 border-b border-white/10">
-      <div>
-        <div class="text-sm font-extrabold text-white">Aktiviti Pengguna</div>
-        <div class="text-[10px] text-white/40 mt-1">Rekod aktiviti HEALINK yang dipilih</div>
-      </div>
-
-      <button type="button"
-              onclick="closeLiveActivityDetail()"
-              class="w-9 h-9 rounded-xl bg-white/5 border border-white/10
-                     hover:bg-white/10 transition text-white/70"
-              aria-label="Tutup">
-        ✕
-      </button>
-    </div>
-
-    <div id="liveActivityDetailContent"
-         class="p-5 md:p-6 overflow-y-auto max-h-[72vh]">
-    </div>
-
-    <div class="px-5 md:px-6 py-4 border-t border-white/10">
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button type="button"
-                id="deleteLiveActivityButton"
-                onclick="deleteLiveActivity()"
-                disabled
-                class="py-3 rounded-xl font-bold text-sm
-                       bg-red-500/10 border border-red-400/20
-                       text-red-200 hover:bg-red-500/20 transition
-                       disabled:opacity-50 disabled:cursor-not-allowed">
-          🗑 Padam Rekod
-        </button>
-
-        <button type="button"
-                onclick="closeLiveActivityDetail()"
-                class="py-3 rounded-xl font-bold text-sm
-                       bg-gradient-to-r from-violet-600 to-cyan-500
-                       hover:opacity-90 transition">
-          Tutup
-        </button>
-      </div>
-    </div>
-
-  </div>
 </div>
 
 <div id="particles"></div>
